@@ -1,20 +1,25 @@
+SQLQueryBuilder
+===============
+
 
 Licensing
-=========
+---------
 
-Copyright (C) 2011 by Spyrit Systèmes d'information
+Copyright (C) 2009-2010 Justin Stayton <justin.stayton@gmail.com>
+Copyright (C) 2011 Matt Labrum
+Copyright (C) 2011 Charles SANQUER <charles.sanquer@spyrit.net>
 
-This file is part of SpyritDatagrid.
+This file is part of SQLQueryBuilder.
 
-SpyritDatagrid is free software: you can redistribute it and/or modify
+SQLQueryBuilder is free software: you can redistribute it and/or modify
 it under the terms of the GNU Lesser General Public License as published by
 the Free Software Foundation, either version 3 of the License, or
 (at your option) any later version.
 
-SpyritDatagrid is distributed in the hope that it will be useful,
+SQLQueryBuilder is distributed in the hope that it will be useful,
 but WITHOUT ANY WARRANTY; without even the implied warranty of
 MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 GNU Lesser General Public License for more details.
 
 You should have received a copy of the GNU Lesser General Public License
-along with SpyritDatagrid.  If not, see <http://www.gnu.org/licenses/>.
+along with SQLQueryBuilder.  If not, see <http://www.gnu.org/licenses/>.
