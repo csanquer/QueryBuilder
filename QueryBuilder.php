@@ -50,8 +50,8 @@ class QueryBuilder
     /**
      * ORDER BY directions.
      */
-    const ORDER_BY_ASC = "ASC";
-    const ORDER_BY_DESC = "DESC";
+    const ASC = "ASC";
+    const DESC = "DESC";
 
     /**
      * Brackets for grouping criteria.
@@ -60,7 +60,7 @@ class QueryBuilder
     const BRACKET_CLOSE = ")";
 
     /**
-     * Specifies that the where() column name is the full where field, eg where("users.password = password(?)", "test", QueryBuilder3::RAW_WHERE)
+     * Specifies that the where() column name is the full where field, eg where("users.password = password(?)", "test", QueryBuilder::RAW_WHERE)
      */
     const RAW_WHERE = "raw";
 
@@ -306,7 +306,7 @@ class QueryBuilder
      * @param  QueryBuilder $QueryBuilder to merge into
      * @return QueryBuilder
      */
-    public function mergeSelectInto(QueryBuilder3 $QueryBuilder)
+    public function mergeSelectInto(QueryBuilder $QueryBuilder)
     {
         foreach ($this->option as $currentOption)
         {
@@ -463,7 +463,7 @@ class QueryBuilder
      * @param  string QueryBuilder $QueryBuilder to merge into
      * @return QueryBuilder
      */
-    public function mergeJoinInto(QueryBuilder3 $QueryBuilder)
+    public function mergeJoinInto(QueryBuilder $QueryBuilder)
     {
         foreach ($this->join as $currentJoin)
         {
@@ -996,7 +996,7 @@ class QueryBuilder
      * @param  QueryBuilder $QueryBuilder to merge into
      * @return QueryBuilder
      */
-    public function mergeWhereInto(QueryBuilder3 $QueryBuilder)
+    public function mergeWhereInto(QueryBuilder $QueryBuilder)
     {
         foreach ($this->where as $currentWhere)
         {
@@ -1059,7 +1059,7 @@ class QueryBuilder
      * @param  string $order optional order direction, default ASC
      * @return QueryBuilder
      */
-    public function groupBy($column, $order = self::ORDER_BY_ASC)
+    public function groupBy($column, $order = self::ASC)
     {
         $this->groupBy[] = array('column' => $column,
             'order' => $order);
@@ -1073,7 +1073,7 @@ class QueryBuilder
      * @param  QueryBuilder $QueryBuilder to merge into
      * @return QueryBuilder
      */
-    public function mergeGroupByInto(QueryBuilder3 $QueryBuilder)
+    public function mergeGroupByInto(QueryBuilder $QueryBuilder)
     {
         foreach ($this->groupBy as $currentGroupBy)
         {
@@ -1229,7 +1229,7 @@ class QueryBuilder
      * @param  QueryBuilder $QueryBuilder to merge into
      * @return QueryBuilder
      */
-    public function mergeHavingInto(QueryBuilder3 $QueryBuilder)
+    public function mergeHavingInto(QueryBuilder $QueryBuilder)
     {
         foreach ($this->having as $currentHaving)
         {
@@ -1292,7 +1292,7 @@ class QueryBuilder
      * @param  string $order optional order direction, default ASC
      * @return QueryBuilder
      */
-    public function orderBy($column, $order = self::ORDER_BY_ASC)
+    public function orderBy($column, $order = self::ASC)
     {
         $this->orderBy[] = array('column' => $column,
             'order' => $order);
@@ -1306,7 +1306,7 @@ class QueryBuilder
      * @param  QueryBuilder $QueryBuilder to merge into
      * @return QueryBuilder
      */
-    public function mergeOrderByInto(QueryBuilder3 $QueryBuilder)
+    public function mergeOrderByInto(QueryBuilder $QueryBuilder)
     {
         foreach ($this->orderBy as $currentOrderBy)
         {
@@ -1407,7 +1407,7 @@ class QueryBuilder
      * @param  bool $overwriteLimit optional overwrite limit, default true
      * @return QueryBuilder
      */
-    public function mergeInto(QueryBuilder3 $QueryBuilder, $overwriteLimit = true)
+    public function mergeInto(QueryBuilder $QueryBuilder, $overwriteLimit = true)
     {
         $this->mergeSelectInto($QueryBuilder);
         $this->mergeJoinInto($QueryBuilder);
