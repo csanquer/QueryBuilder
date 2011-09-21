@@ -1,4 +1,6 @@
 <?php
+namespace SQL;
+
 
 /**
  * Programmatically build MySQL SELECT queries without the overhead of
