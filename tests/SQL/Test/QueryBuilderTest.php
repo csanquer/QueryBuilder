@@ -10,7 +10,13 @@ use SQL\QueryBuilder;
 class QueryBuilderTest extends \PHPUnit_Framework_TestCase
 {
     /**
-     * @var QueryBuilder
+     *
+     * @var PDO 
+     */
+    protected $pdo;
+    
+    /**
+     * @var SQL\QueryBuilder
      */
     protected $queryBuilder;
 
@@ -20,7 +26,32 @@ class QueryBuilderTest extends \PHPUnit_Framework_TestCase
      */
     protected function setUp()
     {
-        $this->queryBuilder = new QueryBuilder();
+        $this->pdo = new \PDO('sqlite::memory:');
+        
+        /**
+        $sql = <<<EOD
+CREATE TABLE [book]
+(
+	[id] INTEGER NOT NULL PRIMARY KEY,
+	[title] VARCHAR(255) NOT NULL,
+	[author_id] INTEGER NOT NULL,
+	[published_at] DATETIME,
+	[price] DECIMAL,
+	[score] DECIMAL
+);
+
+CREATE TABLE [author]
+(
+	[id] INTEGER NOT NULL PRIMARY KEY,
+	[first_name] VARCHAR(128) NOT NULL,
+	[last_name] VARCHAR(128) NOT NULL
+);
+
+EOD;
+        
+        $this->pdo->exec($sql);
+        /**/
+        $this->queryBuilder = new QueryBuilder($this->pdo);
     }
 
     /**
@@ -29,6 +60,7 @@ class QueryBuilderTest extends \PHPUnit_Framework_TestCase
      */
     protected function tearDown()
     {
+        unset($this->pdo);
     }
 
     /**
@@ -36,23 +68,239 @@ class QueryBuilderTest extends \PHPUnit_Framework_TestCase
      */
     public function testSetPdoConnection()
     {
-        // Remove the following lines when you implement this test.
-        $this->markTestIncomplete(
-          'This test has not been implemented yet.'
+        $queryBuilder = new QueryBuilder();
+        $queryBuilder->setConnection(new \PDO('sqlite::memory:'));
+        $this->assertInstanceOf('\PDO', $this->queryBuilder->getConnection());
+    }
+
+    public function testGetPdoConnection()
+    {
+        $this->assertInstanceOf('\PDO', $this->queryBuilder->getConnection());
+    }
+
+    /**
+     * @dataProvider fromProvider
+     */
+    public function testFrom($table, $alias)
+    {
+        $this->assertInstanceOf('SQL\QueryBuilder',$this->queryBuilder->from($table, $alias));
+        $this->assertEquals($table, $this->queryBuilder->getFromTable());
+        $this->assertEquals($alias, $this->queryBuilder->getFromAlias());
+        $this->assertEquals(array('table' => $table, 'alias' => $alias), $this->queryBuilder->getFrom());
+    }
+    
+    public function fromProvider()
+    {
+        return array(
+            array('book', null),
+            array('author', null),
+            array('book', 'b'),
+            array('author', 'a'),
         );
     }
 
     /**
-     * @todo Implement testGetPdoConnection().
+     * @dataProvider joinProvider
      */
-    public function testGetPdoConnection()
+    public function testJoin($joins, $expected)
     {
-        // Remove the following lines when you implement this test.
-        $this->markTestIncomplete(
-          'This test has not been implemented yet.'
+        foreach ($joins as $join)
+        {
+            $this->assertInstanceOf('SQL\QueryBuilder',$this->queryBuilder->join($join[0], $join[1], $join[2], $join[3]));
+        }
+        
+        $this->assertEquals($expected, $this->queryBuilder->getJoins());
+    }
+    
+    public function joinProvider()
+    {
+        return array(
+            array(
+                array(
+                    array('book', 'b', 'a.id = b.author_id', null),
+                ),
+                array(
+                    array(
+                        'table' => 'book',
+                        'criteria' => array(
+                            'a.id = b.author_id'
+                        ),
+                        'type' => QueryBuilder::INNER_JOIN,
+                        'alias' => 'b'
+                    ),
+                )
+            ),
+            array(
+                array(
+                    array('book', 'b', 'a.id = b.author_id', QueryBuilder::INNER_JOIN),
+                ),
+                array(
+                    array(
+                        'table' => 'book',
+                        'criteria' => array(
+                            'a.id = b.author_id'
+                        ),
+                        'type' => QueryBuilder::INNER_JOIN,
+                        'alias' => 'b'
+                    ),
+                )
+            ),
+            array(
+                array(
+                    array('edition', 'e', array('e.version = b.version','e.year = b.year'), QueryBuilder::LEFT_JOIN), 
+                ),
+                array(
+                    array(
+                        'table' => 'edition',
+                        'criteria' => array(
+                            'e.version = b.version',
+                            'e.year = b.year'
+                        ),
+                        'type' => QueryBuilder::LEFT_JOIN,
+                        'alias' => 'e'
+                    ),
+                )
+            ),
+            array(
+                array(
+                    array('book', 'b', 'a.id = b.author_id', QueryBuilder::RIGHT_JOIN),
+                    array('edition', 'e', array('e.version = b.version','e.year = b.year'), QueryBuilder::LEFT_JOIN), 
+                ),
+                array(
+                    array(
+                        'table' => 'book',
+                        'criteria' => array(
+                            'a.id = b.author_id'
+                        ),
+                        'type' => QueryBuilder::RIGHT_JOIN,
+                        'alias' => 'b'
+                    ),
+                    array(
+                        'table' => 'edition',
+                        'criteria' => array(
+                            'e.version = b.version',
+                            'e.year = b.year'
+                        ),
+                        'type' => QueryBuilder::LEFT_JOIN,
+                        'alias' => 'e'
+                    ),
+                )
+            ),
         );
     }
+    
+    public function testInnerJoin()
+    {
+        $this->assertInstanceOf('SQL\QueryBuilder',$this->queryBuilder->innerJoin('book', 'b', 'a.id = b.author_id'));
+        $expected = array(
+            array(
+                'table' => 'book',
+                'criteria' => array(
+                    'a.id = b.author_id'
+                ),
+                'type' => QueryBuilder::INNER_JOIN,
+                'alias' => 'b'
+            ),
+        );
+        
+        $this->assertEquals($expected, $this->queryBuilder->getJoins());
+    }
 
+    public function testLeftJoin()
+    {
+        $this->assertInstanceOf('SQL\QueryBuilder',$this->queryBuilder->leftJoin('book', 'b', 'a.id = b.author_id'));
+        $expected = array(
+            array(
+                'table' => 'book',
+                'criteria' => array(
+                    'a.id = b.author_id'
+                ),
+                'type' => QueryBuilder::LEFT_JOIN,
+                'alias' => 'b'
+            ),
+        );
+        
+        $this->assertEquals($expected, $this->queryBuilder->getJoins());
+    }
+    
+    public function testRightJoin()
+    {
+        $this->assertInstanceOf('SQL\QueryBuilder',$this->queryBuilder->rightJoin('book', 'b', 'a.id = b.author_id'));
+        $expected = array(
+            array(
+                'table' => 'book',
+                'criteria' => array(
+                    'a.id = b.author_id'
+                ),
+                'type' => QueryBuilder::RIGHT_JOIN,
+                'alias' => 'b'
+            ),
+        );
+        
+        $this->assertEquals($expected, $this->queryBuilder->getJoins());
+    }
+    
+    /**
+     * @dataProvider GetFromStringProvider
+     */
+    public function testGetFromString($table, $alias, $joins, $expected, $expectedFormatted)
+    {
+        $this->queryBuilder->from($table, $alias);
+        
+        foreach ($joins as $join)
+        {
+            $this->queryBuilder->join($join[0], $join[1], $join[2], $join[3]);
+        }
+        
+//        var_dump($expected);
+//        var_dump($this->queryBuilder->getFromString());
+//        
+//        var_dump($expectedFormatted);
+//        var_dump($this->queryBuilder->getFromString(true));
+        
+        $this->assertEquals($expected, $this->queryBuilder->getFromString());
+        $this->assertEquals($expectedFormatted, $this->queryBuilder->getFromString(true));
+    }
+    
+    public function GetFromStringProvider()
+    {
+        return array(
+            array(
+                'book',
+                null, 
+                array(), 
+                'FROM book ',
+                'FROM book '."\n",
+            ),
+            array(
+                'book', 
+                'b', 
+                array(), 
+                'FROM book AS b ',
+                'FROM book AS b '."\n",
+            ),
+            array(
+                'author', 
+                'a', 
+                array(
+                    array('book', 'b', 'a.id = b.author_id', null),
+                ), 
+                'FROM author AS a INNER JOIN book AS b ON a.id = b.author_id ',
+                'FROM author AS a '."\n".'INNER JOIN book AS b '."\n".'ON a.id = b.author_id '."\n",
+            ),
+            array(
+                'author', 
+                'a', 
+                array(
+                    array('book', 'b', 'a.id = b.author_id', QueryBuilder::RIGHT_JOIN),
+                    array('edition', 'e', array('e.version = b.version','e.year = b.year'), QueryBuilder::LEFT_JOIN), 
+                ), 
+                'FROM author AS a RIGHT JOIN book AS b ON a.id = b.author_id LEFT JOIN edition AS e ON e.version = b.version AND e.year = b.year ',
+                'FROM author AS a '."\n".'RIGHT JOIN book AS b '."\n".'ON a.id = b.author_id '."\n".'LEFT JOIN edition AS e '."\n".'ON e.version = b.version '."\n".'AND e.year = b.year '."\n",
+            ),
+        );
+    }
+    
     /**
      * @todo Implement test__toString().
      */
