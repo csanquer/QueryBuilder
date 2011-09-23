@@ -350,7 +350,7 @@ class QueryBuilder
      *
      * @return array
      */
-    public function getFrom()
+    public function getFromPart()
     {
         return $this->sqlParts['from'];
     }
@@ -433,7 +433,7 @@ class QueryBuilder
      * 
      * @return array 
      */
-    public function getJoins()
+    public function getJoinParts()
     {
         return $this->sqlParts['join'];
     }
@@ -460,10 +460,11 @@ class QueryBuilder
      *
      * @param  int $joinIndex index of current join
      * @param  string $table current table name
+     * @param  string $alias current table alias name
      * @param  string $column current column name
      * @return string
      */
-    protected function getJoinCriteriaUsingPreviousTable($joinIndex, $table, $column)
+    protected function getJoinCriteriaUsingPreviousTable($joinIndex, $table, $alias, $column)
     {
         $previousJoinIndex = $joinIndex - 1;
 
@@ -472,13 +473,15 @@ class QueryBuilder
         if (array_key_exists($previousJoinIndex, $this->sqlParts['join']))
         {
             $previousTable = $this->sqlParts['join'][$previousJoinIndex]['table'];
+            $previousAlias = $this->sqlParts['join'][$previousJoinIndex]['alias'];
         }
         else
         {
-            $previousTable = $this->getFrom();
+            $previousTable = $this->getFromTable();
+            $previousAlias = $this->getFromAlias();
         }
 
-        return $previousTable.'.'.$column.' = '.$table.'.'.$column;
+        return (empty($previousAlias) ? $previousTable : $previousAlias).'.'.$column.' = '.(empty($alias) ? $table : $alias).'.'.$column;
     }
 
     /**
@@ -523,7 +526,7 @@ class QueryBuilder
                     // table.
                     if (strpos($criterion, '=') === false)
                     {
-                        $join .= $this->getJoinCriteriaUsingPreviousTable($i, $currentJoin['table'], $criterion);
+                        $join .= $this->getJoinCriteriaUsingPreviousTable($i, $currentJoin['table'], $currentJoin['alias'], $criterion);
                     }
                     else
                     {
@@ -910,17 +913,34 @@ class QueryBuilder
      * Adds a GROUP BY column.
      *
      * @param  string $column column name
-     * @param  string $order optional order direction, default ASC
+     * @param  string $order optional order direction, default empty (specific to MySQL)
      * @return SQL\QueryBuilder
      */
-    public function groupBy($column, $order = self::ASC)
+    public function groupBy($column, $order = null)
     {
-        $this->sqlParts['groupBy'][] = array('column' => $column,
-            'order' => $order);
+        if (!in_array($order, array(self::ASC, self::DESC)))
+        {
+            $order = null;
+        }
+        
+        $this->sqlParts['groupBy'][] = array(
+            'column' => $column,
+            'order' => $order
+        );
 
         return $this;
     }
 
+    /**
+     * get Group By parts
+     * 
+     * @return array
+     */
+    public function getGroupByParts()
+    {
+        return $this->sqlParts['groupBy'];
+    }
+    
     /**
      * Merges this QueryBuilder's GROUP BY into the given QueryBuilder.
      *
@@ -951,14 +971,14 @@ class QueryBuilder
         {
             if (!$first)
             {
-                $orderBy .= ', ';
+                $groupBy .= ', ';
             }
             else
             {
                 $first = false;
             }
 
-            $groupBy .= $currentGroupBy['column'].' '.$currentGroupBy['order'].', ';
+            $groupBy .= $currentGroupBy['column'].(!empty($currentGroupBy['order']) ? ' '.$currentGroupBy['order'] : '');
         }
 
         if (!empty($groupBy))
@@ -1097,12 +1117,27 @@ class QueryBuilder
      */
     public function orderBy($column, $order = self::ASC)
     {
+        if (!in_array($order, array(self::ASC, self::DESC)))
+        {
+            $order = self::ASC;
+        }
+        
         $this->sqlParts['orderBy'][] = array('column' => $column,
             'order' => $order);
 
         return $this;
     }
 
+    /**
+     * get Order By parts
+     * 
+     * @return array 
+     */
+    public function getOrderByParts()
+    {
+        return $this->sqlParts['orderBy'];
+    }
+    
     /**
      * Merges this QueryBuilder's ORDER BY into the given QueryBuilder.
      *

@@ -86,7 +86,7 @@ EOD;
         $this->assertInstanceOf('SQL\QueryBuilder',$this->queryBuilder->from($table, $alias));
         $this->assertEquals($table, $this->queryBuilder->getFromTable());
         $this->assertEquals($alias, $this->queryBuilder->getFromAlias());
-        $this->assertEquals(array('table' => $table, 'alias' => $alias), $this->queryBuilder->getFrom());
+        $this->assertEquals(array('table' => $table, 'alias' => $alias), $this->queryBuilder->getFromPart());
     }
     
     public function fromProvider()
@@ -109,7 +109,7 @@ EOD;
             $this->assertInstanceOf('SQL\QueryBuilder',$this->queryBuilder->join($join[0], $join[1], $join[2], $join[3]));
         }
         
-        $this->assertEquals($expected, $this->queryBuilder->getJoins());
+        $this->assertEquals($expected, $this->queryBuilder->getJoinParts());
     }
     
     public function joinProvider()
@@ -203,7 +203,7 @@ EOD;
             ),
         );
         
-        $this->assertEquals($expected, $this->queryBuilder->getJoins());
+        $this->assertEquals($expected, $this->queryBuilder->getJoinParts());
     }
 
     public function testLeftJoin()
@@ -220,7 +220,7 @@ EOD;
             ),
         );
         
-        $this->assertEquals($expected, $this->queryBuilder->getJoins());
+        $this->assertEquals($expected, $this->queryBuilder->getJoinParts());
     }
     
     public function testRightJoin()
@@ -237,7 +237,7 @@ EOD;
             ),
         );
         
-        $this->assertEquals($expected, $this->queryBuilder->getJoins());
+        $this->assertEquals($expected, $this->queryBuilder->getJoinParts());
     }
     
     /**
@@ -251,12 +251,6 @@ EOD;
         {
             $this->queryBuilder->join($join[0], $join[1], $join[2], $join[3]);
         }
-        
-//        var_dump($expected);
-//        var_dump($this->queryBuilder->getFromString());
-//        
-//        var_dump($expectedFormatted);
-//        var_dump($this->queryBuilder->getFromString(true));
         
         $this->assertEquals($expected, $this->queryBuilder->getFromString());
         $this->assertEquals($expectedFormatted, $this->queryBuilder->getFromString(true));
@@ -297,6 +291,151 @@ EOD;
                 ), 
                 'FROM author AS a RIGHT JOIN book AS b ON a.id = b.author_id LEFT JOIN edition AS e ON e.version = b.version AND e.year = b.year ',
                 'FROM author AS a '."\n".'RIGHT JOIN book AS b '."\n".'ON a.id = b.author_id '."\n".'LEFT JOIN edition AS e '."\n".'ON e.version = b.version '."\n".'AND e.year = b.year '."\n",
+            ),
+            array(
+                'author', 
+                'a', 
+                array(
+                    array('book', 'b', 'a.id = b.author_id', null),
+                    array('reward', 'r', 'author_id', QueryBuilder::LEFT_JOIN),
+                ), 
+                'FROM author AS a INNER JOIN book AS b ON a.id = b.author_id LEFT JOIN reward AS r ON b.author_id = r.author_id ',
+                'FROM author AS a '."\n".'INNER JOIN book AS b '."\n".'ON a.id = b.author_id '."\n".'LEFT JOIN reward AS r '."\n".'ON b.author_id = r.author_id '."\n",
+            ),
+            array(
+                'book', 
+                'b', 
+                array(
+                    array('reward', 'r', 'author_id', null),
+                ), 
+                'FROM book AS b INNER JOIN reward AS r ON b.author_id = r.author_id ',
+                'FROM book AS b '."\n".'INNER JOIN reward AS r '."\n".'ON b.author_id = r.author_id '."\n",
+            ),
+        );
+    }
+    
+    /**
+     *
+     * @dataProvider groupByProvider
+     */
+    public function testGroupBy($column, $order, $expected)
+    {
+        $this->queryBuilder->groupBy($column, $order);
+        $this->assertEquals($expected, $this->queryBuilder->getGroupByParts());
+    }
+    
+    public function groupByProvider()
+    {
+        return array(
+            array(
+                'id',
+                null,
+                array(
+                    array('column' => 'id', 'order' => null),
+                )
+            ),
+            array(
+                'year',
+                QueryBuilder::ASC,
+                array(
+                    array('column' => 'year', 'order' => QueryBuilder::ASC),
+                )
+            ),
+            array(
+                'id',
+                QueryBuilder::DESC,
+                array(
+                    array('column' => 'id', 'order' => QueryBuilder::DESC),
+                )
+            ),
+        );
+    }
+    
+    /**
+     *
+     * @dataProvider getGroupByStringProvider
+     */
+    public function testGetGroupByString($groupBys, $expected, $expectedFormatted)
+    {
+        foreach ($groupBys as $groupBy)
+        {
+            $this->queryBuilder->groupBy($groupBy[0], $groupBy[1]);
+        }
+        
+        $this->assertEquals($expected, $this->queryBuilder->getGroupByString());
+        $this->assertEquals($expectedFormatted, $this->queryBuilder->getGroupByString(true));
+    }
+    
+    public function getGroupByStringProvider()
+    {
+        return array(
+            array(
+                array(
+                    array('year', null),
+                ),
+                'GROUP BY year ',
+                'GROUP BY year '."\n",
+            ),
+            array(
+                array(
+                    array('id', null),
+                    array('year', null),
+                ),
+                'GROUP BY id, year ',
+                'GROUP BY id, year '."\n",
+            ),
+            array(
+                array(
+                    array('year', null),
+                    array('id', QueryBuilder::ASC),
+                ),
+                'GROUP BY year, id ASC ',
+                'GROUP BY year, id ASC '."\n",
+            ),
+            array(
+                array(
+                    array('id', QueryBuilder::DESC),
+                    array('year', QueryBuilder::ASC),
+                ),
+                'GROUP BY id DESC, year ASC ',
+                'GROUP BY id DESC, year ASC '."\n",
+            ),
+        );
+    }
+    
+        /**
+     *
+     * @dataProvider groupByProvider
+     */
+    public function testOrderBy($column, $order, $expected)
+    {
+        $this->queryBuilder->orderBy($column, $order);
+        $this->assertEquals($expected, $this->queryBuilder->getGroupByParts());
+    }
+    
+    public function orderByProvider()
+    {
+        return array(
+            array(
+                'id',
+                null,
+                array(
+                    array('column' => 'id', 'order' => null),
+                )
+            ),
+            array(
+                'year',
+                QueryBuilder::ASC,
+                array(
+                    array('column' => 'year', 'order' => QueryBuilder::ASC),
+                )
+            ),
+            array(
+                'id',
+                QueryBuilder::DESC,
+                array(
+                    array('column' => 'id', 'order' => QueryBuilder::DESC),
+                )
             ),
         );
     }
