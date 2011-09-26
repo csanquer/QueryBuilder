@@ -551,7 +551,7 @@ EOD;
         );
     }
 
-        /**
+    /**
      *
      * @dataProvider getLimitStringProvider
      */
@@ -590,6 +590,146 @@ EOD;
                 ),
                 'LIMIT 5 OFFSET 10 ',
                 'LIMIT 5 '."\n".'OFFSET 10 '."\n",
+            ),
+        );
+    }
+    
+    /**
+     * @dataProvider optionsProvider 
+     */
+    public function testOptions($option, $expected)
+    {
+        $this->assertInstanceOf('SQL\QueryBuilder',$this->queryBuilder->addOption($option));
+        $this->assertEquals($expected, $this->queryBuilder->getOptions());
+    }
+    
+    public function optionsProvider()
+    {
+        return array(
+            array(
+                null,
+                array(),
+            ),
+            array(
+                'DISTINCT',
+                array(
+                    'DISTINCT'
+                ),
+            ),
+        );
+    }
+    
+    public function testDistinct()
+    {
+        $this->assertInstanceOf('SQL\QueryBuilder',$this->queryBuilder->distinct());
+        $this->assertEquals(array('DISTINCT'), $this->queryBuilder->getOptions());
+    }
+    
+    public function testCalcFoundRows()
+    {
+        $this->assertInstanceOf('SQL\QueryBuilder',$this->queryBuilder->calcFoundRows());
+        $this->assertEquals(array('SQL_CALC_FOUND_ROWS'), $this->queryBuilder->getOptions());
+    }
+
+    /**
+     *
+     * @dataProvider selectProvider
+     */
+    public function testSelect($column, $alias, $expected)
+    {
+        $this->assertInstanceOf('SQL\QueryBuilder',$this->queryBuilder->select($column, $alias));
+        $this->assertEquals($expected, $this->queryBuilder->getSelectParts());
+    }
+    
+    public function selectProvider()
+    {
+        return array(
+            array(
+                null, 
+                null,
+                array(),
+            ),
+            array(
+                'id', 
+                null,
+                array(
+                    'id' => null,
+                ),
+            ),
+            array(
+                'CONCAT(firstname, lastname)', 
+                'name',
+                array(
+                    'CONCAT(firstname, lastname)' => 'name',
+                ),
+            ),
+            array(
+                array(
+                    'id' => null,
+                    'year',
+                    'CONCAT(firstname, lastname)' => 'name', 
+                ),
+                null,
+                array(
+                    'id' => null,
+                    'year' => null,
+                    'CONCAT(firstname, lastname)' => 'name',
+                ),
+            ),
+        );
+    }
+    
+    /**
+     *
+     * @dataProvider getSelectStringProvider
+     */
+    public function testGetSelectString($selects, $options, $expected, $expectedFormatted)
+    {
+        foreach ($selects as $select)
+        {
+            $this->queryBuilder->select($select[0], $select[1]);
+        }
+        
+        foreach ($options as $option)
+        {
+            $this->queryBuilder->addOption($option);
+        }
+        
+        $this->assertEquals($expected, $this->queryBuilder->getSelectString());
+        $this->assertEquals($expectedFormatted, $this->queryBuilder->getSelectString(true));
+    }
+    
+    public function getSelectStringProvider()
+    {
+        return array(
+            array(
+                array(
+                ),
+                array(
+                ),
+                'SELECT * ',
+                'SELECT * '."\n",
+            ),
+            array(
+                array(
+                    array('id', null,),
+                    array('year', null,),
+                    array('CONCAT(firstname, lastname)', 'name',),
+                ),
+                array(
+                ),
+                'SELECT id, year, CONCAT(firstname, lastname) AS name ',
+                'SELECT id, year, CONCAT(firstname, lastname) AS name '."\n",
+            ),
+            array(
+                array(
+                    array('start_date', 'date',),
+                ),
+                array(
+                    'DISTINCT',
+                ),
+                'SELECT DISTINCT start_date AS date ',
+                'SELECT DISTINCT start_date AS date '."\n",
             ),
         );
     }

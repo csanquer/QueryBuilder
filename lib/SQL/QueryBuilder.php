@@ -83,7 +83,7 @@ class QueryBuilder
      *
      * @var array
      */
-    protected $option;
+    protected $options;
 
     /**
      * SQL query clauses
@@ -107,7 +107,7 @@ class QueryBuilder
      */
     public function __construct(\PDO $PdoConnection = null)
     {
-        $this->option = array();
+        $this->options = array();
         $this->sqlParts = array(
             'select' => array(),
             'from' => array('table' => null, 'alias' => null),
@@ -182,9 +182,12 @@ class QueryBuilder
      * @param  string $option execution option to add
      * @return SQL\QueryBuilder
      */
-    public function option($option)
+    public function addOption($option)
     {
-        $this->option[] = $option;
+        if (!is_null($option) && $option != '')
+        {
+            $this->options[] = $option;
+        }
 
         return $this;
     }
@@ -196,7 +199,7 @@ class QueryBuilder
      */
     public function calcFoundRows()
     {
-        return $this->option('SQL_CALC_FOUND_ROWS');
+        return $this->addOption('SQL_CALC_FOUND_ROWS');
     }
 
     /**
@@ -206,39 +209,63 @@ class QueryBuilder
      */
     public function distinct()
     {
-        return $this->option('DISTINCT');
+        return $this->addOption('DISTINCT');
     }
 
     /**
+     * get Options
+     * 
+     * @return array
+     */
+    public function getOptions()
+    {
+        return $this->options;
+    }
+    
+    /**
      * Adds a SELECT column, table, or expression with optional alias.
      *
-     * @param  string $column column name, table name, or expression
+     * @param  string $column column name, table name, or expression, or array of column (index = column and value = alias)
      * @param  string $alias optional alias
+     * 
      * @return SQL\QueryBuilder
      */
     public function select($column, $alias = null)
     {
-        if (is_array($column))
+        if (!empty($column) || $column == '0')
         {
-            foreach ($column as $column => $alias)
+            if (is_array($column))
             {
-                if (is_int($column))
+                foreach ($column as $column => $alias)
                 {
-                    $this->sqlParts['select'][$alias] = null;
-                }
-                else
-                {
-                    $this->sqlParts['select'][$column] = $alias;
+                    if (is_int($column))
+                    {
+                        $this->sqlParts['select'][$alias] = null;
+                    }
+                    else
+                    {
+                        $this->sqlParts['select'][$column] = $alias;
+                    }
                 }
             }
-        }
-        else
-        {
-            $this->sqlParts['select'][$column] = $alias;
+            else
+            {
+                $this->sqlParts['select'][$column] = $alias;
+            }
         }
         return $this;
     }
-
+    
+    /**
+     * get Select parts
+     * 
+     * @return array 
+     */
+    public function getSelectParts()
+    {
+        return $this->sqlParts['select'];
+    }
+    
     /**
      * Merges this QueryBuilder's SELECT into the given QueryBuilder.
      *
@@ -247,7 +274,7 @@ class QueryBuilder
      */
 //    public function mergeSelectInto(QueryBuilder $QueryBuilder)
 //    {
-//        foreach ($this->option as $currentOption)
+//        foreach ($this->options as $currentOption)
 //        {
 //            $QueryBuilder->option($currentOption);
 //        }
@@ -295,9 +322,9 @@ class QueryBuilder
         }
 
         // Add any execution options.
-        if (!empty($this->option) && $select != '*')
+        if (!empty($this->options) && $select != '*')
         {
-            $select = implode(' ', $this->option).' '.$select;
+            $select = implode(' ', $this->options).' '.$select;
         }
 
         $select = 'SELECT '.$select.' ';
