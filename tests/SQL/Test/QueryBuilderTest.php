@@ -117,6 +117,13 @@ EOD;
         return array(
             array(
                 array(
+                    array(null, null, null, null),
+                ),
+                array(
+                )
+            ),
+            array(
+                array(
                     array('book', 'b', 'a.id = b.author_id', null),
                 ),
                 array(
@@ -320,13 +327,19 @@ EOD;
      */
     public function testGroupBy($column, $order, $expected)
     {
-        $this->queryBuilder->groupBy($column, $order);
+        $this->assertInstanceOf('SQL\QueryBuilder',$this->queryBuilder->groupBy($column, $order));
         $this->assertEquals($expected, $this->queryBuilder->getGroupByParts());
     }
     
     public function groupByProvider()
     {
         return array(
+            array(
+                null,
+                null,
+                array(
+                )
+            ),
             array(
                 'id',
                 null,
@@ -409,13 +422,19 @@ EOD;
      */
     public function testOrderBy($column, $order, $expected)
     {
-        $this->queryBuilder->orderBy($column, $order);
+        $this->assertInstanceOf('SQL\QueryBuilder',$this->queryBuilder->orderBy($column, $order));
         $this->assertEquals($expected, $this->queryBuilder->getOrderByParts());
     }
     
     public function orderByProvider()
     {
         return array(
+            array(
+                null,
+                null,
+                array(
+                )
+            ),
             array(
                 'id',
                 null,
@@ -440,7 +459,7 @@ EOD;
         );
     }
   
-        /**
+    /**
      *
      * @dataProvider getOrderByStringProvider
      */
@@ -457,6 +476,13 @@ EOD;
     public function getOrderByStringProvider()
     {
         return array(
+            array(
+                array(
+                    array(null, null),
+                ),
+                '',
+                '',
+            ),
             array(
                 array(
                     array('id', null),
@@ -485,6 +511,85 @@ EOD;
                 ),
                 'ORDER BY id ASC, year DESC ',
                 'ORDER BY id ASC, year DESC '."\n",
+            ),
+        );
+    }
+    
+    /**
+     *
+     * @dataProvider limitProvider
+     */
+    public function testLimit($limit, $expected)
+    {
+        $this->assertInstanceOf('SQL\QueryBuilder',$this->queryBuilder->limit($limit));
+        $this->assertEquals($expected, $this->queryBuilder->getLimit());
+    }
+    
+    public function limitProvider()
+    {
+        return array(
+            array(null, 0),
+            array(5, 5),
+        );
+    }
+    
+    /**
+     *
+     * @dataProvider offsetProvider
+     */
+    public function testOffset($offset, $expected)
+    {
+        $this->assertInstanceOf('SQL\QueryBuilder',$this->queryBuilder->offset($offset));
+        $this->assertEquals($expected, $this->queryBuilder->getOffset());
+    }
+    
+    public function offsetProvider()
+    {
+        return array(
+            array(null, 0),
+            array(1, 1),
+        );
+    }
+
+        /**
+     *
+     * @dataProvider getLimitStringProvider
+     */
+    public function testGetLimitString($limits, $expected, $expectedFormatted)
+    {
+        foreach ($limits as $limit)
+        {
+            $this->queryBuilder->limit($limit[0]);
+            $this->queryBuilder->offset($limit[1]);
+        }
+        
+        $this->assertEquals($expected, $this->queryBuilder->getLimitString());
+        $this->assertEquals($expectedFormatted, $this->queryBuilder->getLimitString(true));
+    }
+    
+    public function getLimitStringProvider()
+    {
+        return array(
+            array(
+                array(
+                    array(0, null),
+                ),
+                '',
+                '',
+            ),
+            array(
+                array(
+                    array(5, null),
+                ),
+                'LIMIT 5 OFFSET 0 ',
+                'LIMIT 5 '."\n".'OFFSET 0 '."\n",
+            ),
+            array(
+                array(
+                    array(5, 10),
+                ),
+                'LIMIT 5 OFFSET 10 ',
+                'LIMIT 5 '."\n".'OFFSET 10 '."\n",
             ),
         );
     }

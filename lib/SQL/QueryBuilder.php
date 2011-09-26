@@ -377,13 +377,16 @@ class QueryBuilder
             $criteria = array($criteria);
         }
 
-        $this->sqlParts['join'][] = array(
-            'table' => $table,
-            'criteria' => $criteria,
-            'type' => $type,
-            'alias' => $alias
-        );
-
+        if (!empty($table))
+        {
+            $this->sqlParts['join'][] = array(
+                'table' => $table,
+                'criteria' => $criteria,
+                'type' => $type,
+                'alias' => $alias
+            );
+        }
+        
         return $this;
     }
 
@@ -923,10 +926,13 @@ class QueryBuilder
             $order = null;
         }
         
-        $this->sqlParts['groupBy'][] = array(
-            'column' => $column,
-            'order' => $order
-        );
+        if( !is_null($column) && $column != '')
+        {
+            $this->sqlParts['groupBy'][] = array(
+                'column' => $column,
+                'order' => $order
+            );
+        }
 
         return $this;
     }
@@ -1122,9 +1128,11 @@ class QueryBuilder
             $order = self::ASC;
         }
         
-        $this->sqlParts['orderBy'][] = array('column' => $column,
-            'order' => $order);
-
+        if( !is_null($column) && $column != '')
+        {
+            $this->sqlParts['orderBy'][] = array('column' => $column, 'order' => $order);
+        }
+        
         return $this;
     }
 
@@ -1253,13 +1261,13 @@ class QueryBuilder
 
         if (!empty($this->sqlParts['limit']['limit']))
         {
-            $limit .= 'LIMIT '.$this->sqlParts['limit']['limit'];
+            $limit .= 'LIMIT '.((int) $this->sqlParts['limit']['limit']).' ';
             if ($formatted)
             {
                 $limit .= "\n";
             }
-
-            $limit = 'OFFSET '.$this->sqlParts['limit']['offset'];
+            
+            $limit .= 'OFFSET '.((int) $this->sqlParts['limit']['offset']).' ';
             if ($formatted)
             {
                 $limit .= "\n";
