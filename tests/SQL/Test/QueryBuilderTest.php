@@ -734,6 +734,17 @@ EOD;
         );
     }
     
+    public function testQuote()
+    {
+        $this->assertEquals("''' AND 1'", $this->queryBuilder->quote("' AND 1"));
+        
+        $queryBuilder = new QueryBuilder();
+        
+        $this->assertEquals(1, $queryBuilder->quote(1));
+        $this->assertEquals(2, $queryBuilder->quote('2'));
+        $this->assertEquals("'\' AND 1'", $queryBuilder->quote("' AND 1"));
+    }
+    
     /**
      * @todo Implement test__toString().
      */

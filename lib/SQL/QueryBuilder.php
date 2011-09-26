@@ -155,13 +155,13 @@ class QueryBuilder
      */
     public function quote($value)
     {
-        $PdoConnection = $this->getPdoConnection();
+        $connection = $this->getConnection();
 
         // If a PDO database connection is set, use it to quote the value using
         // the underlying database. Otherwise, quote it manually.
-        if (isset($PdoConnection))
+        if (isset($connection))
         {
-            return $PdoConnection->quote($value);
+            return $connection->quote($value);
         }
         else
         {
