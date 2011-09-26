@@ -1181,7 +1181,7 @@ class QueryBuilder
 
         if (!empty($orderBy))
         {
-            $orderBy = 'ORDER BY '.$orderBy;
+            $orderBy = 'ORDER BY '.$orderBy.' ';
         }
 
         if ($formatted && !empty($orderBy))

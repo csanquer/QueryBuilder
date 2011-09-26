@@ -403,14 +403,14 @@ EOD;
         );
     }
     
-        /**
+    /**
      *
-     * @dataProvider groupByProvider
+     * @dataProvider orderByProvider
      */
     public function testOrderBy($column, $order, $expected)
     {
         $this->queryBuilder->orderBy($column, $order);
-        $this->assertEquals($expected, $this->queryBuilder->getGroupByParts());
+        $this->assertEquals($expected, $this->queryBuilder->getOrderByParts());
     }
     
     public function orderByProvider()
@@ -420,7 +420,7 @@ EOD;
                 'id',
                 null,
                 array(
-                    array('column' => 'id', 'order' => null),
+                    array('column' => 'id', 'order' => QueryBuilder::ASC),
                 )
             ),
             array(
@@ -436,6 +436,55 @@ EOD;
                 array(
                     array('column' => 'id', 'order' => QueryBuilder::DESC),
                 )
+            ),
+        );
+    }
+  
+        /**
+     *
+     * @dataProvider getOrderByStringProvider
+     */
+    public function testGetOrderByString($orderBys, $expected, $expectedFormatted)
+    {
+        foreach ($orderBys as $orderBy)
+        {
+            $this->queryBuilder->orderBy($orderBy[0], $orderBy[1]);
+        }
+        $this->assertEquals($expected, $this->queryBuilder->getOrderByString());
+        $this->assertEquals($expectedFormatted, $this->queryBuilder->getOrderByString(true));
+    }
+    
+    public function getOrderByStringProvider()
+    {
+        return array(
+            array(
+                array(
+                    array('id', null),
+                ),
+                'ORDER BY id ASC ',
+                'ORDER BY id ASC '."\n",
+            ),
+            array(
+                array(
+                    array('id', QueryBuilder::ASC),
+                ),
+                'ORDER BY id ASC ',
+                'ORDER BY id ASC '."\n",
+            ),
+            array(
+                array(
+                    array('id', QueryBuilder::DESC),
+                ),
+                'ORDER BY id DESC ',
+                'ORDER BY id DESC '."\n",
+            ),
+            array(
+                array(
+                    array('id', QueryBuilder::ASC),
+                    array('year', QueryBuilder::DESC),
+                ),
+                'ORDER BY id ASC, year DESC ',
+                'ORDER BY id ASC, year DESC '."\n",
             ),
         );
     }
