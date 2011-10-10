@@ -740,8 +740,14 @@ EOD;
         
         $queryBuilder = new QueryBuilder();
         
-        $this->assertEquals(1, $queryBuilder->quote(1));
-        $this->assertEquals(2, $queryBuilder->quote('2'));
+        $quote1 = $queryBuilder->quote(1);
+        $this->assertInternalType('integer', $quote1);
+        $this->assertEquals(1, $quote1);
+        
+        $quote2 = $queryBuilder->quote('2');
+        $this->assertInternalType('string', $quote2);
+        $this->assertEquals('2', $quote2);
+        
         $this->assertEquals("'\' AND 1'", $queryBuilder->quote("' AND 1"));
     }
     
