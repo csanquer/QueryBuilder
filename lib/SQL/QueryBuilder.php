@@ -37,6 +37,8 @@ class QueryBuilder
     const GREATER_THAN_OR_EQUAL = '>=';
     const IN = 'IN';
     const NOT_IN = 'NOT IN';
+    const EXISTS = 'EXISTS';
+    const NOT_EXISTS = 'NOT EXISTS';
     const LIKE = 'LIKE';
     const NOT_LIKE = 'NOT LIKE';
     const REGEX = 'REGEXP';
@@ -68,8 +70,8 @@ class QueryBuilder
      */
     const SUB_QUERY_IN = 'subquery_in';
     const SUB_QUERY_NOT_IN = 'subquery_not_in';
-//    const SUB_QUERY_EXISTS = 'subquery_exists';
-//    const SUB_QUERY_NOT_EXISTS = 'subquery_not_exists';
+    const SUB_QUERY_EXISTS = 'subquery_exists';
+    const SUB_QUERY_NOT_EXISTS = 'subquery_not_exists';
 
     /**
      * PDO database connection to use in executing the query.
@@ -99,6 +101,13 @@ class QueryBuilder
      */
     protected $boundParams;
 
+    /**
+     * bound parameters last index
+     * 
+     * @var int
+     */
+    protected $lastIndex;
+    
     /**
      * Constructor.
      *
@@ -155,11 +164,22 @@ class QueryBuilder
      */
     public function quote($value)
     {
-        $connection = $this->getConnection();
+        return self::quoteValue($value, $this->getConnection());
+    }
 
+    /**
+     * Safely escapes a value for use in a query.
+     *
+     * @param  string $value value to escape
+     * @param  PDO|null $connection PDO connection
+     * 
+     * @return string|false
+     */
+    public static function quoteValue($value, \PDO $connection = null)
+    {
         // If a PDO database connection is set, use it to quote the value using
         // the underlying database. Otherwise, quote it manually.
-        if (isset($connection))
+        if ($connection instanceof \PDO)
         {
             return $connection->quote($value);
         }
@@ -221,6 +241,17 @@ class QueryBuilder
     {
         return $this->options;
     }
+
+    /**
+     * get SQL part
+     * 
+     * @param string $section
+     * @return mixed 
+     */
+    protected function getSQLPart($section)
+    {
+        return isset($this->sqlParts[$section]) ? $this->sqlParts[$section] : null;
+    }
     
     /**
      * Adds a SELECT column, table, or expression with optional alias.
@@ -255,7 +286,7 @@ class QueryBuilder
         }
         return $this;
     }
-    
+
     /**
      * get Select parts
      * 
@@ -263,9 +294,9 @@ class QueryBuilder
      */
     public function getSelectParts()
     {
-        return $this->sqlParts['select'];
+        return $this->getSQLPart('select');
     }
-    
+
     /**
      * Merges this QueryBuilder's SELECT into the given QueryBuilder.
      *
@@ -359,7 +390,8 @@ class QueryBuilder
      */
     public function getFromTable()
     {
-        return $this->sqlParts['from']['table'];
+        $from = $this->getSQLPart('from');
+        return isset($from['table']) ? $from['table'] : null;
     }
 
     /**
@@ -369,7 +401,8 @@ class QueryBuilder
      */
     public function getFromAlias()
     {
-        return $this->sqlParts['from']['alias'];
+        $from = $this->getSQLPart('from');
+        return isset($from['alias']) ? $from['alias'] : null;
     }
 
     /**
@@ -379,7 +412,7 @@ class QueryBuilder
      */
     public function getFromPart()
     {
-        return $this->sqlParts['from'];
+        return $this->getSQLPart('from');
     }
 
     /**
@@ -389,7 +422,7 @@ class QueryBuilder
      * @param  string $alias optional alias
      * @param  string|array $criteria optional ON criteria
      * @param  string $type optional type of join, default INNER JOIN
-     
+
      * @return SQL\QueryBuilder
      */
     public function join($table, $alias = null, $criteria = null, $type = self::INNER_JOIN)
@@ -398,7 +431,7 @@ class QueryBuilder
         {
             $type = self::INNER_JOIN;
         }
-        
+
         if (is_string($criteria))
         {
             $criteria = array($criteria);
@@ -413,7 +446,7 @@ class QueryBuilder
                 'alias' => $alias
             );
         }
-        
+
         return $this;
     }
 
@@ -465,9 +498,9 @@ class QueryBuilder
      */
     public function getJoinParts()
     {
-        return $this->sqlParts['join'];
+        return $this->getSQLPart('join');
     }
-    
+
     /**
      * Merges this QueryBuilder's JOINs into the given QueryBuilder.
      *
@@ -635,8 +668,10 @@ class QueryBuilder
      */
     protected function openCriteria(array &$criteria, $connector = self::LOGICAL_AND)
     {
-        $criteria[] = array('bracket' => self::BRACKET_OPEN,
-            'connector' => $connector);
+        $criteria[] = array(
+            'bracket' => self::BRACKET_OPEN,
+            'connector' => in_array($connector, array(self::LOGICAL_AND, self::LOGICAL_OR)) ? $connector : self::LOGICAL_AND,
+        );
 
         return $this;
     }
@@ -650,8 +685,10 @@ class QueryBuilder
      */
     protected function closeCriteria(array &$criteria)
     {
-        $criteria[] = array('bracket' => self::BRACKET_CLOSE,
-            'connector' => null);
+        $criteria[] = array(
+            'bracket' => self::BRACKET_CLOSE,
+            'connector' => null
+        );
 
         return $this;
     }
@@ -668,26 +705,85 @@ class QueryBuilder
      */
     protected function criteria(array &$criteria, $column, $value, $operator = self::EQUALS, $connector = self::LOGICAL_AND)
     {
+        if (!in_array($operator, array(
+            self::EQUALS,
+            self::NOT_EQUALS,
+            self::LESS_THAN,
+            self::LESS_THAN_OR_EQUAL,
+            self::GREATER_THAN,
+            self::GREATER_THAN_OR_EQUAL,
+            self::IN,
+            self::NOT_IN,
+            self::EXISTS,
+            self::NOT_EXISTS,
+            self::LIKE,
+            self::NOT_LIKE,
+            self::REGEX,
+            self::NOT_REGEX,
+            self::BETWEEN,
+            self::NOT_BETWEEN,
+            self::IS_NULL,
+            self::IS_NOT_NULL,
+            self::RAW_WHERE,
+            self::SUB_QUERY_IN,
+            self::SUB_QUERY_NOT_IN,
+            self::SUB_QUERY_EXISTS,
+            self::SUB_QUERY_NOT_EXISTS,
+        )))
+        {
+            $operator = self::EQUALS;
+        }
+        
+        if (!in_array($connector, array(self::LOGICAL_AND, self::LOGICAL_OR)))
+        {
+            $connector = self::LOGICAL_AND;
+        }
+        
+        $rawValue = null;
+        $bind = null;
         switch ($operator)
         {
             case self::BETWEEN:
             case self::NOT_BETWEEN:
-                if (!is_array($value) || count($value) < 2)
+                if (!is_array($value) || count($value) != 2)
                 {
                     throw new \InvalidArgumentException('the operator BETWEEN need a array value with 2 elements : minimum and maximum');
+                }
+                
+                sort($value);
+                
+                $bind = array();
+                foreach ($value as $val)
+                {
+                    $bind[] = $this->addBoundParameter($val);
                 }
                 break;
 
             case self::IN:
             case self::NOT_IN:
                 $value = is_array($value) ? $value : array($value);
+                $bind = array();
+                foreach ($value as $val)
+                {
+                    $bind[] = $this->addBoundParameter($val);
+                }
+                break;
+            
+            case self::IS_NULL:
+            case self::IS_NOT_NULL:
+                break;
+            default:
+                $bind = $this->addBoundParameter($value);
                 break;
         }
 
-        $criteria[] = array('column' => $column,
-            'value' => $value,
+        $criteria[] = array(
+            'column' => $column,
+            'value' => $rawValue,
+            'bind'  => $bind,
             'operator' => $operator,
-            'connector' => $connector);
+            'connector' => $connector
+        );
 
         return $this;
     }
@@ -696,17 +792,19 @@ class QueryBuilder
      * Returns the WHERE or HAVING portion of the query as a string.
      *
      * @param  array $criteria WHERE or HAVING criteria
-     * @param  bool $usePlaceholders optional use ? placeholders, default true
-     * @param  array $placeholderValues optional placeholder values array
+     * @param  bool $formatted format SQL string on multiple lines, default false
+     * 
      * @return string
      */
-    protected function getCriteriaString(array &$criteria)
+    protected function getCriteriaString(array &$criteria, $formatted = false)
     {
         $string = '';
         $useConnector = false;
 
         foreach ($criteria as $i => $currentCriterion)
         {
+            $criterionString = '';
+            
             if (array_key_exists('bracket', $currentCriterion))
             {
                 // If an open bracket, include the logical connector.
@@ -714,7 +812,11 @@ class QueryBuilder
                 {
                     if ($useConnector)
                     {
-                        $string .= ' '.$currentCriterion['connector'].' ';
+                        $criterionString .= $currentCriterion['connector'].' ';
+                        if ($formatted)
+                        {
+                            $criterionString .= "\n";
+                        }
                     }
 
                     $useConnector = false;
@@ -724,13 +826,18 @@ class QueryBuilder
                     $useConnector = true;
                 }
 
-                $string .= $currentCriterion['bracket'];
+                $criterionString .= $currentCriterion['bracket'];
+                if ($formatted)
+                {
+                    $criterionString .= "\n";
+                }
+                $string .= $criterionString;
             }
             else
             {
                 if ($useConnector)
                 {
-                    $string .= ' '.$currentCriterion['connector'].' ';
+                    $criterionString .= $currentCriterion['connector'].' ';
                 }
 
                 $useConnector = true;
@@ -739,86 +846,84 @@ class QueryBuilder
                 {
                     case self::BETWEEN:
                     case self::NOT_BETWEEN:
-                        $value = ':param'.$this->addBoundParameter($currentCriterion['value'][0]).
-                                ' '.self::LOGICAL_AND.' '.
-                                ':param'.$this->addBoundParameter($currentCriterion['value'][1]);
+                        $value = '? '.self::LOGICAL_AND.' ?';
                         break;
 
                     case self::IN:
                     case self::NOT_IN:
-                        $value = self::BRACKET_OPEN;
-
-                        $first = true;
-                        foreach ($currentCriterion['value'] as $currentValue)
-                        {
-                            if (!$first)
-                            {
-                                $value .= ' , ';
-                            }
-                            else
-                            {
-                                $first = false;
-                            }
-                            $value .= ' :param'.$this->addBoundParameter($currentValue);
-                        }
-
-                        $value .= self::BRACKET_CLOSE;
-
+                        $value = self::BRACKET_OPEN
+                            .substr(str_repeat('?, ', count($currentCriterion['bind'])), 0, -2)
+                            .self::BRACKET_CLOSE;
                         break;
 
                     case self::IS_NULL:
                     case self::IS_NOT_NULL:
                         $value = '';
-
                         break;
-                    case self::RAW_WHERE:
-                        $currentCriterion['operator'] = '';
-                        $value = '';
-                        $currentCriterion['column'] = preg_replace('/(\?|:[a-zA-Z0-9]+)/', ':param'.$this->addBoundParameter($currentCriterion['value']), $currentCriterion['column']);
-                        break;
+                    
+//                    case self::RAW_WHERE:
+//                        $currentCriterion['operator'] = '';
+//                        $value = '';
+//                        $this->addBoundParameter($currentCriterion['value']);
+//                        $currentCriterion['column'] = preg_replace('/(\?|:[a-zA-Z0-9]+)/', '?', $currentCriterion['column']);
+//                        break;
 
-                    case self::SUB_QUERY:
-                        $value = '';
-                        $currentCriterion['operator'] = self::IN;
-
-                        if ($currentCriterion['value'] instanceof self)
-                        {
-                            if ($usePlaceholders)
-                            {
-                                $value = $currentCriterion['value']->getQueryString();
-                                $placeholderValues = array_merge($placeholderValues, $currentCriterion['value']->getPlaceholderValues());
-                            }
-                            else
-                            {
-                                $value = $currentCriterion['value']->getQueryString(false);
-                            }
-                        }
-                        else
-                        {
-                            // Raw sql
-                            $value = $currentCriterion['value'];
-                        }
-
-                        // Wrap the subquery
-                        $value = self::BRACKET_OPEN.$value.self::BRACKET_CLOSE;
-                        break;
+//                    case self::SUB_QUERY_IN:
+//                    case self::SUB_QUERY_NOT_IN:
+//                    case self::SUB_QUERY_EXISTS:
+//                    case self::SUB_QUERY_NOT_EXISTS:
+//                        
+//                        switch ($currentCriterion['operator'])
+//                        {
+//                            case self::SUB_QUERY_IN:
+//                                $currentCriterion['operator'] = self::IN;
+//                                break;
+//                            
+//                            case self::SUB_QUERY_NOT_IN:
+//                                $currentCriterion['operator'] = self::NOT_IN;
+//                                break;
+//                            
+//                            case self::SUB_QUERY_EXISTS:
+//                                $currentCriterion['operator'] = self::EXISTS;
+//                                break;
+//                            
+//                            case self::SUB_QUERY_NOT_EXISTS:
+//                                $currentCriterion['operator'] = self::NOT_EXISTS;
+//                                break;
+//                        }
+//                        $value = '';
+//                        
+//                        if ($currentCriterion['value'] instanceof self)
+//                        {
+//                                $value = $currentCriterion['value']->getQueryString();
+//                                $this->boundParams = array_merge($this->boundParams, $currentCriterion['value']->getBoundParameters());
+//                        }
+//                        else
+//                        {
+//                            // Raw sql
+//                            $value = $currentCriterion['value'];
+//                        }
+//
+//                        // Wrap the subquery
+//                        $value = self::BRACKET_OPEN.$value.self::BRACKET_CLOSE;
+//                        break;
 
                     default:
-                        if ($usePlaceholders)
-                        {
-                            $value = '?';
-
-                            $placeholderValues[] = $currentCriterion['value'];
-                        }
-                        else
-                        {
-                            $value = $this->quote($currentCriterion['value']);
-                        }
-
+                        $value = '?';
                         break;
                 }
 
-                $string .= $currentCriterion['column'].' '.$currentCriterion['operator'].' '.$value;
+                $criterionString .= $currentCriterion['column']
+                    .(!is_null($currentCriterion['column']) && $currentCriterion['column'] != '' ? ' ' : '')
+                    .$currentCriterion['operator']
+                    .(!is_null($currentCriterion['operator']) && $currentCriterion['operator'] != '' ? ' ' : '')
+                    .$value.(!is_null($value) && $value != '' ? ' ' : '');
+                
+                if ($formatted && !empty($criterionString))
+                {
+                    $criterionString .= "\n";
+                }
+                $string .= $criterionString;
             }
         }
 
@@ -887,6 +992,16 @@ class QueryBuilder
     }
 
     /**
+     * get Where SQL parts
+     * 
+     * @return array 
+     */
+    public function getWhereParts()
+    {
+        return $this->getSQLPart('where');
+    }
+    
+    /**
      * Merges this QueryBuilder's WHERE into the given QueryBuilder.
      *
      * @param  QueryBuilder $QueryBuilder to merge into
@@ -920,20 +1035,16 @@ class QueryBuilder
     /**
      * Returns the WHERE portion of the query as a string.
      *
+     * @param bool $formatted
      * @return string
      */
     public function getWhereString($formatted = false)
     {
-        $where = $this->getCriteriaString($this->sqlParts['where'], $usePlaceholders, $this->wherePlaceholderValues);
+        $where = $this->getCriteriaString($this->sqlParts['where'], $formatted);
 
         if (!empty($where))
         {
-            $where = 'WHERE '.$where.' ';
-        }
-
-        if ($formatted && !empty($where))
-        {
-            $where .= "\n";
+            $where = 'WHERE '.$where;
         }
 
         return $where;
@@ -952,8 +1063,8 @@ class QueryBuilder
         {
             $order = null;
         }
-        
-        if( !is_null($column) && $column != '')
+
+        if (!is_null($column) && $column != '')
         {
             $this->sqlParts['groupBy'][] = array(
                 'column' => $column,
@@ -971,9 +1082,9 @@ class QueryBuilder
      */
     public function getGroupByParts()
     {
-        return $this->sqlParts['groupBy'];
+        return $this->getSQLPart('groupBy');
     }
-    
+
     /**
      * Merges this QueryBuilder's GROUP BY into the given QueryBuilder.
      *
@@ -1089,6 +1200,15 @@ class QueryBuilder
     }
 
     /**
+     * get Having SQL parts
+     * 
+     * @return array 
+     */
+    public function getHavingParts()
+    {
+        return $this->getSQLPart('having');
+    }
+    /**
      * Merges this QueryBuilder's HAVING into the given QueryBuilder.
      *
      * @param  QueryBuilder $QueryBuilder to merge into
@@ -1154,12 +1274,12 @@ class QueryBuilder
         {
             $order = self::ASC;
         }
-        
-        if( !is_null($column) && $column != '')
+
+        if (!is_null($column) && $column != '')
         {
             $this->sqlParts['orderBy'][] = array('column' => $column, 'order' => $order);
         }
-        
+
         return $this;
     }
 
@@ -1170,9 +1290,9 @@ class QueryBuilder
      */
     public function getOrderByParts()
     {
-        return $this->sqlParts['orderBy'];
+        return $this->getSQLPart('orderBy');
     }
-    
+
     /**
      * Merges this QueryBuilder's ORDER BY into the given QueryBuilder.
      *
@@ -1262,7 +1382,8 @@ class QueryBuilder
      */
     public function getLimit()
     {
-        return isset($this->sqlParts['limit']['limit']) ? $this->sqlParts['limit']['limit'] : null;
+        $limit = $this->getSQLPart('limit');
+        return isset($limit['limit']) ? $limit['limit'] : null;
     }
 
     /**
@@ -1273,7 +1394,8 @@ class QueryBuilder
      */
     public function getOffset()
     {
-        return isset($this->sqlParts['limit']['offset']) ? $this->sqlParts['limit']['offset'] : null;
+        $limit = $this->getSQLPart('limit');
+        return isset($limit['offset']) ? $limit['offset'] : null;
     }
 
     /**
@@ -1293,7 +1415,7 @@ class QueryBuilder
             {
                 $limit .= "\n";
             }
-            
+
             $limit .= 'OFFSET '.((int) $this->sqlParts['limit']['offset']).' ';
             if ($formatted)
             {
@@ -1349,24 +1471,47 @@ class QueryBuilder
      * add a new bound parameter
      *
      * @param mixed $value
-     * @return int index of the new bound parameter
+     * 
+     * @return int last inserted index
      */
     public function addBoundParameter($value)
     {
-        $this->boundParams[] = $value;
-        return key(array_slice($this->boundParams, -1, 1));
+        if (is_array($value))
+        {
+            $lastIndex = null;
+            foreach ($value as $subvalue)
+            {
+                $lastIndex = $this->addBoundParameter($subvalue);
+            }
+            return $lastIndex;
+        }
+        else
+        {
+            $this->boundParams[] = $value;
+            return $this->getLastBoundParameterIndex();
+        }
     }
 
     /**
+     *
+     * @return int 
+     */
+    public function getLastBoundParameterIndex()
+    {
+        end($this->boundParams);
+        return key($this->boundParams);
+    }
+    
+    /**
      * Returns all bound parameters
      *
-     * @param $identifier
+     * @param $index
      * 
-     * @return array
+     * @return mixed
      */
-    public function getBoundParameter($identifier)
+    public function getBoundParameter($index)
     {
-        return isset($this->boundParams[$identifier]) ? $this->boundParams[$identifier] : null;
+        return isset($this->boundParams[$index]) ? $this->boundParams[$index] : null;
     }
 
     /**
@@ -1386,6 +1531,57 @@ class QueryBuilder
         return $this->boundParams;
     }
 
+    /**
+     * Replaces any parameter placeholders in a query with the value of that
+     * parameter. Useful for debugging. Assumes anonymous parameters from 
+     * $params are are in the same order as specified in $query
+     *
+     * @param string $query The sql query with parameter placeholders
+     * @param array $params The array of substitution parameters
+     * @param bool $quote default = true, if true quote each parameter
+     * @param PDO default = null $connection PDO connection (used to quote values)
+     * 
+     * @return string The debugged query
+     */
+    public static function debugQuery($query, $params, $quoted = true, \PDO $connection = null)
+    {
+        $keys = array();
+        // build a regular expression for each parameter
+        foreach ($params as $key => $value)
+        {
+            if (is_string($key))
+            {
+                $keys[] = '/:'.$key.'/';
+            }
+            else
+            {
+                $keys[] = '/[?]/';
+            }
+            
+            if ($quoted)
+            {
+                $params[$key] = self::quoteValue($value, $connection);
+            }
+        }
+        $query = preg_replace($keys, $params, $query, 1);
+
+        return $query;
+    }
+
+    /**
+     * Replaces any parameter placeholders in a query with the value of that
+     * parameter. Useful for debugging. Assumes anonymous parameters from 
+     * $params are are in the same order as specified in $query
+     *
+     * @param bool $quoted default = true, if true quote each parameter
+     * 
+     * @return string The debugged query
+     */
+    public function debug($quoted = true, $formatted = true)
+    {
+        return self::debugQuery($this->getQueryString($formatted), $this->getBoundParameters($quoted));
+    }
+    
     /**
      * Executes the query using the PDO database connection.
      *

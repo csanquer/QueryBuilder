@@ -78,6 +78,40 @@ EOD;
         $this->assertInstanceOf('\PDO', $this->queryBuilder->getConnection());
     }
 
+
+    
+    /**
+     *
+     * @dataProvider AddBoundParameterProvider
+     */
+    public function testAddBoundParameter($param)
+    {
+        // Remove the following lines when you implement this test.
+        $this->markTestIncomplete(
+          'This test has not been implemented yet.'
+        );
+    }
+    
+    public function AddBoundParameterProvider()
+    {
+        return array(
+            array(
+                'test',
+            ),
+            array(
+                array(2,5),
+            ),
+        );
+    }
+
+    public function testGetBoundParameters()
+    {
+        // Remove the following lines when you implement this test.
+        $this->markTestIncomplete(
+          'This test has not been implemented yet.'
+        );
+    }
+    
     /**
      * @dataProvider fromProvider
      */
@@ -437,6 +471,13 @@ EOD;
             ),
             array(
                 'id',
+                'truc',
+                array(
+                    array('column' => 'id', 'order' => QueryBuilder::ASC),
+                )
+            ),
+            array(
+                'id',
                 null,
                 array(
                     array('column' => 'id', 'order' => QueryBuilder::ASC),
@@ -732,6 +773,395 @@ EOD;
                 'SELECT DISTINCT start_date AS date '."\n",
             ),
         );
+    }
+    
+    /**
+     *
+     * @dataProvider whereProvider
+     */
+    public function testWhere($column, $value, $operator, $connector, $expected, $expectedBoundParameters)
+    {
+        $this->assertInstanceOf('SQL\QueryBuilder',$this->queryBuilder->where($column, $value, $operator, $connector));
+        $this->assertEquals($expected, $this->queryBuilder->getWhereParts());
+        $this->assertEquals($expectedBoundParameters, $this->queryBuilder->getBoundParameters());
+    }
+    
+    /**
+     * @expectedException \InvalidArgumentException
+     */
+    public function testWhereBetweenException()
+    {
+        $this->assertInstanceOf('SQL\QueryBuilder',$this->queryBuilder->where('id', 5, QueryBuilder::BETWEEN));
+    }
+    
+    public function testAndWhere()
+    {
+        $this->assertInstanceOf('SQL\QueryBuilder',$this->queryBuilder->andWhere('id', 1, QueryBuilder::EQUALS));
+        $expected = array(
+            array(
+                'column' => 'id',
+                'value' => null,
+                'bind' => 0,
+                'operator' => QueryBuilder::EQUALS,
+                'connector' => QueryBuilder::LOGICAL_AND,
+            ),
+        );
+        $expectedBoundParameters = array(1);
+        $this->assertEquals($expected, $this->queryBuilder->getWhereParts());
+        $this->assertEquals($expectedBoundParameters, $this->queryBuilder->getBoundParameters());
+    }
+    
+    public function testOrWhere()
+    {
+        $this->assertInstanceOf('SQL\QueryBuilder',$this->queryBuilder->orWhere('id', 1, QueryBuilder::EQUALS));
+        $expected = array(
+            array(
+                'column' => 'id',
+                'value' => null,
+                'bind' => 0,
+                'operator' => QueryBuilder::EQUALS,
+                'connector' => QueryBuilder::LOGICAL_OR,
+            ),
+        );
+        $expectedBoundParameters = array(1);
+        $this->assertEquals($expected, $this->queryBuilder->getWhereParts());
+        $this->assertEquals($expectedBoundParameters, $this->queryBuilder->getBoundParameters());
+    }
+    
+    public function whereProvider()
+    {
+        return array(
+            array(
+                'id',
+                1,
+                null,
+                null,
+                array(
+                    array(
+                        'column' => 'id',
+                        'value' => null,
+                        'bind' => 0,
+                        'operator' => QueryBuilder::EQUALS,
+                        'connector' => QueryBuilder::LOGICAL_AND,
+                    ),
+                ),
+                array(1),
+            ),
+            array(
+                'id',
+                1,
+                QueryBuilder::GREATER_THAN_OR_EQUAL,
+                QueryBuilder::LOGICAL_OR,
+                array(
+                    array(
+                        'column' => 'id',
+                        'value' => null,
+                        'bind' => 0,
+                        'operator' => QueryBuilder::GREATER_THAN_OR_EQUAL,
+                        'connector' => QueryBuilder::LOGICAL_OR,
+                    ),
+                ),
+                array(1),
+            ),
+            array(
+                'published_at',
+                null,
+                QueryBuilder::IS_NULL,
+                null,
+                array(
+                    array(
+                        'column' => 'published_at',
+                        'value' => null,
+                        'bind' => null,
+                        'operator' => QueryBuilder::IS_NULL,
+                        'connector' => QueryBuilder::LOGICAL_AND,
+                    ),
+                ),
+                array(),
+            ),
+            array(
+                'id',
+                array(2,5),
+                QueryBuilder::BETWEEN,
+                QueryBuilder::LOGICAL_AND,
+                array(
+                    array(
+                        'column' => 'id',
+                        'value' => null,
+                        'bind' => array(0,1),
+                        'operator' => QueryBuilder::BETWEEN,
+                        'connector' => QueryBuilder::LOGICAL_AND,
+                    ),
+                ),
+                array(2,5),
+            ),
+            array(
+                'title',
+                array('Dune','Fahrenheit'),
+                QueryBuilder::IN,
+                null,
+                array(
+                    array(
+                        'column' => 'title',
+                        'value' => null,
+                        'bind' => array(0,1),
+                        'operator' => QueryBuilder::IN,
+                        'connector' => QueryBuilder::LOGICAL_AND,
+                    ),
+                ),
+                array('Dune','Fahrenheit'),
+            ),
+            array(
+                'title',
+                'Dune',
+                QueryBuilder::IN,
+                null,
+                array(
+                    array(
+                        'column' => 'title',
+                        'value' => null,
+                        'bind' => array(0),
+                        'operator' => QueryBuilder::IN,
+                        'connector' => QueryBuilder::LOGICAL_AND,
+                    ),
+                ),
+                array('Dune'),
+            ),
+        );
+    }
+    
+    /**
+     * @dataProvider openWhereProvider
+     */
+    public function testOpenWhere($connector, $expected)
+    {
+        $this->assertInstanceOf('SQL\QueryBuilder',$this->queryBuilder->openWhere($connector));
+        $this->assertEquals($expected, $this->queryBuilder->getWhereParts());
+    }
+    
+    public function openWhereProvider()
+    {
+        return array(
+            array(
+                null,
+                array(
+                    Array(
+                        'bracket' => QueryBuilder::BRACKET_OPEN,
+                        'connector' => QueryBuilder::LOGICAL_AND,
+                    )
+                ),
+            ),
+            array(
+                QueryBuilder::LOGICAL_AND,
+                array(
+                    Array(
+                        'bracket' => QueryBuilder::BRACKET_OPEN,
+                        'connector' => QueryBuilder::LOGICAL_AND,
+                    )
+                ),
+            ),
+            array(
+                QueryBuilder::LOGICAL_OR,
+                array(
+                    Array(
+                        'bracket' => QueryBuilder::BRACKET_OPEN,
+                        'connector' => QueryBuilder::LOGICAL_OR,
+                    )
+                ),
+            ),
+        );
+    }
+    
+    public function testCloseWhere()
+    {
+        $this->assertInstanceOf('SQL\QueryBuilder',$this->queryBuilder->closeWhere());
+        $expected = array(
+            Array(
+                'bracket' => QueryBuilder::BRACKET_CLOSE,
+                'connector' => null,
+            )
+        );
+        $this->assertEquals($expected, $this->queryBuilder->getWhereParts());
+    }
+
+    /**
+     *
+     * @dataProvider getWhereStringProvider
+     */
+    public function testGetWhereString($wheres, $expected, $expectedFormatted, $expectedBoundParameters)
+    {
+//        var_dump($this->queryBuilder->getBoundParameters());
+        foreach ($wheres as $where)
+        {
+            if (count($where) == 4)
+            {    
+                $this->queryBuilder->where($where[0], $where[1], $where[2], $where[3]);
+            }
+            elseif (count($where) == 1)
+            {
+                if ($where[0] == '(')
+                {
+                    $this->queryBuilder->openWhere();
+                }
+                elseif($where[0] == ')')
+                {
+                    $this->queryBuilder->closeWhere();
+                }
+            }
+        }
+//        var_dump($expected,$this->queryBuilder->getWhereString());
+//        var_dump($expectedFormatted, $this->queryBuilder->getWhereString(true));
+        
+        $this->assertEquals($expected, $this->queryBuilder->getWhereString());
+//        var_dump($this->queryBuilder->getBoundParameters());
+        $this->assertEquals($expectedFormatted, $this->queryBuilder->getWhereString(true));
+//        var_dump($this->queryBuilder->getBoundParameters());
+        $this->assertEquals($expectedBoundParameters, $this->queryBuilder->getBoundParameters());
+    }
+    
+    public function getWhereStringProvider()
+    {
+        return array(
+            array(
+                array(
+                    array('id', 1, null, null),
+                ),
+                'WHERE id = ? ',
+                'WHERE id = ? '."\n",
+                array(
+                    1,
+                ),
+            ),
+            array(
+                array(
+                    array('id', 1, QueryBuilder::NOT_EQUALS, null),
+                ),
+                'WHERE id != ? ',
+                'WHERE id != ? '."\n",
+                array(
+                    1,
+                ),
+            ),
+            array(
+                array(
+                    array('published_at', null, QueryBuilder::IS_NULL, null),
+                ),
+                'WHERE published_at IS NULL ',
+                'WHERE published_at IS NULL '."\n",
+                array(
+                ),
+            ),
+            array(
+                array(
+                    array('published_at', null, QueryBuilder::IS_NOT_NULL, null),
+                ),
+                'WHERE published_at IS NOT NULL ',
+                'WHERE published_at IS NOT NULL '."\n",
+                array(
+                ),
+            ),
+            array(
+                array(
+                    array('score', array(8,15), QueryBuilder::BETWEEN, null),
+                ),
+                'WHERE score BETWEEN ? AND ? ',
+                'WHERE score BETWEEN ? AND ? '."\n",
+                array(
+                    8,
+                    15,
+                ),
+            ),
+            array(
+                array(
+                    array('score', array(8,15), QueryBuilder::NOT_BETWEEN, null),
+                ),
+                'WHERE score NOT BETWEEN ? AND ? ',
+                'WHERE score NOT BETWEEN ? AND ? '."\n",
+                array(
+                    8,
+                    15,
+                ),
+            ),
+            array(
+                array(
+                    array('score', array(8,12,10,9,15), QueryBuilder::IN, null),
+                ),
+                'WHERE score IN (?, ?, ?, ?, ?) ',
+                'WHERE score IN (?, ?, ?, ?, ?) '."\n",
+                array(8,12,10,9,15),
+            ),
+            array(
+                array(
+                    array('score', array(8,12,10,9,15), QueryBuilder::NOT_IN, null),
+                ),
+                'WHERE score NOT IN (?, ?, ?, ?, ?) ',
+                'WHERE score NOT IN (?, ?, ?, ?, ?) '."\n",
+                array(8,12,10,9,15),
+            ),
+            array(
+                array(
+                    array('id', 1, QueryBuilder::NOT_EQUALS, null),
+                    array('score', array(8,12,10,9,15), QueryBuilder::IN, null),
+                ),
+                'WHERE id != ? AND score IN (?, ?, ?, ?, ?) ',
+                'WHERE id != ? '."\n".'AND score IN (?, ?, ?, ?, ?) '."\n",
+                array(1,8,12,10,9,15),
+            ),
+        );
+    }
+    
+    /**
+     * @dataProvider openHavingProvider
+     */
+    public function testOpenHaving($connector, $expected)
+    {
+        $this->assertInstanceOf('SQL\QueryBuilder',$this->queryBuilder->openHaving($connector));
+        $this->assertEquals($expected, $this->queryBuilder->getHavingParts());
+    }
+    
+    public function openHavingProvider()
+    {
+        return array(
+            array(
+                null,
+                array(
+                    Array(
+                        'bracket' => QueryBuilder::BRACKET_OPEN,
+                        'connector' => QueryBuilder::LOGICAL_AND,
+                    )
+                ),
+            ),
+            array(
+                QueryBuilder::LOGICAL_AND,
+                array(
+                    Array(
+                        'bracket' => QueryBuilder::BRACKET_OPEN,
+                        'connector' => QueryBuilder::LOGICAL_AND,
+                    )
+                ),
+            ),
+            array(
+                QueryBuilder::LOGICAL_OR,
+                array(
+                    Array(
+                        'bracket' => QueryBuilder::BRACKET_OPEN,
+                        'connector' => QueryBuilder::LOGICAL_OR,
+                    )
+                ),
+            ),
+        );
+    }
+    
+    public function testCloseHaving()
+    {
+        $this->assertInstanceOf('SQL\QueryBuilder',$this->queryBuilder->closeHaving());
+        $expected = array(
+            Array(
+                'bracket' => QueryBuilder::BRACKET_CLOSE,
+                'connector' => null,
+            )
+        );
+        $this->assertEquals($expected, $this->queryBuilder->getHavingParts());
     }
     
     public function testQuote()
