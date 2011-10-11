@@ -11,58 +11,103 @@ class QueryBuilderTest extends \PHPUnit_Framework_TestCase
 {
     /**
      *
-     * @var PDO 
+     * @var \PDO 
      */
-    protected $pdo;
+    protected static $pdo;
     
     /**
-     * @var SQL\QueryBuilder
+     * @var \SQL\QueryBuilder
      */
     protected $queryBuilder;
 
+    public static function setUpBeforeClass()
+    {
+        try
+        {
+            self::$pdo = new \PDO('sqlite::memory:');
+        }
+        catch(PDOException $e)
+        {
+            echo $e->getMessage();
+        }
+    }
+    
+    public static function tearDownAfterClass()
+    {
+        self::$pdo = null;
+    }
+    
     /**
      * Sets up the fixture, for example, opens a network connection.
      * This method is called before a test is executed.
      */
     protected function setUp()
     {
-        $this->pdo = new \PDO('sqlite::memory:');
-        
-        /**
-        $sql = <<<EOD
-CREATE TABLE [book]
-(
-	[id] INTEGER NOT NULL PRIMARY KEY,
-	[title] VARCHAR(255) NOT NULL,
-	[author_id] INTEGER NOT NULL,
-	[published_at] DATETIME,
-	[price] DECIMAL,
-	[score] DECIMAL
-);
-
-CREATE TABLE [author]
-(
-	[id] INTEGER NOT NULL PRIMARY KEY,
-	[first_name] VARCHAR(128) NOT NULL,
-	[last_name] VARCHAR(128) NOT NULL
-);
-
-EOD;
-        
-        $this->pdo->exec($sql);
-        /**/
-        $this->queryBuilder = new QueryBuilder($this->pdo);
+        $this->queryBuilder = new QueryBuilder(self::$pdo);
     }
 
-    /**
-     * Tears down the fixture, for example, closes a network connection.
-     * This method is called after a test is executed.
-     */
-    protected function tearDown()
+    protected function loadSchema()
     {
-        unset($this->pdo);
-    }
+        $sql = <<<SQL
+CREATE TABLE author
+(
+	id INTEGER NOT NULL PRIMARY KEY,
+	first_name VARCHAR(128) NOT NULL,
+	last_name VARCHAR(128) NOT NULL
+);
 
+CREATE TABLE book 
+(
+	id INTEGER NOT NULL PRIMARY KEY,
+	title VARCHAR(255) NOT NULL,
+	author_id INTEGER NOT NULL,
+	published_at DATETIME,
+	price DECIMAL,
+	score DECIMAL
+);
+SQL;
+
+        if (self::$pdo instanceof \PDO)
+        {
+            try
+            {
+                self::$pdo->exec($sql);
+            }
+            catch (PDOException $e)
+            {
+                echo $e->getMessage();
+            }
+        }
+    }
+    
+    protected function loadFixtures()
+    {
+        $sql = <<<EOD
+INSERT INTO author (id, first_name, last_name) VALUES (1 ,'John Ronald Reuel', 'Tolkien');
+INSERT INTO author (id, first_name, last_name) VALUES (2 ,'Philip Kindred', 'Dick');
+INSERT INTO author (id, first_name, last_name) VALUES (3 ,'Frank', 'Herbert');
+
+INSERT INTO book (id, title, author_id, published_at, price, score) VALUES (1,'Dune', 3, '1965-01-01 00:00:00', 13.6, 5);
+INSERT INTO book (id, title, author_id, published_at, price, score) VALUES (2,'The Man in the High Castles', 2, '1962-01-01 00:00:00', 6, 3);
+INSERT INTO book (id, title, author_id, published_at, price, score) VALUES (3,'Do Androids Dream of Electric Sheep?', 2, '1968-01-01 00:00:00', 4.8, 4.5);
+INSERT INTO book (id, title, author_id, published_at, price, score) VALUES (4,'Flow my Tears, the Policeman Said', 2, '1974-01-01 00:00:00', 9.05, NULL);
+INSERT INTO book (id, title, author_id, published_at, price, score) VALUES (5,'The Hobbit', 1, '1937-09-21 00:00:00', 5.5, 4);
+INSERT INTO book (id, title, author_id, published_at, price, score) VALUES (6,'The Lord of the Rings', 1, '1954-01-01 00:00:00', 12.6, 5);
+EOD;
+
+        if (self::$pdo instanceof \PDO)
+        {
+            try
+            {
+                self::$pdo->exec($sql);
+            }
+            catch (PDOException $e)
+            {
+                echo $e->getMessage();
+            }
+        }
+    }
+    
     /**
      * @todo Implement testSetPdoConnection().
      */
@@ -1459,7 +1504,7 @@ EOD;
     {
         $this->assertEquals($expected, QueryBuilder::debugQuery($query, $params, false));
         $this->assertEquals($expectedQuoted, QueryBuilder::debugQuery($query, $params, true));
-        $this->assertEquals($expectedQuotedPDO, QueryBuilder::debugQuery($query, $params, true, $this->pdo));
+        $this->assertEquals($expectedQuotedPDO, QueryBuilder::debugQuery($query, $params, true, self::$pdo));
     }
     
     public function debugQueryProvider()
@@ -1640,4 +1685,65 @@ EOD;
         $this->assertEquals("'\' AND 1'", $queryBuilder->quote("' AND 1"));
     }
     
+    public function testQueryWithoutPDO()
+    {
+        $querybuiler = new QueryBuilder();
+        $querybuiler->from('book');
+        $this->assertFalse($querybuiler->query());
+    }
+    
+    public function testQueryWithoutQueryStatement()
+    {
+        $this->assertFalse($this->queryBuilder->query());
+    }
+    
+    public function testQuery()
+    {
+        $this->loadSchema();
+        $this->loadFixtures();
+        
+        $this->queryBuilder->from('book');
+        $this->queryBuilder->where('author_id', 2);
+        
+        $this->assertInstanceOf('\PDOStatement', $this->queryBuilder->query());
+        
+        $expected = array(
+            array(
+                'id' => '2',
+                'title' => 'The Man in the High Castles',
+                'author_id' => '2',
+                'published_at' => '1962-01-01 00:00:00',
+                'price' => '6',
+                'score' => '3',
+            ),
+            array(
+                'id' => '3',
+                'title' => 'Do Androids Dream of Electric Sheep?',
+                'author_id' => '2',
+                'published_at' => '1968-01-01 00:00:00',
+                'price' => '4.8',
+                'score' => '4.5',
+            ),
+            array(
+                'id' => '4',
+                'title' => 'Flow my Tears, the Policeman Said',
+                'author_id' => '2',
+                'published_at' => '1974-01-01 00:00:00',
+                'price' => '9.05',
+                'score' => NULL,
+            ),
+        );
+        
+        $this->assertEquals($expected, $this->queryBuilder->query(\PDO::FETCH_ASSOC));
+        
+        return $this->queryBuilder;
+    }
+    
+    /**
+     * @depends testQuery
+     */
+    public function testQueryGetRowCount(QueryBuilder $queryBuilder)
+    {
+        $this->assertEquals(3, $queryBuilder->queryGetRowCount());
+    }
 }

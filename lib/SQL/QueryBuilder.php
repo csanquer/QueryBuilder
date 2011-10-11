@@ -1474,6 +1474,12 @@ class QueryBuilder
      */
     public function getQueryString($formatted = false)
     {
+        $tableFrom = $this->getFromTable();
+        if (empty($tableFrom))
+        {
+            return '';
+        }
+        
         return $this->getSelectString($formatted)
                 .$this->getFromString($formatted)
                 .$this->getWhereString($formatted)
@@ -1577,16 +1583,22 @@ class QueryBuilder
     }
     
     /**
-     * Executes the query using the PDO database connection.
+     * Executes the query using the PDO database connection and return result as PDOStatement or array of scalar values or objects
      *
-     * @return PDOStatement|false
+     * @see PDOStatement::fetch() and PDOStatement::fetchAll()
+     * 
+     * @param int $fetch_style default = null , a PDO_FETCH constant to return a result as array or null to return a PDOStatement
+     * 
+     * @return array|PDOStatement|false , return PDOStatement if $fetch_style is null , otherwise an array , false if something goes wrong
+     * 
+     * @throws PDOException if a error occured with PDO
      */
-    public function query()
+    public function query($fetch_style = null)
     {
-        $PdoConnection = $this->getPdoConnection();
+        $PdoConnection = $this->getConnection();
 
         // If no PDO database connection is set, the query cannot be executed.
-        if (!isset($PdoConnection))
+        if (!$PdoConnection instanceof \PDO)
         {
             return false;
         }
@@ -1597,9 +1609,16 @@ class QueryBuilder
         if (!empty($queryString))
         {
             $PdoStatement = $PdoConnection->prepare($queryString);
-            $PdoStatement->execute($this->getPlaceholderValues());
+            $PdoStatement->execute($this->getBoundParameters());
 
-            return $PdoStatement;
+            if (is_null($fetch_style))
+            {
+                return $PdoStatement;
+            }
+            else
+            {
+                return $PdoStatement->fetchAll($fetch_style);
+            }
         }
         else
         {
@@ -1624,10 +1643,10 @@ class QueryBuilder
         $this->sqlParts['select'] = $this->sqlParts['orderBy'] = $this->sqlParts['limit'] = Array();
 
         // Add the new count select
-        $this->sqlParts['select']('COUNT(*)');
+        $this->sqlParts['select']['COUNT(*)'] = null;
 
         // Run the query
-        $result = $this->query();
+        $stmt = $this->query();
 
         // Restore the values
         $this->sqlParts['select'] = $old_select;
@@ -1635,14 +1654,13 @@ class QueryBuilder
         $this->sqlParts['limit'] = $old_limit;
 
         // Fetch the count from the query result
-        if ($result)
+        $result = false;
+        if ($stmt instanceof \PDOStatement)
         {
-            $c = $result->fetchColumn();
-            $result->closeCursor();
-            return $c;
+            $result = $stmt->fetchColumn();
+            $stmt->closeCursor();
         }
-
-        return false;
+        return $result;
     }
 
     /**
