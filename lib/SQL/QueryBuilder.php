@@ -1478,7 +1478,7 @@ class QueryBuilder
                 .$this->getFromString($formatted)
                 .$this->getWhereString($formatted)
                 .$this->getGroupByString($formatted)
-                .$this->getHavingString($usePlaceholders)
+                .$this->getHavingString($formatted)
                 .$this->getOrderByString($formatted)
                 .$this->getLimitString($formatted);
     }

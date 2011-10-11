@@ -848,13 +848,13 @@ EOD;
             ),
             array(
                 'title',
-                array('Dune','Fahrenheit'),
+                array('Dune','Fahrenheit 451'),
                 QueryBuilder::IN,
                 null,
                 array(
                     array(
                         'column' => 'title',
-                        'value' => array('Dune','Fahrenheit'),
+                        'value' => array('Dune','Fahrenheit 451'),
                         'operator' => QueryBuilder::IN,
                         'connector' => QueryBuilder::LOGICAL_AND,
                     ),
@@ -937,7 +937,6 @@ EOD;
      */
     public function testGetWhereString($wheres, $expected, $expectedFormatted, $expectedBoundParameters)
     {
-//        var_dump($this->queryBuilder->getBoundParameters());
         foreach ($wheres as $where)
         {
             $nbWhere = count($where);
@@ -964,13 +963,9 @@ EOD;
                 }
             }
         }
-//        var_dump($expected,$this->queryBuilder->getWhereString());
-//        var_dump($expectedFormatted, $this->queryBuilder->getWhereString(true));
         
         $this->assertEquals($expected, $this->queryBuilder->getWhereString());
-//        var_dump($this->queryBuilder->getBoundParameters());
         $this->assertEquals($expectedFormatted, $this->queryBuilder->getWhereString(true));
-//        var_dump($this->queryBuilder->getBoundParameters());
         $this->assertEquals($expectedBoundParameters, $this->queryBuilder->getBoundParameters());
         $this->assertEquals($expectedBoundParameters, $this->queryBuilder->getBoundParameters(false, 'where'));
         $this->assertEquals(array(), $this->queryBuilder->getBoundParameters(false, 'having'));
@@ -1102,6 +1097,142 @@ EOD;
             ),
         );
     }
+
+    /**
+     *
+     * @dataProvider havingProvider
+     */
+    public function testHaving($column, $value, $operator, $connector, $expected)
+    {
+        $this->assertInstanceOf('SQL\QueryBuilder',$this->queryBuilder->having($column, $value, $operator, $connector));
+        $this->assertEquals($expected, $this->queryBuilder->getHavingParts());
+    }
+    
+    /**
+     * @expectedException \InvalidArgumentException
+     */
+    public function testHavingBetweenException()
+    {
+        $this->assertInstanceOf('SQL\QueryBuilder',$this->queryBuilder->having('id', 5, QueryBuilder::BETWEEN));
+    }
+    
+    public function testAndHaving()
+    {
+        $this->assertInstanceOf('SQL\QueryBuilder',$this->queryBuilder->andHaving('id', 1, QueryBuilder::EQUALS));
+        $expected = array(
+            array(
+                'column' => 'id',
+                'value' => 1,
+                'operator' => QueryBuilder::EQUALS,
+                'connector' => QueryBuilder::LOGICAL_AND,
+            ),
+        );
+        $this->assertEquals($expected, $this->queryBuilder->getHavingParts());
+    }
+    
+    public function testOrHaving()
+    {
+        $this->assertInstanceOf('SQL\QueryBuilder',$this->queryBuilder->orHaving('id', 1, QueryBuilder::EQUALS));
+        $expected = array(
+            array(
+                'column' => 'id',
+                'value' => 1,
+                'operator' => QueryBuilder::EQUALS,
+                'connector' => QueryBuilder::LOGICAL_OR,
+            ),
+        );
+        $this->assertEquals($expected, $this->queryBuilder->getHavingParts());
+    }
+    
+    public function havingProvider()
+    {
+        return array(
+            array(
+                'id',
+                1,
+                null,
+                null,
+                array(
+                    array(
+                        'column' => 'id',
+                        'value' => 1,
+                        'operator' => QueryBuilder::EQUALS,
+                        'connector' => QueryBuilder::LOGICAL_AND,
+                    ),
+                ),
+            ),
+            array(
+                'id',
+                1,
+                QueryBuilder::GREATER_THAN_OR_EQUAL,
+                QueryBuilder::LOGICAL_OR,
+                array(
+                    array(
+                        'column' => 'id',
+                        'value' => 1,
+                        'operator' => QueryBuilder::GREATER_THAN_OR_EQUAL,
+                        'connector' => QueryBuilder::LOGICAL_OR,
+                    ),
+                ),
+            ),
+            array(
+                'published_at',
+                null,
+                QueryBuilder::IS_NULL,
+                null,
+                array(
+                    array(
+                        'column' => 'published_at',
+                        'value' => null,
+                        'operator' => QueryBuilder::IS_NULL,
+                        'connector' => QueryBuilder::LOGICAL_AND,
+                    ),
+                ),
+            ),
+            array(
+                'id',
+                array(2,5),
+                QueryBuilder::BETWEEN,
+                QueryBuilder::LOGICAL_AND,
+                array(
+                    array(
+                        'column' => 'id',
+                        'value' => array(2,5),
+                        'operator' => QueryBuilder::BETWEEN,
+                        'connector' => QueryBuilder::LOGICAL_AND,
+                    ),
+                ),
+            ),
+            array(
+                'title',
+                array('Dune','Fahrenheit 451'),
+                QueryBuilder::IN,
+                null,
+                array(
+                    array(
+                        'column' => 'title',
+                        'value' => array('Dune','Fahrenheit 451'),
+                        'operator' => QueryBuilder::IN,
+                        'connector' => QueryBuilder::LOGICAL_AND,
+                    ),
+                ),
+            ),
+            array(
+                'title',
+                'Dune',
+                QueryBuilder::IN,
+                null,
+                array(
+                    array(
+                        'column' => 'title',
+                        'value' => array('Dune'),
+                        'operator' => QueryBuilder::IN,
+                        'connector' => QueryBuilder::LOGICAL_AND,
+                    ),
+                ),
+            ),
+        );
+    }
     
     /**
      * @dataProvider openHavingProvider
@@ -1155,6 +1286,178 @@ EOD;
             )
         );
         $this->assertEquals($expected, $this->queryBuilder->getHavingParts());
+    }
+
+    /**
+     *
+     * @dataProvider getHavingStringProvider
+     */
+    public function testGetHavingString($havings, $expected, $expectedFormatted, $expectedBoundParameters)
+    {
+//        var_dump($this->queryBuilder->getBoundParameters());
+        foreach ($havings as $having)
+        {
+            $nbHaving = count($having);
+            if ($nbHaving == 4)
+            {    
+                $this->queryBuilder->having($having[0], $having[1], $having[2], $having[3]);
+            }
+            elseif ($nbHaving >= 1 && $nbHaving <= 2)
+            {
+                if ($having[0] == '(')
+                {
+                    if (isset($having[1]))
+                    {
+                        $this->queryBuilder->openHaving($having[1]);
+                    }
+                    else
+                    {
+                        $this->queryBuilder->openHaving();
+                    }
+                }
+                elseif($having[0] == ')')
+                {
+                    $this->queryBuilder->closeHaving();
+                }
+            }
+        }
+//        var_dump($expected,$this->queryBuilder->getHavingString());
+//        var_dump($expectedFormatted, $this->queryBuilder->getHavingString(true));
+        
+        $this->assertEquals($expected, $this->queryBuilder->getHavingString());
+//        var_dump($this->queryBuilder->getBoundParameters());
+        $this->assertEquals($expectedFormatted, $this->queryBuilder->getHavingString(true));
+//        var_dump($this->queryBuilder->getBoundParameters());
+        $this->assertEquals($expectedBoundParameters, $this->queryBuilder->getBoundParameters());
+        $this->assertEquals($expectedBoundParameters, $this->queryBuilder->getBoundParameters(false, 'having'));
+        $this->assertEquals(array(), $this->queryBuilder->getBoundParameters(false, 'where'));
+    }
+    
+    public function getHavingStringProvider()
+    {
+        return array(
+            array(
+                array(
+                    array('id', 1, null, null),
+                ),
+                'HAVING id = ? ',
+                'HAVING id = ? '."\n",
+                array(
+                    1,
+                ),
+            ),
+            array(
+                array(
+                    array('id', 1, QueryBuilder::NOT_EQUALS, null),
+                ),
+                'HAVING id != ? ',
+                'HAVING id != ? '."\n",
+                array(
+                    1,
+                ),
+            ),
+            array(
+                array(
+                    array('published_at', null, QueryBuilder::IS_NULL, null),
+                ),
+                'HAVING published_at IS NULL ',
+                'HAVING published_at IS NULL '."\n",
+                array(
+                ),
+            ),
+            array(
+                array(
+                    array('published_at', null, QueryBuilder::IS_NOT_NULL, null),
+                ),
+                'HAVING published_at IS NOT NULL ',
+                'HAVING published_at IS NOT NULL '."\n",
+                array(
+                ),
+            ),
+            array(
+                array(
+                    array('score', array(8,15), QueryBuilder::BETWEEN, null),
+                ),
+                'HAVING score BETWEEN ? AND ? ',
+                'HAVING score BETWEEN ? AND ? '."\n",
+                array(
+                    8,
+                    15,
+                ),
+            ),
+            array(
+                array(
+                    array('score', array(8,15), QueryBuilder::NOT_BETWEEN, null),
+                ),
+                'HAVING score NOT BETWEEN ? AND ? ',
+                'HAVING score NOT BETWEEN ? AND ? '."\n",
+                array(
+                    8,
+                    15,
+                ),
+            ),
+            array(
+                array(
+                    array('score', array(8,12,10,9,15), QueryBuilder::IN, null),
+                ),
+                'HAVING score IN (?, ?, ?, ?, ?) ',
+                'HAVING score IN (?, ?, ?, ?, ?) '."\n",
+                array(8,12,10,9,15),
+            ),
+            array(
+                array(
+                    array('score', array(8,12,10,9,15), QueryBuilder::NOT_IN, null),
+                ),
+                'HAVING score NOT IN (?, ?, ?, ?, ?) ',
+                'HAVING score NOT IN (?, ?, ?, ?, ?) '."\n",
+                array(8,12,10,9,15),
+            ),
+            array(
+                array(
+                    array('id', 1, QueryBuilder::NOT_EQUALS, null),
+                    array('score', array(8,12,10,9,15), QueryBuilder::IN, null),
+                ),
+                'HAVING id != ? AND score IN (?, ?, ?, ?, ?) ',
+                'HAVING id != ? '."\n".'AND score IN (?, ?, ?, ?, ?) '."\n",
+                array(1,8,12,10,9,15),
+            ),
+            array(
+                array(
+                    array('score', 5, QueryBuilder::LESS_THAN_OR_EQUAL, null),
+                    array('score', 9, QueryBuilder::GREATER_THAN_OR_EQUAL, QueryBuilder::LOGICAL_OR),
+                ),
+                'HAVING score <= ? OR score >= ? ',
+                'HAVING score <= ? '."\n".'OR score >= ? '."\n",
+                array(5,9),
+            ),
+            array(
+                array(
+                    array('title', 'Dune', QueryBuilder::NOT_EQUALS, null),
+                    array(QueryBuilder::BRACKET_OPEN, QueryBuilder::LOGICAL_OR),
+                    array('score', 5, QueryBuilder::GREATER_THAN_OR_EQUAL, null),
+                    array('score', 10, QueryBuilder::LESS_THAN_OR_EQUAL, QueryBuilder::LOGICAL_AND),
+                    array(QueryBuilder::BRACKET_CLOSE),
+                ),
+                'HAVING title != ? OR ( score >= ? AND score <= ? ) ',
+                'HAVING title != ? '."\n".'OR '."\n".'( '."\n".'    score >= ? '."\n".'    AND score <= ? '."\n".') '."\n",
+                array('Dune', 5, 10),
+            ),
+            array(
+                array(
+                    array('title', 'Dune', QueryBuilder::NOT_EQUALS, null),
+                    array(QueryBuilder::BRACKET_OPEN, QueryBuilder::LOGICAL_OR),
+                    array('score', 5, QueryBuilder::GREATER_THAN_OR_EQUAL, null),
+                    array('score', 10, QueryBuilder::LESS_THAN_OR_EQUAL, QueryBuilder::LOGICAL_AND),
+                    array(QueryBuilder::BRACKET_OPEN, QueryBuilder::LOGICAL_OR),
+                    array('published_at', '2011-10-02 00:00:00', QueryBuilder::EQUALS, null),
+                    array(QueryBuilder::BRACKET_CLOSE),
+                    array(QueryBuilder::BRACKET_CLOSE),
+                ),
+                'HAVING title != ? OR ( score >= ? AND score <= ? OR ( published_at = ? ) ) ',
+                'HAVING title != ? '."\n".'OR '."\n".'( '."\n".'    score >= ? '."\n".'    AND score <= ? '."\n".'    OR '."\n".'    ( '."\n".'        published_at = ? '."\n".'    ) '."\n".') '."\n",
+                array('Dune', 5, 10, '2011-10-02 00:00:00'),
+            ),
+        );
     }
     
     public function testQuote()
