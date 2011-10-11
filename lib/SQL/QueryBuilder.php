@@ -95,18 +95,11 @@ class QueryBuilder
     protected $sqlParts;
 
     /**
-     * bound parameters
+     * Where and Having bound parameters
      *
      * @var array
      */
     protected $boundParams;
-
-    /**
-     * bound parameters last index
-     * 
-     * @var int
-     */
-    protected $lastIndex;
     
     /**
      * Constructor.
@@ -128,7 +121,10 @@ class QueryBuilder
             'limit' => array('limit' => 0, 'offset' => 0),
         );
 
-        $this->boundParams = array();
+        $this->boundParams = array(
+            'where' => array(),
+            'having' => array(),
+        );
 
         $this->setConnection($PdoConnection);
     }
@@ -739,8 +735,6 @@ class QueryBuilder
             $connector = self::LOGICAL_AND;
         }
         
-        $rawValue = null;
-        $bind = null;
         switch ($operator)
         {
             case self::BETWEEN:
@@ -751,36 +745,24 @@ class QueryBuilder
                 }
                 
                 sort($value);
-                
-                $bind = array();
-                foreach ($value as $val)
-                {
-                    $bind[] = $this->addBoundParameter($val);
-                }
                 break;
 
             case self::IN:
             case self::NOT_IN:
                 $value = is_array($value) ? $value : array($value);
-                $bind = array();
-                foreach ($value as $val)
-                {
-                    $bind[] = $this->addBoundParameter($val);
-                }
                 break;
             
             case self::IS_NULL:
             case self::IS_NOT_NULL:
+                $value = null;
                 break;
             default:
-                $bind = $this->addBoundParameter($value);
                 break;
         }
 
         $criteria[] = array(
             'column' => $column,
-            'value' => $rawValue,
-            'bind'  => $bind,
+            'value' => $value,
             'operator' => $operator,
             'connector' => $connector
         );
@@ -796,11 +778,15 @@ class QueryBuilder
      * 
      * @return string
      */
-    protected function getCriteriaString(array &$criteria, $formatted = false)
+    protected function getCriteriaString(array &$criteria, array &$boundParams, $formatted = false)
     {
+        $boundParams = array();
         $string = '';
         $useConnector = false;
 
+        $indentChar = str_repeat(' ', 4);
+        $indent = 0;
+        
         foreach ($criteria as $i => $currentCriterion)
         {
             $criterionString = '';
@@ -812,13 +798,17 @@ class QueryBuilder
                 {
                     if ($useConnector)
                     {
+                        if ($formatted && $indent > 0)
+                        {
+                            $criterionString .= str_repeat($indentChar,$indent);
+                        }
+                        
                         $criterionString .= $currentCriterion['connector'].' ';
                         if ($formatted)
                         {
                             $criterionString .= "\n";
                         }
                     }
-
                     $useConnector = false;
                 }
                 else
@@ -826,15 +816,34 @@ class QueryBuilder
                     $useConnector = true;
                 }
 
-                $criterionString .= $currentCriterion['bracket'];
+                if ($formatted && $indent > 0)
+                {
+                    if (strcmp($currentCriterion['bracket'], self::BRACKET_CLOSE) == 0)
+                    {
+                        $indent--;
+                    }
+                    $criterionString .= str_repeat($indentChar,$indent);
+                }
+                
+                $criterionString .= $currentCriterion['bracket'].' ';
+                
                 if ($formatted)
                 {
+                    if (strcmp($currentCriterion['bracket'], self::BRACKET_OPEN) == 0)
+                    {
+                        $indent++;
+                    }
                     $criterionString .= "\n";
                 }
                 $string .= $criterionString;
             }
             else
             {
+                if ($formatted && $indent > 0)
+                {
+                    $criterionString .= str_repeat($indentChar,$indent);
+                }
+                
                 if ($useConnector)
                 {
                     $criterionString .= $currentCriterion['connector'].' ';
@@ -847,12 +856,20 @@ class QueryBuilder
                     case self::BETWEEN:
                     case self::NOT_BETWEEN:
                         $value = '? '.self::LOGICAL_AND.' ?';
+                        $boundParams[] = $currentCriterion['value'][0];
+                        $boundParams[] = $currentCriterion['value'][1];
                         break;
 
                     case self::IN:
                     case self::NOT_IN:
+                        
+                        foreach ($currentCriterion['value'] as $val)
+                        {
+                            $boundParams[] = $val;
+                        }
+                        
                         $value = self::BRACKET_OPEN
-                            .substr(str_repeat('?, ', count($currentCriterion['bind'])), 0, -2)
+                            .substr(str_repeat('?, ', count($currentCriterion['value'])), 0, -2)
                             .self::BRACKET_CLOSE;
                         break;
 
@@ -909,6 +926,7 @@ class QueryBuilder
 //                        break;
 
                     default:
+                        $boundParams[] = $currentCriterion['value'];
                         $value = '?';
                         break;
                 }
@@ -1040,7 +1058,7 @@ class QueryBuilder
      */
     public function getWhereString($formatted = false)
     {
-        $where = $this->getCriteriaString($this->sqlParts['where'], $formatted);
+        $where = $this->getCriteriaString($this->sqlParts['where'], $this->boundParams['where'], $formatted);
 
         if (!empty($where))
         {
@@ -1246,16 +1264,11 @@ class QueryBuilder
      */
     public function getHavingString($formatted = false)
     {
-        $having = $this->getCriteriaString($this->sqlParts['having'], $usePlaceholders, $this->havingPlaceholderValues);
+        $having = $this->getCriteriaString($this->sqlParts['having'], $this->boundParams['having'], $formatted);
 
         if (!empty($having))
         {
-            $having = 'HAVING '.$having.' ';
-        }
-
-        if ($formatted && !empty($having))
-        {
-            $having .= "\n";
+            $having = 'HAVING '.$having;
         }
 
         return $having;
@@ -1468,67 +1481,33 @@ class QueryBuilder
     }
 
     /**
-     * add a new bound parameter
-     *
-     * @param mixed $value
-     * 
-     * @return int last inserted index
-     */
-    public function addBoundParameter($value)
-    {
-        if (is_array($value))
-        {
-            $lastIndex = null;
-            foreach ($value as $subvalue)
-            {
-                $lastIndex = $this->addBoundParameter($subvalue);
-            }
-            return $lastIndex;
-        }
-        else
-        {
-            $this->boundParams[] = $value;
-            return $this->getLastBoundParameterIndex();
-        }
-    }
-
-    /**
-     *
-     * @return int 
-     */
-    public function getLastBoundParameterIndex()
-    {
-        end($this->boundParams);
-        return key($this->boundParams);
-    }
-    
-    /**
-     * Returns all bound parameters
-     *
-     * @param $index
-     * 
-     * @return mixed
-     */
-    public function getBoundParameter($index)
-    {
-        return isset($this->boundParams[$index]) ? $this->boundParams[$index] : null;
-    }
-
-    /**
      * Returns all bound parameters
      *
      * @param bool $quoted default = false, if true the bound parameters are escaped
      * 
      * @return array
      */
-    public function getBoundParameters($quoted = false)
+    public function getBoundParameters($quoted = false, $section = null)
     {
+        if ($section == 'having')
+        {
+            $boundParams = $this->boundParams['having'];
+        }
+        elseif ($section == 'where')
+        {
+            $boundParams = $this->boundParams['where'];
+        }
+        else
+        {
+            $boundParams = array_merge($this->boundParams['where'], $this->boundParams['having']);
+        }
+        
         if ($quoted)
         {
-            return array_map(array($this, 'quote'), $this->boundParams);
+            return array_map(array($this, 'quote'), $boundParams);
         }
 
-        return $this->boundParams;
+        return $boundParams;
     }
 
     /**

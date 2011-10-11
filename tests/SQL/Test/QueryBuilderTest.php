@@ -77,40 +77,6 @@ EOD;
     {
         $this->assertInstanceOf('\PDO', $this->queryBuilder->getConnection());
     }
-
-
-    
-    /**
-     *
-     * @dataProvider AddBoundParameterProvider
-     */
-    public function testAddBoundParameter($param)
-    {
-        // Remove the following lines when you implement this test.
-        $this->markTestIncomplete(
-          'This test has not been implemented yet.'
-        );
-    }
-    
-    public function AddBoundParameterProvider()
-    {
-        return array(
-            array(
-                'test',
-            ),
-            array(
-                array(2,5),
-            ),
-        );
-    }
-
-    public function testGetBoundParameters()
-    {
-        // Remove the following lines when you implement this test.
-        $this->markTestIncomplete(
-          'This test has not been implemented yet.'
-        );
-    }
     
     /**
      * @dataProvider fromProvider
@@ -779,11 +745,10 @@ EOD;
      *
      * @dataProvider whereProvider
      */
-    public function testWhere($column, $value, $operator, $connector, $expected, $expectedBoundParameters)
+    public function testWhere($column, $value, $operator, $connector, $expected)
     {
         $this->assertInstanceOf('SQL\QueryBuilder',$this->queryBuilder->where($column, $value, $operator, $connector));
         $this->assertEquals($expected, $this->queryBuilder->getWhereParts());
-        $this->assertEquals($expectedBoundParameters, $this->queryBuilder->getBoundParameters());
     }
     
     /**
@@ -800,15 +765,12 @@ EOD;
         $expected = array(
             array(
                 'column' => 'id',
-                'value' => null,
-                'bind' => 0,
+                'value' => 1,
                 'operator' => QueryBuilder::EQUALS,
                 'connector' => QueryBuilder::LOGICAL_AND,
             ),
         );
-        $expectedBoundParameters = array(1);
         $this->assertEquals($expected, $this->queryBuilder->getWhereParts());
-        $this->assertEquals($expectedBoundParameters, $this->queryBuilder->getBoundParameters());
     }
     
     public function testOrWhere()
@@ -817,15 +779,12 @@ EOD;
         $expected = array(
             array(
                 'column' => 'id',
-                'value' => null,
-                'bind' => 0,
+                'value' => 1,
                 'operator' => QueryBuilder::EQUALS,
                 'connector' => QueryBuilder::LOGICAL_OR,
             ),
         );
-        $expectedBoundParameters = array(1);
         $this->assertEquals($expected, $this->queryBuilder->getWhereParts());
-        $this->assertEquals($expectedBoundParameters, $this->queryBuilder->getBoundParameters());
     }
     
     public function whereProvider()
@@ -839,13 +798,11 @@ EOD;
                 array(
                     array(
                         'column' => 'id',
-                        'value' => null,
-                        'bind' => 0,
+                        'value' => 1,
                         'operator' => QueryBuilder::EQUALS,
                         'connector' => QueryBuilder::LOGICAL_AND,
                     ),
                 ),
-                array(1),
             ),
             array(
                 'id',
@@ -855,13 +812,11 @@ EOD;
                 array(
                     array(
                         'column' => 'id',
-                        'value' => null,
-                        'bind' => 0,
+                        'value' => 1,
                         'operator' => QueryBuilder::GREATER_THAN_OR_EQUAL,
                         'connector' => QueryBuilder::LOGICAL_OR,
                     ),
                 ),
-                array(1),
             ),
             array(
                 'published_at',
@@ -872,12 +827,10 @@ EOD;
                     array(
                         'column' => 'published_at',
                         'value' => null,
-                        'bind' => null,
                         'operator' => QueryBuilder::IS_NULL,
                         'connector' => QueryBuilder::LOGICAL_AND,
                     ),
                 ),
-                array(),
             ),
             array(
                 'id',
@@ -887,13 +840,11 @@ EOD;
                 array(
                     array(
                         'column' => 'id',
-                        'value' => null,
-                        'bind' => array(0,1),
+                        'value' => array(2,5),
                         'operator' => QueryBuilder::BETWEEN,
                         'connector' => QueryBuilder::LOGICAL_AND,
                     ),
                 ),
-                array(2,5),
             ),
             array(
                 'title',
@@ -903,13 +854,11 @@ EOD;
                 array(
                     array(
                         'column' => 'title',
-                        'value' => null,
-                        'bind' => array(0,1),
+                        'value' => array('Dune','Fahrenheit'),
                         'operator' => QueryBuilder::IN,
                         'connector' => QueryBuilder::LOGICAL_AND,
                     ),
                 ),
-                array('Dune','Fahrenheit'),
             ),
             array(
                 'title',
@@ -919,13 +868,11 @@ EOD;
                 array(
                     array(
                         'column' => 'title',
-                        'value' => null,
-                        'bind' => array(0),
+                        'value' => array('Dune'),
                         'operator' => QueryBuilder::IN,
                         'connector' => QueryBuilder::LOGICAL_AND,
                     ),
                 ),
-                array('Dune'),
             ),
         );
     }
@@ -993,15 +940,23 @@ EOD;
 //        var_dump($this->queryBuilder->getBoundParameters());
         foreach ($wheres as $where)
         {
-            if (count($where) == 4)
+            $nbWhere = count($where);
+            if ($nbWhere == 4)
             {    
                 $this->queryBuilder->where($where[0], $where[1], $where[2], $where[3]);
             }
-            elseif (count($where) == 1)
+            elseif ($nbWhere >= 1 && $nbWhere <= 2)
             {
                 if ($where[0] == '(')
                 {
-                    $this->queryBuilder->openWhere();
+                    if (isset($where[1]))
+                    {
+                        $this->queryBuilder->openWhere($where[1]);
+                    }
+                    else
+                    {
+                        $this->queryBuilder->openWhere();
+                    }
                 }
                 elseif($where[0] == ')')
                 {
@@ -1017,6 +972,8 @@ EOD;
         $this->assertEquals($expectedFormatted, $this->queryBuilder->getWhereString(true));
 //        var_dump($this->queryBuilder->getBoundParameters());
         $this->assertEquals($expectedBoundParameters, $this->queryBuilder->getBoundParameters());
+        $this->assertEquals($expectedBoundParameters, $this->queryBuilder->getBoundParameters(false, 'where'));
+        $this->assertEquals(array(), $this->queryBuilder->getBoundParameters(false, 'having'));
     }
     
     public function getWhereStringProvider()
@@ -1106,6 +1063,42 @@ EOD;
                 'WHERE id != ? AND score IN (?, ?, ?, ?, ?) ',
                 'WHERE id != ? '."\n".'AND score IN (?, ?, ?, ?, ?) '."\n",
                 array(1,8,12,10,9,15),
+            ),
+            array(
+                array(
+                    array('score', 5, QueryBuilder::LESS_THAN_OR_EQUAL, null),
+                    array('score', 9, QueryBuilder::GREATER_THAN_OR_EQUAL, QueryBuilder::LOGICAL_OR),
+                ),
+                'WHERE score <= ? OR score >= ? ',
+                'WHERE score <= ? '."\n".'OR score >= ? '."\n",
+                array(5,9),
+            ),
+            array(
+                array(
+                    array('title', 'Dune', QueryBuilder::NOT_EQUALS, null),
+                    array(QueryBuilder::BRACKET_OPEN, QueryBuilder::LOGICAL_OR),
+                    array('score', 5, QueryBuilder::GREATER_THAN_OR_EQUAL, null),
+                    array('score', 10, QueryBuilder::LESS_THAN_OR_EQUAL, QueryBuilder::LOGICAL_AND),
+                    array(QueryBuilder::BRACKET_CLOSE),
+                ),
+                'WHERE title != ? OR ( score >= ? AND score <= ? ) ',
+                'WHERE title != ? '."\n".'OR '."\n".'( '."\n".'    score >= ? '."\n".'    AND score <= ? '."\n".') '."\n",
+                array('Dune', 5, 10),
+            ),
+            array(
+                array(
+                    array('title', 'Dune', QueryBuilder::NOT_EQUALS, null),
+                    array(QueryBuilder::BRACKET_OPEN, QueryBuilder::LOGICAL_OR),
+                    array('score', 5, QueryBuilder::GREATER_THAN_OR_EQUAL, null),
+                    array('score', 10, QueryBuilder::LESS_THAN_OR_EQUAL, QueryBuilder::LOGICAL_AND),
+                    array(QueryBuilder::BRACKET_OPEN, QueryBuilder::LOGICAL_OR),
+                    array('published_at', '2011-10-02 00:00:00', QueryBuilder::EQUALS, null),
+                    array(QueryBuilder::BRACKET_CLOSE),
+                    array(QueryBuilder::BRACKET_CLOSE),
+                ),
+                'WHERE title != ? OR ( score >= ? AND score <= ? OR ( published_at = ? ) ) ',
+                'WHERE title != ? '."\n".'OR '."\n".'( '."\n".'    score >= ? '."\n".'    AND score <= ? '."\n".'    OR '."\n".'    ( '."\n".'        published_at = ? '."\n".'    ) '."\n".') '."\n",
+                array('Dune', 5, 10, '2011-10-02 00:00:00'),
             ),
         );
     }
