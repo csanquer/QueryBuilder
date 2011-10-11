@@ -562,12 +562,15 @@ EOD;
      *
      * @dataProvider getLimitStringProvider
      */
-    public function testGetLimitString($limits, $expected, $expectedFormatted)
+    public function testGetLimitString($limit, $expected, $expectedFormatted)
     {
-        foreach ($limits as $limit)
+        if (!empty($limit))
         {
             $this->queryBuilder->limit($limit[0]);
-            $this->queryBuilder->offset($limit[1]);
+            if (isset($limit[1]))
+            {
+                $this->queryBuilder->offset($limit[1]);
+            }
         }
         
         $this->assertEquals($expected, $this->queryBuilder->getLimitString());
@@ -578,23 +581,17 @@ EOD;
     {
         return array(
             array(
-                array(
-                    array(0, null),
-                ),
+                array(0, null),
                 '',
                 '',
             ),
             array(
-                array(
-                    array(5, null),
-                ),
+                array(5, null),
                 'LIMIT 5 OFFSET 0 ',
                 'LIMIT 5 '."\n".'OFFSET 0 '."\n",
             ),
             array(
-                array(
-                    array(5, 10),
-                ),
+                array(5, 10),
                 'LIMIT 5 OFFSET 10 ',
                 'LIMIT 5 '."\n".'OFFSET 10 '."\n",
             ),
@@ -1294,7 +1291,6 @@ EOD;
      */
     public function testGetHavingString($havings, $expected, $expectedFormatted, $expectedBoundParameters)
     {
-//        var_dump($this->queryBuilder->getBoundParameters());
         foreach ($havings as $having)
         {
             $nbHaving = count($having);
@@ -1321,13 +1317,9 @@ EOD;
                 }
             }
         }
-//        var_dump($expected,$this->queryBuilder->getHavingString());
-//        var_dump($expectedFormatted, $this->queryBuilder->getHavingString(true));
         
         $this->assertEquals($expected, $this->queryBuilder->getHavingString());
-//        var_dump($this->queryBuilder->getBoundParameters());
         $this->assertEquals($expectedFormatted, $this->queryBuilder->getHavingString(true));
-//        var_dump($this->queryBuilder->getBoundParameters());
         $this->assertEquals($expectedBoundParameters, $this->queryBuilder->getBoundParameters());
         $this->assertEquals($expectedBoundParameters, $this->queryBuilder->getBoundParameters(false, 'having'));
         $this->assertEquals(array(), $this->queryBuilder->getBoundParameters(false, 'where'));
@@ -1459,6 +1451,177 @@ EOD;
             ),
         );
     }
+ 
+    /**
+     * @dataProvider debugQueryProvider
+     */
+    public function testDebugQuery($query, $params, $expected, $expectedQuoted, $expectedQuotedPDO)
+    {
+        $this->assertEquals($expected, QueryBuilder::debugQuery($query, $params, false));
+        $this->assertEquals($expectedQuoted, QueryBuilder::debugQuery($query, $params, true));
+        $this->assertEquals($expectedQuotedPDO, QueryBuilder::debugQuery($query, $params, true, $this->pdo));
+    }
+    
+    public function debugQueryProvider()
+    {
+        return array(
+            array(
+                'SELECT * FROM book b WHERE b.title = ?', 
+                array('l\'île au trésor'),
+                'SELECT * FROM book b WHERE b.title = \'l\'île au trésor\'',
+                'SELECT * FROM book b WHERE b.title = \'l\\\'île au trésor\'',
+                'SELECT * FROM book b WHERE b.title = \'l\'\'île au trésor\'',
+            ),
+            array(
+                'SELECT * FROM book b WHERE b.title = :title', 
+                array('title' => 'l\'île au trésor'),
+                'SELECT * FROM book b WHERE b.title = \'l\'île au trésor\'',
+                'SELECT * FROM book b WHERE b.title = \'l\\\'île au trésor\'',
+                'SELECT * FROM book b WHERE b.title = \'l\'\'île au trésor\'',
+            ),
+            array(
+                'SELECT * FROM book b WHERE b.title = :title', 
+                array(':title' => 'l\'île au trésor'),
+                'SELECT * FROM book b WHERE b.title = \'l\'île au trésor\'',
+                'SELECT * FROM book b WHERE b.title = \'l\\\'île au trésor\'',
+                'SELECT * FROM book b WHERE b.title = \'l\'\'île au trésor\'',
+            ),
+        );
+    }
+    
+    /**
+     * @dataProvider getQueryStringProvider
+     */
+    public function testGetQueryString($selects, $from, $joins, $wheres, $groupBys, $havings, $orderBys, $limit, $expectedQuery, $expectedFormattedQuery, $expectedBoundParameters, $expectedQuotedBoundParameters, $expectedDebuggedQuery)
+    {
+        foreach ($selects as $select)
+        {
+            $this->queryBuilder->select($select[0], isset($select[1]) ? $select[1] : null);
+        }
+        
+        $this->queryBuilder->from($from[0], isset($from[1]) ? $from[1] : null);
+        
+        foreach ($joins as $join)
+        {
+            $this->queryBuilder->join($join[0], isset($join[1]) ? $join[1] : null, isset($join[2]) ? $join[2] : null, isset($join[3]) ? $join[3] : null);
+        }
+        
+        foreach ($wheres as $where)
+        {
+            $nbWhere = count($where);
+            if ($nbWhere == 4)
+            {    
+                $this->queryBuilder->where($where[0], $where[1], $where[2], $where[3]);
+            }
+            elseif ($nbWhere >= 1 && $nbWhere <= 2)
+            {
+                if ($where[0] == '(')
+                {
+                    if (isset($where[1]))
+                    {
+                        $this->queryBuilder->openWhere($where[1]);
+                    }
+                    else
+                    {
+                        $this->queryBuilder->openWhere();
+                    }
+                }
+                elseif($where[0] == ')')
+                {
+                    $this->queryBuilder->closeWhere();
+                }
+            }
+        }
+        
+        foreach ($groupBys as $groupBy)
+        {
+            $this->queryBuilder->groupBy($groupBy[0], $groupBy[1]);
+        }
+        
+        foreach ($havings as $having)
+        {
+            $nbHaving = count($having);
+            if ($nbHaving == 4)
+            {    
+                $this->queryBuilder->having($having[0], $having[1], $having[2], $having[3]);
+            }
+            elseif ($nbHaving >= 1 && $nbHaving <= 2)
+            {
+                if ($having[0] == '(')
+                {
+                    if (isset($having[1]))
+                    {
+                        $this->queryBuilder->openHaving($having[1]);
+                    }
+                    else
+                    {
+                        $this->queryBuilder->openHaving();
+                    }
+                }
+                elseif($having[0] == ')')
+                {
+                    $this->queryBuilder->closeHaving();
+                }
+            }
+        }
+        
+        foreach ($orderBys as $orderBy)
+        {
+            $this->queryBuilder->orderBy($orderBy[0], $orderBy[1]);
+        }
+        
+        if (!empty($limit))
+        {
+            $this->queryBuilder->limit($limit[0]);
+            if (isset($limit[1]))
+            {
+                $this->queryBuilder->offset($limit[1]);
+            }
+        }
+        
+        $this->assertEquals($expectedQuery, $this->queryBuilder->getQueryString());
+        $this->assertEquals($expectedQuery, (string) $this->queryBuilder);
+        $this->assertEquals($expectedFormattedQuery, $this->queryBuilder->getQueryString(true));
+        $this->assertEquals($expectedBoundParameters, $this->queryBuilder->getBoundParameters());
+        $this->assertEquals($expectedQuotedBoundParameters, $this->queryBuilder->getBoundParameters(true));
+        $this->assertEquals($expectedDebuggedQuery, $this->queryBuilder->debug());
+    }
+   
+    public function getQueryStringProvider()
+    {
+        return array(
+            array(
+                //select
+                array(),
+                //from
+                array('book'),
+                //joins
+                array(),
+                //wheres
+                array(
+                    array('title', 'l\'île au trésor', null, null),
+                ),
+                //groupBys
+                array(),
+                //havings
+                array(),
+                //orderBys
+                array(),
+                //limit
+                array(),
+                //expectedQuery
+                'SELECT * FROM book WHERE title = ? ',
+                //expectedFormattedQuery
+                'SELECT * '."\n".'FROM book '."\n".'WHERE title = ? '."\n",
+                //expectedBoundParameters
+                array('l\'île au trésor'),
+                //expectedQuotedBoundParameters
+                array('\'l\'\'île au trésor\''),
+                //expectedDebuggedQuery
+                'SELECT * '."\n".'FROM book '."\n".'WHERE title = \'l\'\'île au trésor\' '."\n",
+            ),
+        );
+    }
     
     public function testQuote()
     {
@@ -1477,14 +1640,4 @@ EOD;
         $this->assertEquals("'\' AND 1'", $queryBuilder->quote("' AND 1"));
     }
     
-    /**
-     * @todo Implement test__toString().
-     */
-    public function test__toString()
-    {
-        // Remove the following lines when you implement this test.
-        $this->markTestIncomplete(
-          'This test has not been implemented yet.'
-        );
-    }
 }

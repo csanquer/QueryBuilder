@@ -1522,7 +1522,7 @@ class QueryBuilder
      * @param string $query The sql query with parameter placeholders
      * @param array $params The array of substitution parameters
      * @param bool $quote default = true, if true quote each parameter
-     * @param PDO default = null $connection PDO connection (used to quote values)
+     * @param PDO $connection default = null , PDO connection (used to quote values)
      * 
      * @return string The debugged query
      */
@@ -1534,7 +1534,14 @@ class QueryBuilder
         {
             if (is_string($key))
             {
-                $keys[] = '/:'.$key.'/';
+                if (strpos($key, ':') === 0)
+                {
+                    $keys[] = '/'.$key.'/';
+                }
+                else
+                {
+                    $keys[] = '/:'.$key.'/';
+                }
             }
             else
             {
@@ -1544,6 +1551,10 @@ class QueryBuilder
             if ($quoted)
             {
                 $params[$key] = self::quoteValue($value, $connection);
+            }
+            elseif (is_string($value) && !is_numeric($value))
+            {
+                $params[$key] = '\''.$value.'\'';
             }
         }
         $query = preg_replace($keys, $params, $query, 1);
@@ -1562,7 +1573,7 @@ class QueryBuilder
      */
     public function debug($quoted = true, $formatted = true)
     {
-        return self::debugQuery($this->getQueryString($formatted), $this->getBoundParameters($quoted));
+        return self::debugQuery($this->getQueryString($formatted), $this->getBoundParameters(), $quoted, $this->getConnection());
     }
     
     /**
