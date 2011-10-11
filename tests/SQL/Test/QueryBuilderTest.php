@@ -1672,15 +1672,23 @@ EOD;
     {
         $this->assertEquals("''' AND 1'", $this->queryBuilder->quote("' AND 1"));
         
-        $queryBuilder = new QueryBuilder();
-        
-        $quote1 = $queryBuilder->quote(1);
+        $quote1 = $this->queryBuilder->quote(1);
         $this->assertInternalType('integer', $quote1);
         $this->assertEquals(1, $quote1);
         
-        $quote2 = $queryBuilder->quote('2');
+        $quote2 = $this->queryBuilder->quote('2');
         $this->assertInternalType('string', $quote2);
-        $this->assertEquals('2', $quote2);
+        $this->assertEquals('\'2\'', $quote2);
+        
+        $queryBuilder = new QueryBuilder();
+        
+        $quote3 = $queryBuilder->quote(1);
+        $this->assertInternalType('integer', $quote3);
+        $this->assertEquals(1, $quote3);
+        
+        $quote4 = $queryBuilder->quote('2');
+        $this->assertInternalType('string', $quote4);
+        $this->assertEquals('\'2\'', $quote4);
         
         $this->assertEquals("'\' AND 1'", $queryBuilder->quote("' AND 1"));
     }

@@ -173,17 +173,17 @@ class QueryBuilder
      */
     public static function quoteValue($value, \PDO $connection = null)
     {
-        // If a PDO database connection is set, use it to quote the value using
-        // the underlying database. Otherwise, quote it manually.
-        if ($connection instanceof \PDO)
+        if (is_int($value) || is_float($value))
         {
-            return $connection->quote($value);
+            return $value;
         }
         else
         {
-            if (is_numeric($value))
+            // If a PDO database connection is set, use it to quote the value using
+            // the underlying database. Otherwise, quote it manually.
+            if ($connection instanceof \PDO)
             {
-                return $value;
+                return $connection->quote($value);
             }
             else
             {
