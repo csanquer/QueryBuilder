@@ -1474,8 +1474,10 @@ class QueryBuilder
      */
     public function getQueryString($formatted = false)
     {
+        //return empty string if from parts or selects parts are not set
         $tableFrom = $this->getFromTable();
-        if (empty($tableFrom))
+        $selects = $this->getSelectParts();
+        if (empty($tableFrom) && empty($selects))
         {
             return '';
         }
