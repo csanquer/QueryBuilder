@@ -560,7 +560,7 @@ class QueryBuilder
             {
                 $join .= ' AS '.$currentJoin['alias'];
             }
-            $join .= ' ';
+            $join = trim($join).' ';
 
             if ($formatted)
             {
@@ -591,7 +591,7 @@ class QueryBuilder
                     {
                         $join .= $criterion;
                     }
-                    $join .= ' ';
+                    $join = trim($join).' ';
 
                     if ($formatted)
                     {
@@ -600,7 +600,6 @@ class QueryBuilder
                 }
             }
         }
-//        $join = trim($join);
 
         return $join;
     }
@@ -636,7 +635,7 @@ class QueryBuilder
             {
                 $from .= ' AS '.$this->sqlParts['from']['alias'];
             }
-            $from .= ' ';
+            $from = trim($from).' ';
             if ($formatted)
             {
                 $from .= "\n";
@@ -644,7 +643,6 @@ class QueryBuilder
             // Add any JOINs.
             $from .= $this->getJoinString($formatted);
         }
-//        $from = rtrim($from);
 
         if (!empty($from))
         {
