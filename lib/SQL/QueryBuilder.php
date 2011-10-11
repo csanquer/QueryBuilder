@@ -774,6 +774,7 @@ class QueryBuilder
      * Returns the WHERE or HAVING portion of the query as a string.
      *
      * @param  array $criteria WHERE or HAVING criteria
+     * @param  array $boundParams bound parameters section 
      * @param  bool $formatted format SQL string on multiple lines, default false
      * 
      * @return string
@@ -1073,6 +1074,7 @@ class QueryBuilder
      *
      * @param  string $column column name
      * @param  string $order optional order direction, default empty (specific to MySQL)
+     * 
      * @return SQL\QueryBuilder
      */
     public function groupBy($column, $order = null)
@@ -1466,7 +1468,8 @@ class QueryBuilder
     /**
      * Returns the full query string.
      *
-     * @param  bool $usePlaceholders optional use ? placeholders, default true
+     * @param  bool $formatted format SQL string on multiple lines, default false
+     * 
      * @return string
      */
     public function getQueryString($formatted = false)
@@ -1484,6 +1487,7 @@ class QueryBuilder
      * Returns all bound parameters
      *
      * @param bool $quoted default = false, if true the bound parameters are escaped
+     * @param string|null $section default = null, which bound parameters section to retrieve
      * 
      * @return array
      */
