@@ -1137,6 +1137,24 @@ EOD;
                 'WHERE title != ? '."\n".'OR '."\n".'( '."\n".'    score >= ? '."\n".'    AND score <= ? '."\n".'    OR '."\n".'    ( '."\n".'        published_at = ? '."\n".'    ) '."\n".') '."\n",
                 array('Dune', 5, 10, '2011-10-02 00:00:00'),
             ),
+            array(
+                array(
+                    array('title LIKE ?', '%the%', QueryBuilder::RAW_WHERE, null),
+                ),
+                'WHERE title LIKE ? ',
+                'WHERE title LIKE ? '."\n",
+                array(
+                    '%the%',
+                ),
+            ),
+            array(
+                array(
+                    array('score BETWEEN ? AND ?  ', array(5, 8), QueryBuilder::RAW_WHERE, null),
+                ),
+                'WHERE score BETWEEN ? AND ? ',
+                'WHERE score BETWEEN ? AND ? '."\n",
+                array(5, 8),
+            ),
         );
     }
 

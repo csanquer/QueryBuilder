@@ -877,12 +877,25 @@ class QueryBuilder
                         $value = '';
                         break;
                     
-//                    case self::RAW_WHERE:
-//                        $currentCriterion['operator'] = '';
-//                        $value = '';
-//                        $this->addBoundParameter($currentCriterion['value']);
-//                        $currentCriterion['column'] = preg_replace('/(\?|:[a-zA-Z0-9]+)/', '?', $currentCriterion['column']);
-//                        break;
+                    case self::RAW_WHERE:
+                        $currentCriterion['column'] = trim($currentCriterion['column']);
+                        $currentCriterion['operator'] = '';
+                        $value = '';
+                        if (!is_null($currentCriterion['value']))
+                        {
+                            if (is_array($currentCriterion['value']))
+                            {
+                                foreach ($currentCriterion['value'] as $val)
+                                {
+                                    $boundParams[] = $val;
+                                }
+                            }
+                            else
+                            {
+                                $boundParams[] = $currentCriterion['value'];
+                            }
+                        }
+                        break;
 
 //                    case self::SUB_QUERY_IN:
 //                    case self::SUB_QUERY_NOT_IN:
