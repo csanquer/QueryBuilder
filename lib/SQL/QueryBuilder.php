@@ -63,7 +63,7 @@ class QueryBuilder
     /**
      * Specifies that the where() column name is the full where field, eg where('users.password = password(?)', 'test', QueryBuilder::RAW_WHERE)
      */
-    const RAW_WHERE = 'raw';
+    const RAW_CRITERIA = 'raw';
 
     /**
      * Specifies that the where() column contains a subquery
@@ -718,7 +718,7 @@ class QueryBuilder
             self::NOT_BETWEEN,
             self::IS_NULL,
             self::IS_NOT_NULL,
-            self::RAW_WHERE,
+            self::RAW_CRITERIA,
             self::SUB_QUERY_IN,
             self::SUB_QUERY_NOT_IN,
             self::SUB_QUERY_EXISTS,
@@ -877,7 +877,7 @@ class QueryBuilder
                         $value = '';
                         break;
                     
-                    case self::RAW_WHERE:
+                    case self::RAW_CRITERIA:
                         $currentCriterion['column'] = trim($currentCriterion['column']);
                         $currentCriterion['operator'] = '';
                         $value = '';

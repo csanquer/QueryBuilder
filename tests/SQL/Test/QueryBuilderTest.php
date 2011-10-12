@@ -1139,7 +1139,7 @@ EOD;
             ),
             array(
                 array(
-                    array('title LIKE ?', '%the%', QueryBuilder::RAW_WHERE, null),
+                    array('title LIKE ?', '%the%', QueryBuilder::RAW_CRITERIA, null),
                 ),
                 'WHERE title LIKE ? ',
                 'WHERE title LIKE ? '."\n",
@@ -1149,7 +1149,7 @@ EOD;
             ),
             array(
                 array(
-                    array('score BETWEEN ? AND ?  ', array(5, 8), QueryBuilder::RAW_WHERE, null),
+                    array('score BETWEEN ? AND ?  ', array(5, 8), QueryBuilder::RAW_CRITERIA, null),
                 ),
                 'WHERE score BETWEEN ? AND ? ',
                 'WHERE score BETWEEN ? AND ? '."\n",
@@ -1741,7 +1741,7 @@ EOD;
                 ),
                 //wheres
                 array(
-                    array('b.price >= ? ', 7.0, QueryBuilder::RAW_WHERE, null),
+                    array('b.price >= ? ', 7.0, QueryBuilder::RAW_CRITERIA, null),
                 ),
                 //groupBys
                 array(
@@ -1749,7 +1749,7 @@ EOD;
                 ),
                 //havings
                 array(
-                    array('score > ? ', 4, QueryBuilder::RAW_WHERE, null),
+                    array('score > ? ', 4, QueryBuilder::RAW_CRITERIA, null),
                 ),
                 //orderBys
                 array(
