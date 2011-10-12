@@ -11,7 +11,7 @@ namespace SQL;
  * @author   Matt Labrum
  * @author   Charles SANQUER <charles.sanquer@spyrit.net>
  */
-class QueryBuilder
+class SelectQueryBuilder
 {
     /**
      * JOIN types.
@@ -117,7 +117,7 @@ class QueryBuilder
      * Constructor.
      *
      * @param  PDO $PdoConnection optional PDO database connection
-     * @return SQL\QueryBuilder
+     * @return SQLSelectQueryBuilderr
      */
     public function __construct(\PDO $PdoConnection = null)
     {
@@ -148,7 +148,7 @@ class QueryBuilder
      * Sets the PDO database connection to use in executing this query.
      *
      * @param  PDO $PdoConnection optional PDO database connection
-     * @return SQL\QueryBuilder
+     * @return SQLSelectQueryBuilderr
      */
     public function setConnection(\PDO $connection = null)
     {
@@ -211,7 +211,7 @@ class QueryBuilder
      * Adds an execution option like DISTINCT or SQL_CALC_FOUND_ROWS.
      *
      * @param  string $option execution option to add
-     * @return SQL\QueryBuilder
+     * @return SQLSelectQueryBuilderr
      */
     public function addOption($option)
     {
@@ -226,7 +226,7 @@ class QueryBuilder
     /**
      * Adds SQL_CALC_FOUND_ROWS execution option.
      *
-     * @return SQL\QueryBuilder
+     * @return SQLSelectQueryBuilderr
      */
     public function calcFoundRows()
     {
@@ -236,7 +236,7 @@ class QueryBuilder
     /**
      * Adds DISTINCT execution option.
      *
-     * @return SQL\QueryBuilder
+     * @return SQLSelectQueryBuilderr
      */
     public function distinct()
     {
@@ -270,7 +270,7 @@ class QueryBuilder
      * @param  string $column column name, table name, or expression, or array of column (index = column and value = alias)
      * @param  string $alias optional alias
      * 
-     * @return SQL\QueryBuilder
+     * @return SQLSelectQueryBuilderr
      */
     public function select($column, $alias = null)
     {
@@ -363,7 +363,7 @@ class QueryBuilder
      *
      * @param  string $table table name
      * @param  string $alias optional alias
-     * @return SQL\QueryBuilder
+     * @return SQLSelectQueryBuilderr
      */
     public function from($table, $alias = null)
     {
@@ -413,7 +413,7 @@ class QueryBuilder
      * @param  string|array $criteria optional ON criteria
      * @param  string $type optional type of join, default INNER JOIN
 
-     * @return SQL\QueryBuilder
+     * @return SQLSelectQueryBuilderr
      */
     public function join($table, $alias = null, $criteria = null, $type = self::INNER_JOIN)
     {
@@ -446,7 +446,7 @@ class QueryBuilder
      * @param  string $table table name
      * @param  string|array $criteria optional ON criteria
      * @param  string $alias optional alias
-     * @return SQL\QueryBuilder
+     * @return SQLSelectQueryBuilderr
      */
     public function innerJoin($table, $alias = null, $criteria = null)
     {
@@ -460,7 +460,7 @@ class QueryBuilder
      * @param  string $alias optional alias
      * @param  string|array $criteria optional ON criteria
      * 
-     * @return SQL\QueryBuilder
+     * @return SQLSelectQueryBuilderr
      */
     public function leftJoin($table, $alias = null, $criteria = null)
     {
@@ -474,7 +474,7 @@ class QueryBuilder
      * @param  string $alias optional alias
      * @param  string|array $criteria optional ON criteria
      * 
-     * @return SQL\QueryBuilder
+     * @return SQLSelectQueryBuilderr
      */
     public function rightJoin($table, $alias = null, $criteria = null)
     {
@@ -636,7 +636,7 @@ class QueryBuilder
      *
      * @param  array $criteria WHERE or HAVING criteria
      * @param  string $connector optional logical connector, default AND
-     * @return SQL\QueryBuilder
+     * @return SQLSelectQueryBuilderr
      */
     protected function openCriteria(array &$criteria, $connector = self::LOGICAL_AND)
     {
@@ -653,7 +653,7 @@ class QueryBuilder
      * HAVING criteria.
      *
      * @param  array $criteria WHERE or HAVING criteria
-     * @return SQL\QueryBuilder
+     * @return SQLSelectQueryBuilderr
      */
     protected function closeCriteria(array &$criteria)
     {
@@ -673,7 +673,7 @@ class QueryBuilder
      * @param  mixed $value value
      * @param  string $operator optional comparison operator, default =
      * @param  string $connector optional logical connector, default AND
-     * @return SQL\QueryBuilder
+     * @return SQLSelectQueryBuilderr
      */
     protected function criteria(array &$criteria, $column, $value, $operator = self::EQUALS, $connector = self::LOGICAL_AND)
     {
@@ -970,7 +970,7 @@ class QueryBuilder
      * Adds an open bracket for nesting WHERE conditions.
      *
      * @param  string $connector optional logical connector, default AND
-     * @return SQL\QueryBuilder
+     * @return SQLSelectQueryBuilderr
      */
     public function openWhere($connector = self::LOGICAL_AND)
     {
@@ -980,7 +980,7 @@ class QueryBuilder
     /**
      * Adds a closing bracket for nesting WHERE conditions.
      *
-     * @return SQL\QueryBuilder
+     * @return SQLSelectQueryBuilderr
      */
     public function closeWhere()
     {
@@ -994,7 +994,7 @@ class QueryBuilder
      * @param  mixed $value value
      * @param  string $operator optional comparison operator, default =
      * @param  string $connector optional logical connector, default AND
-     * @return SQL\QueryBuilder
+     * @return SQLSelectQueryBuilderr
      */
     public function where($column, $value, $operator = self::EQUALS, $connector = self::LOGICAL_AND)
     {
@@ -1007,7 +1007,7 @@ class QueryBuilder
      * @param  string $column colum name
      * @param  mixed $value value
      * @param  string $operator optional comparison operator, default =
-     * @return SQL\QueryBuilder
+     * @return SQLSelectQueryBuilderr
      */
     public function andWhere($column, $value, $operator = self::EQUALS)
     {
@@ -1020,7 +1020,7 @@ class QueryBuilder
      * @param  string $column colum name
      * @param  mixed $value value
      * @param  string $operator optional comparison operator, default =
-     * @return SQL\QueryBuilder
+     * @return SQLSelectQueryBuilderr
      */
     public function orWhere($column, $value, $operator = self::EQUALS)
     {
@@ -1061,7 +1061,7 @@ class QueryBuilder
      * @param  string $column column name
      * @param  string $order optional order direction, default empty (specific to MySQL)
      * 
-     * @return SQL\QueryBuilder
+     * @return SQLSelectQueryBuilderr
      */
     public function groupBy($column, $order = null)
     {
@@ -1132,7 +1132,7 @@ class QueryBuilder
      * Adds an open bracket for nesting HAVING conditions.
      *
      * @param  string $connector optional logical connector, default AND
-     * @return SQL\QueryBuilder
+     * @return SQLSelectQueryBuilderr
      */
     public function openHaving($connector = self::LOGICAL_AND)
     {
@@ -1142,7 +1142,7 @@ class QueryBuilder
     /**
      * Adds a closing bracket for nesting HAVING conditions.
      *
-     * @return SQL\QueryBuilder
+     * @return SQLSelectQueryBuilderr
      */
     public function closeHaving()
     {
@@ -1156,7 +1156,7 @@ class QueryBuilder
      * @param  mixed $value value
      * @param  string $operator optional comparison operator, default =
      * @param  string $connector optional logical connector, default AND
-     * @return SQL\QueryBuilder
+     * @return SQLSelectQueryBuilderr
      */
     public function having($column, $value, $operator = self::EQUALS, $connector = self::LOGICAL_AND)
     {
@@ -1169,7 +1169,7 @@ class QueryBuilder
      * @param  string $column colum name
      * @param  mixed $value value
      * @param  string $operator optional comparison operator, default =
-     * @return SQL\QueryBuilder
+     * @return SQLSelectQueryBuilderr
      */
     public function andHaving($column, $value, $operator = self::EQUALS)
     {
@@ -1182,7 +1182,7 @@ class QueryBuilder
      * @param  string $column colum name
      * @param  mixed $value value
      * @param  string $operator optional comparison operator, default =
-     * @return SQL\QueryBuilder
+     * @return SQLSelectQueryBuilderr
      */
     public function orHaving($column, $value, $operator = self::EQUALS)
     {
@@ -1221,7 +1221,7 @@ class QueryBuilder
      *
      * @param  string $column column name
      * @param  string $order optional order direction, default ASC
-     * @return SQL\QueryBuilder
+     * @return SQLSelectQueryBuilderr
      */
     public function orderBy($column, $order = self::ASC)
     {
@@ -1291,7 +1291,7 @@ class QueryBuilder
      *
      * @param  int $limit number of rows to return
      * 
-     * @return SQL\QueryBuilder
+     * @return SQLSelectQueryBuilderr
      */
     public function limit($limit)
     {
@@ -1305,7 +1305,7 @@ class QueryBuilder
      * 
      * @param  int $offset start row number 
      * 
-     * @return SQL\QueryBuilder
+     * @return SQLSelectQueryBuilderr
      */
     public function offset($offset)
     {
@@ -1368,11 +1368,11 @@ class QueryBuilder
     /**
      * Merges the given QueryBuilder's SELECT into this QueryBuilder.
      *
-     * @param  \SQL\QueryBuilder $QueryBuilder to merge 
+     * @param  \SQLSelectQueryBuilderr $QueryBuilder to merge 
      * 
-     * @return \SQL\QueryBuilder the current QueryBuilder
+     * @return \SQLSelectQueryBuilderr the current QueryBuilder
      */
-    public function mergeSelect(QueryBuilder $QueryBuilder)
+    public function mergeSelect(SelectQueryBuilder $QueryBuilder)
     {
         foreach ($QueryBuilder->getOptions() as $currentOption)
         {
@@ -1390,11 +1390,11 @@ class QueryBuilder
     /**
      * Merges the given QueryBuilder's JOINs into this QueryBuilder.
      *
-     * @param  \SQL\QueryBuilder $QueryBuilder to merge 
+     * @param  \SQLSelectQueryBuilderr $QueryBuilder to merge 
      * 
-     * @return \SQL\QueryBuilder the current QueryBuilder
+     * @return \SQLSelectQueryBuilderr the current QueryBuilder
      */
-    public function mergeJoin(QueryBuilder $QueryBuilder)
+    public function mergeJoin(SelectQueryBuilder $QueryBuilder)
     {
         foreach ($QueryBuilder->getJoinParts() as $currentJoin)
         {
@@ -1407,11 +1407,11 @@ class QueryBuilder
     /**
      * Merges the given QueryBuilder's WHEREs into this QueryBuilder.
      *
-     * @param  \SQL\QueryBuilder $QueryBuilder to merge 
+     * @param  \SQLSelectQueryBuilderr $QueryBuilder to merge 
      * 
-     * @return \SQL\QueryBuilder the current QueryBuilder
+     * @return \SQLSelectQueryBuilderr the current QueryBuilder
      */
-    public function mergeWhere(QueryBuilder $QueryBuilder)
+    public function mergeWhere(SelectQueryBuilder $QueryBuilder)
     {
         foreach ($QueryBuilder->getWhereParts() as $currentWhere)
         {
@@ -1439,11 +1439,11 @@ class QueryBuilder
     /**
      * Merges the given QueryBuilder's GROUP BYs into this QueryBuilder.
      *
-     * @param  \SQL\QueryBuilder $QueryBuilder to merge 
+     * @param  \SQLSelectQueryBuilderr $QueryBuilder to merge 
      * 
-     * @return \SQL\QueryBuilder the current QueryBuilder
+     * @return \SQLSelectQueryBuilderr the current QueryBuilder
      */
-    public function mergeGroupBy(QueryBuilder $QueryBuilder)
+    public function mergeGroupBy(SelectQueryBuilder $QueryBuilder)
     {
         foreach ($QueryBuilder->getGroupByParts() as $currentGroupBy)
         {
@@ -1456,11 +1456,11 @@ class QueryBuilder
     /**
      * Merges the given QueryBuilder's HAVINGs into this QueryBuilder.
      *
-     * @param  \SQL\QueryBuilder $QueryBuilder to merge 
+     * @param  \SQLSelectQueryBuilderr $QueryBuilder to merge 
      * 
-     * @return \SQL\QueryBuilder the current QueryBuilder
+     * @return \SQLSelectQueryBuilderr the current QueryBuilder
      */
-    public function mergeHaving(QueryBuilder $QueryBuilder)
+    public function mergeHaving(SelectQueryBuilder $QueryBuilder)
     {
         foreach ($QueryBuilder->getHavingParts() as $currentHaving)
         {
@@ -1488,11 +1488,11 @@ class QueryBuilder
     /**
      * Merges the given QueryBuilder's ORDER BYs into this QueryBuilder.
      *
-     * @param  \SQL\QueryBuilder $QueryBuilder to merge 
+     * @param  \SQLSelectQueryBuilderr $QueryBuilder to merge 
      * 
-     * @return \SQL\QueryBuilder the current QueryBuilder
+     * @return \SQLSelectQueryBuilderr the current QueryBuilder
      */
-    public function mergeOrderBy(QueryBuilder $QueryBuilder)
+    public function mergeOrderBy(SelectQueryBuilder $QueryBuilder)
     {
         foreach ($QueryBuilder->getOrderByParts() as $currentOrderBy)
         {
@@ -1505,11 +1505,11 @@ class QueryBuilder
     /**
      * Merges the given QueryBuilder's LIMITs into this QueryBuilder.
      *
-     * @param  \SQL\QueryBuilder $QueryBuilder to merge 
+     * @param  \SQLSelectQueryBuilderr $QueryBuilder to merge 
      * 
-     * @return \SQL\QueryBuilder the current QueryBuilder
+     * @return \SQLSelectQueryBuilderr the current QueryBuilder
      */
-    public function mergeLimit(QueryBuilder $QueryBuilder)
+    public function mergeLimit(SelectQueryBuilder $QueryBuilder)
     {
         $this->limit($QueryBuilder->getLimit());
         $this->offset($QueryBuilder->getOffset());
@@ -1520,13 +1520,13 @@ class QueryBuilder
     /**
      * Merges the given QueryBuilder's HAVINGs into this QueryBuilder.
      *
-     * @param  \SQL\QueryBuilder $QueryBuilder to merge 
+     * @param  \SQLSelectQueryBuilderr $QueryBuilder to merge 
      * @param  bool $overwriteLimit optional overwrite limit, default = true
      * @param  bool $mergeOrderBy optional merge order by clause, default = true
      * 
-     * @return \SQL\QueryBuilder the current QueryBuilder
+     * @return \SQLSelectQueryBuilderr the current QueryBuilder
      */
-    public function merge(QueryBuilder $QueryBuilder, $overwriteLimit = true, $mergeOrderBy = true)
+    public function merge(SelectQueryBuilder $QueryBuilder, $overwriteLimit = true, $mergeOrderBy = true)
     {
         $this
             ->mergeSelect($QueryBuilder)
