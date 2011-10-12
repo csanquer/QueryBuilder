@@ -1726,6 +1726,49 @@ EOD;
                 //expectedDebuggedQuery
                 'SELECT a.first_name, a.last_name, count(b.id) AS books '."\n".'FROM author AS a '."\n".'INNER JOIN book AS b '."\n".'ON a.id = b.author_id '."\n".'WHERE b.price >= 7 '."\n".'GROUP BY b.id '."\n".'HAVING score > 4 '."\n".'ORDER BY a.last_name ASC, a.first_name ASC '."\n".'LIMIT 5 '."\n".'OFFSET 0 '."\n",
             ),
+            array(
+                //select
+                array(
+                    array('a.first_name'),
+                    array('a.last_name'),
+                    array('count(b.id)','books'),
+                ),
+                //from
+                array('author', 'a'),
+                //joins
+                array(
+                    array('book', 'b', 'a.id = b.author_id', QueryBuilder::INNER_JOIN),
+                ),
+                //wheres
+                array(
+                    array('b.price >= ? ', 7.0, QueryBuilder::RAW_WHERE, null),
+                ),
+                //groupBys
+                array(
+                    array('b.id', null),
+                ),
+                //havings
+                array(
+                    array('score > ? ', 4, QueryBuilder::RAW_WHERE, null),
+                ),
+                //orderBys
+                array(
+                    array('a.last_name', QueryBuilder::ASC),
+                    array('a.first_name', QueryBuilder::ASC),
+                ),
+                //limit
+                array(5,0),
+                //expectedQuery
+                'SELECT a.first_name, a.last_name, count(b.id) AS books FROM author AS a INNER JOIN book AS b ON a.id = b.author_id WHERE b.price >= ? GROUP BY b.id HAVING score > ? ORDER BY a.last_name ASC, a.first_name ASC LIMIT 5 OFFSET 0 ',
+                //expectedFormattedQuery
+                'SELECT a.first_name, a.last_name, count(b.id) AS books '."\n".'FROM author AS a '."\n".'INNER JOIN book AS b '."\n".'ON a.id = b.author_id '."\n".'WHERE b.price >= ? '."\n".'GROUP BY b.id '."\n".'HAVING score > ? '."\n".'ORDER BY a.last_name ASC, a.first_name ASC '."\n".'LIMIT 5 '."\n".'OFFSET 0 '."\n",
+                //expectedBoundParameters
+                array(7, 4),
+                //expectedQuotedBoundParameters
+                array(7, 4),
+                //expectedDebuggedQuery
+                'SELECT a.first_name, a.last_name, count(b.id) AS books '."\n".'FROM author AS a '."\n".'INNER JOIN book AS b '."\n".'ON a.id = b.author_id '."\n".'WHERE b.price >= 7 '."\n".'GROUP BY b.id '."\n".'HAVING score > 4 '."\n".'ORDER BY a.last_name ASC, a.first_name ASC '."\n".'LIMIT 5 '."\n".'OFFSET 0 '."\n",
+            ),
         );
     }
     
