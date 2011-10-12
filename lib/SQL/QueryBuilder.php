@@ -309,27 +309,6 @@ class QueryBuilder
     }
 
     /**
-     * Merges this QueryBuilder's SELECT into the given QueryBuilder.
-     *
-     * @param  QueryBuilder $QueryBuilder to merge into
-     * @return SQL\QueryBuilder
-     */
-//    public function mergeSelectInto(QueryBuilder $QueryBuilder)
-//    {
-//        foreach ($this->options as $currentOption)
-//        {
-//            $QueryBuilder->option($currentOption);
-//        }
-//
-//        foreach ($this->sqlParts['select'] as $currentColumn => $currentAlias)
-//        {
-//            $QueryBuilder->select($currentColumn, $currentAlias);
-//        }
-//
-//        return $QueryBuilder;
-//    }
-
-    /**
      * Returns the SELECT portion of the query as a string.
      *
      * @return string
@@ -511,22 +490,6 @@ class QueryBuilder
     {
         return $this->getSQLPart('join');
     }
-
-    /**
-     * Merges this QueryBuilder's JOINs into the given QueryBuilder.
-     *
-     * @param  string QueryBuilder $QueryBuilder to merge into
-     * @return SQL\QueryBuilder
-     */
-//    public function mergeJoinInto(QueryBuilder $QueryBuilder)
-//    {
-//        foreach ($this->sqlParts['join'] as $currentJoin)
-//        {
-//            $QueryBuilder->join($currentJoin['table'], $currentJoin['criteria'], $currentJoin['type'], $currentJoin['alias']);
-//        }
-//
-//        return $QueryBuilder;
-//    }
 
     /**
      * Returns an ON criteria string joining the specified table and column to
@@ -1073,38 +1036,7 @@ class QueryBuilder
     {
         return $this->getSQLPart('where');
     }
-    
-    /**
-     * Merges this QueryBuilder's WHERE into the given QueryBuilder.
-     *
-     * @param  QueryBuilder $QueryBuilder to merge into
-     * @return SQL\QueryBuilder
-     */
-//    public function mergeWhereInto(QueryBuilder $QueryBuilder)
-//    {
-//        foreach ($this->sqlParts['where'] as $currentWhere)
-//        {
-//            // Handle open/close brackets differently than other criteria.
-//            if (array_key_exists('bracket', $currentWhere))
-//            {
-//                if (strcmp($currentWhere['bracket'], self::BRACKET_OPEN) == 0)
-//                {
-//                    $QueryBuilder->openWhere($currentWhere['connector']);
-//                }
-//                else
-//                {
-//                    $QueryBuilder->closeWhere();
-//                }
-//            }
-//            else
-//            {
-//                $QueryBuilder->where($currentWhere['column'], $currentWhere['value'], $currentWhere['operator'], $currentWhere['connector']);
-//            }
-//        }
-//
-//        return $QueryBuilder;
-//    }
-
+   
     /**
      * Returns the WHERE portion of the query as a string.
      *
@@ -1158,22 +1090,6 @@ class QueryBuilder
     {
         return $this->getSQLPart('groupBy');
     }
-
-    /**
-     * Merges this QueryBuilder's GROUP BY into the given QueryBuilder.
-     *
-     * @param  QueryBuilder $QueryBuilder to merge into
-     * @return SQL\QueryBuilder
-     */
-//    public function mergeGroupByInto(QueryBuilder $QueryBuilder)
-//    {
-//        foreach ($this->sqlParts['groupBy'] as $currentGroupBy)
-//        {
-//            $QueryBuilder->groupBy($currentGroupBy['column'], $currentGroupBy['order']);
-//        }
-//
-//        return $QueryBuilder;
-//    }
 
     /**
      * Returns the GROUP BY portion of the query as a string.
@@ -1282,36 +1198,6 @@ class QueryBuilder
     {
         return $this->getSQLPart('having');
     }
-    /**
-     * Merges this QueryBuilder's HAVING into the given QueryBuilder.
-     *
-     * @param  QueryBuilder $QueryBuilder to merge into
-     * @return SQL\QueryBuilder
-     */
-//    public function mergeHavingInto(QueryBuilder $QueryBuilder)
-//    {
-//        foreach ($this->sqlParts['having'] as $currentHaving)
-//        {
-//            // Handle open/close brackets differently than other criteria.
-//            if (array_key_exists('bracket', $currentHaving))
-//            {
-//                if (strcmp($currentHaving['bracket'], self::BRACKET_OPEN) == 0)
-//                {
-//                    $QueryBuilder->openHaving($currentHaving['connector']);
-//                }
-//                else
-//                {
-//                    $QueryBuilder->closeHaving();
-//                }
-//            }
-//            else
-//            {
-//                $QueryBuilder->having($currentHaving['column'], $currentHaving['value'], $currentHaving['operator'], $currentHaving['connector']);
-//            }
-//        }
-//
-//        return $QueryBuilder;
-//    }
 
     /**
      * Returns the HAVING portion of the query as a string.
@@ -1361,22 +1247,6 @@ class QueryBuilder
     {
         return $this->getSQLPart('orderBy');
     }
-
-    /**
-     * Merges this QueryBuilder's ORDER BY into the given QueryBuilder.
-     *
-     * @param  QueryBuilder $QueryBuilder to merge into
-     * @return SQL\QueryBuilder
-     */
-//    public function mergeOrderByInto(QueryBuilder $QueryBuilder)
-//    {
-//        foreach ($this->sqlParts['orderBy'] as $currentOrderBy)
-//        {
-//            $QueryBuilder->orderBy($currentOrderBy['column'], $currentOrderBy['order']);
-//        }
-//
-//        return $QueryBuilder;
-//    }
 
     /**
      * Returns the ORDER BY portion of the query as a string.
@@ -1496,28 +1366,187 @@ class QueryBuilder
     }
 
     /**
-     * Merges this QueryBuilder into the given QueryBuilder.
+     * Merges the given QueryBuilder's SELECT into this QueryBuilder.
      *
-     * @param  QueryBuilder $QueryBuilder to merge into
-     * @param  bool $overwriteLimit optional overwrite limit, default true
-     * @return SQL\QueryBuilder
+     * @param  \SQL\QueryBuilder $QueryBuilder to merge 
+     * 
+     * @return \SQL\QueryBuilder the current QueryBuilder
      */
-//    public function mergeInto(QueryBuilder $QueryBuilder, $overwriteLimit = true)
-//    {
-//        $this->mergeSelectInto($QueryBuilder);
-//        $this->mergeJoinInto($QueryBuilder);
-//        $this->mergeWhereInto($QueryBuilder);
-//        $this->mergeGroupByInto($QueryBuilder);
-//        $this->mergeHavingInto($QueryBuilder);
-//        $this->mergeOrderByInto($QueryBuilder);
-//
-//        if ($overwriteLimit && !empty($this->sqlParts['limit']))
-//        {
-//            $QueryBuilder->limit($this->getLimit(), $this->getLimitOffset());
-//        }
-//
-//        return $QueryBuilder;
-//    }
+    public function mergeSelect(QueryBuilder $QueryBuilder)
+    {
+        foreach ($QueryBuilder->getOptions() as $currentOption)
+        {
+            $this->addOption($currentOption);
+        }
+
+        foreach ($QueryBuilder->getSelectParts() as $currentColumn => $currentAlias)
+        {
+            $this->select($currentColumn, $currentAlias);
+        }
+
+        return $this;
+    }
+    
+    /**
+     * Merges the given QueryBuilder's JOINs into this QueryBuilder.
+     *
+     * @param  \SQL\QueryBuilder $QueryBuilder to merge 
+     * 
+     * @return \SQL\QueryBuilder the current QueryBuilder
+     */
+    public function mergeJoin(QueryBuilder $QueryBuilder)
+    {
+        foreach ($QueryBuilder->getJoinParts() as $currentJoin)
+        {
+            $this->join($currentJoin['table'], $currentJoin['alias'], $currentJoin['criteria'], $currentJoin['type']);
+        }
+
+        return $this;
+    }
+    
+    /**
+     * Merges the given QueryBuilder's WHEREs into this QueryBuilder.
+     *
+     * @param  \SQL\QueryBuilder $QueryBuilder to merge 
+     * 
+     * @return \SQL\QueryBuilder the current QueryBuilder
+     */
+    public function mergeWhere(QueryBuilder $QueryBuilder)
+    {
+        foreach ($QueryBuilder->getWhereParts() as $currentWhere)
+        {
+            // Handle open/close brackets differently than other criteria.
+            if (array_key_exists('bracket', $currentWhere))
+            {
+                if (strcmp($currentWhere['bracket'], self::BRACKET_OPEN) == 0)
+                {
+                    $this->openWhere($currentWhere['connector']);
+                }
+                else
+                {
+                    $this->closeWhere();
+                }
+            }
+            else
+            {
+                $this->where($currentWhere['column'], $currentWhere['value'], $currentWhere['operator'], $currentWhere['connector']);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * Merges the given QueryBuilder's GROUP BYs into this QueryBuilder.
+     *
+     * @param  \SQL\QueryBuilder $QueryBuilder to merge 
+     * 
+     * @return \SQL\QueryBuilder the current QueryBuilder
+     */
+    public function mergeGroupBy(QueryBuilder $QueryBuilder)
+    {
+        foreach ($QueryBuilder->getGroupByParts() as $currentGroupBy)
+        {
+            $this->groupBy($currentGroupBy['column'], $currentGroupBy['order']);
+        }
+
+        return $this;
+    }
+
+    /**
+     * Merges the given QueryBuilder's HAVINGs into this QueryBuilder.
+     *
+     * @param  \SQL\QueryBuilder $QueryBuilder to merge 
+     * 
+     * @return \SQL\QueryBuilder the current QueryBuilder
+     */
+    public function mergeHaving(QueryBuilder $QueryBuilder)
+    {
+        foreach ($QueryBuilder->getHavingParts() as $currentHaving)
+        {
+            // Handle open/close brackets differently than other criteria.
+            if (array_key_exists('bracket', $currentHaving))
+            {
+                if (strcmp($currentHaving['bracket'], self::BRACKET_OPEN) == 0)
+                {
+                    $this->openHaving($currentHaving['connector']);
+                }
+                else
+                {
+                    $this->closeHaving();
+                }
+            }
+            else
+            {
+                $this->having($currentHaving['column'], $currentHaving['value'], $currentHaving['operator'], $currentHaving['connector']);
+            }
+        }
+
+        return $this;
+    }
+    
+    /**
+     * Merges the given QueryBuilder's ORDER BYs into this QueryBuilder.
+     *
+     * @param  \SQL\QueryBuilder $QueryBuilder to merge 
+     * 
+     * @return \SQL\QueryBuilder the current QueryBuilder
+     */
+    public function mergeOrderBy(QueryBuilder $QueryBuilder)
+    {
+        foreach ($QueryBuilder->getOrderByParts() as $currentOrderBy)
+        {
+            $this->orderBy($currentOrderBy['column'], $currentOrderBy['order']);
+        }
+
+        return $this;
+    }
+    
+    /**
+     * Merges the given QueryBuilder's LIMITs into this QueryBuilder.
+     *
+     * @param  \SQL\QueryBuilder $QueryBuilder to merge 
+     * 
+     * @return \SQL\QueryBuilder the current QueryBuilder
+     */
+    public function mergeLimit(QueryBuilder $QueryBuilder)
+    {
+        $this->limit($QueryBuilder->getLimit());
+        $this->offset($QueryBuilder->getOffset());
+        
+        return $this;
+    }
+
+    /**
+     * Merges the given QueryBuilder's HAVINGs into this QueryBuilder.
+     *
+     * @param  \SQL\QueryBuilder $QueryBuilder to merge 
+     * @param  bool $overwriteLimit optional overwrite limit, default = true
+     * @param  bool $mergeOrderBy optional merge order by clause, default = true
+     * 
+     * @return \SQL\QueryBuilder the current QueryBuilder
+     */
+    public function merge(QueryBuilder $QueryBuilder, $overwriteLimit = true, $mergeOrderBy = true)
+    {
+        $this
+            ->mergeSelect($QueryBuilder)
+            ->mergeJoin($QueryBuilder)
+            ->mergeWhere($QueryBuilder)
+            ->mergeGroupBy($QueryBuilder)
+            ->mergeHaving($QueryBuilder);
+        
+        if ($mergeOrderBy)
+        {
+            $this->mergeOrderBy($QueryBuilder);
+        }
+
+        if ($overwriteLimit)
+        {
+            $this->mergeLimit($QueryBuilder);
+        }
+        
+        return $this;
+    }
 
     /**
      * Returns the full query string.

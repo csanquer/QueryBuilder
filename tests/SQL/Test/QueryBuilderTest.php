@@ -1,4 +1,5 @@
 <?php
+
 namespace SQL\Test;
 
 use SQL\QueryBuilder;
@@ -9,12 +10,13 @@ use SQL\QueryBuilder;
  */
 class QueryBuilderTest extends \PHPUnit_Framework_TestCase
 {
+
     /**
      *
      * @var \PDO 
      */
     protected static $pdo;
-    
+
     /**
      * @var \SQL\QueryBuilder
      */
@@ -26,17 +28,17 @@ class QueryBuilderTest extends \PHPUnit_Framework_TestCase
         {
             self::$pdo = new \PDO('sqlite::memory:');
         }
-        catch(PDOException $e)
+        catch (PDOException $e)
         {
             echo $e->getMessage();
         }
     }
-    
+
     public static function tearDownAfterClass()
     {
         self::$pdo = null;
     }
-    
+
     /**
      * Sets up the fixture, for example, opens a network connection.
      * This method is called before a test is executed.
@@ -79,7 +81,7 @@ SQL;
             }
         }
     }
-    
+
     protected function loadFixtures()
     {
         $sql = <<<EOD
@@ -107,7 +109,7 @@ EOD;
             }
         }
     }
-    
+
     /**
      * @todo Implement testSetPdoConnection().
      */
@@ -122,18 +124,18 @@ EOD;
     {
         $this->assertInstanceOf('\PDO', $this->queryBuilder->getConnection());
     }
-    
+
     /**
      * @dataProvider fromProvider
      */
     public function testFrom($table, $alias)
     {
-        $this->assertInstanceOf('SQL\QueryBuilder',$this->queryBuilder->from($table, $alias));
+        $this->assertInstanceOf('SQL\QueryBuilder', $this->queryBuilder->from($table, $alias));
         $this->assertEquals($table, $this->queryBuilder->getFromTable());
         $this->assertEquals($alias, $this->queryBuilder->getFromAlias());
         $this->assertEquals(array('table' => $table, 'alias' => $alias), $this->queryBuilder->getFromPart());
     }
-    
+
     public function fromProvider()
     {
         return array(
@@ -151,12 +153,12 @@ EOD;
     {
         foreach ($joins as $join)
         {
-            $this->assertInstanceOf('SQL\QueryBuilder',$this->queryBuilder->join($join[0], $join[1], $join[2], $join[3]));
+            $this->assertInstanceOf('SQL\QueryBuilder', $this->queryBuilder->join($join[0], $join[1], $join[2], $join[3]));
         }
-        
+
         $this->assertEquals($expected, $this->queryBuilder->getJoinParts());
     }
-    
+
     public function joinProvider()
     {
         return array(
@@ -199,7 +201,7 @@ EOD;
             ),
             array(
                 array(
-                    array('edition', 'e', array('e.version = b.version','e.year = b.year'), QueryBuilder::LEFT_JOIN), 
+                    array('edition', 'e', array('e.version = b.version', 'e.year = b.year'), QueryBuilder::LEFT_JOIN),
                 ),
                 array(
                     array(
@@ -216,7 +218,7 @@ EOD;
             array(
                 array(
                     array('book', 'b', 'a.id = b.author_id', QueryBuilder::RIGHT_JOIN),
-                    array('edition', 'e', array('e.version = b.version','e.year = b.year'), QueryBuilder::LEFT_JOIN), 
+                    array('edition', 'e', array('e.version = b.version', 'e.year = b.year'), QueryBuilder::LEFT_JOIN),
                 ),
                 array(
                     array(
@@ -240,10 +242,10 @@ EOD;
             ),
         );
     }
-    
+
     public function testInnerJoin()
     {
-        $this->assertInstanceOf('SQL\QueryBuilder',$this->queryBuilder->innerJoin('book', 'b', 'a.id = b.author_id'));
+        $this->assertInstanceOf('SQL\QueryBuilder', $this->queryBuilder->innerJoin('book', 'b', 'a.id = b.author_id'));
         $expected = array(
             array(
                 'table' => 'book',
@@ -254,13 +256,13 @@ EOD;
                 'alias' => 'b'
             ),
         );
-        
+
         $this->assertEquals($expected, $this->queryBuilder->getJoinParts());
     }
 
     public function testLeftJoin()
     {
-        $this->assertInstanceOf('SQL\QueryBuilder',$this->queryBuilder->leftJoin('book', 'b', 'a.id = b.author_id'));
+        $this->assertInstanceOf('SQL\QueryBuilder', $this->queryBuilder->leftJoin('book', 'b', 'a.id = b.author_id'));
         $expected = array(
             array(
                 'table' => 'book',
@@ -271,13 +273,13 @@ EOD;
                 'alias' => 'b'
             ),
         );
-        
+
         $this->assertEquals($expected, $this->queryBuilder->getJoinParts());
     }
-    
+
     public function testRightJoin()
     {
-        $this->assertInstanceOf('SQL\QueryBuilder',$this->queryBuilder->rightJoin('book', 'b', 'a.id = b.author_id'));
+        $this->assertInstanceOf('SQL\QueryBuilder', $this->queryBuilder->rightJoin('book', 'b', 'a.id = b.author_id'));
         $expected = array(
             array(
                 'table' => 'book',
@@ -288,94 +290,94 @@ EOD;
                 'alias' => 'b'
             ),
         );
-        
+
         $this->assertEquals($expected, $this->queryBuilder->getJoinParts());
     }
-    
+
     /**
      * @dataProvider GetFromStringProvider
      */
     public function testGetFromString($table, $alias, $joins, $expected, $expectedFormatted)
     {
         $this->queryBuilder->from($table, $alias);
-        
+
         foreach ($joins as $join)
         {
             $this->queryBuilder->join($join[0], $join[1], $join[2], $join[3]);
         }
-        
+
         $this->assertEquals($expected, $this->queryBuilder->getFromString());
         $this->assertEquals($expectedFormatted, $this->queryBuilder->getFromString(true));
     }
-    
+
     public function GetFromStringProvider()
     {
         return array(
             array(
                 'book',
-                null, 
-                array(), 
+                null,
+                array(),
                 'FROM book ',
                 'FROM book '."\n",
             ),
             array(
-                'book', 
-                'b', 
-                array(), 
+                'book',
+                'b',
+                array(),
                 'FROM book AS b ',
                 'FROM book AS b '."\n",
             ),
             array(
-                'author', 
-                'a', 
+                'author',
+                'a',
                 array(
                     array('book', 'b', 'a.id = b.author_id', null),
-                ), 
+                ),
                 'FROM author AS a INNER JOIN book AS b ON a.id = b.author_id ',
                 'FROM author AS a '."\n".'INNER JOIN book AS b '."\n".'ON a.id = b.author_id '."\n",
             ),
             array(
-                'author', 
-                'a', 
+                'author',
+                'a',
                 array(
                     array('book', 'b', 'a.id = b.author_id', QueryBuilder::RIGHT_JOIN),
-                    array('edition', 'e', array('e.version = b.version','e.year = b.year'), QueryBuilder::LEFT_JOIN), 
-                ), 
+                    array('edition', 'e', array('e.version = b.version', 'e.year = b.year'), QueryBuilder::LEFT_JOIN),
+                ),
                 'FROM author AS a RIGHT JOIN book AS b ON a.id = b.author_id LEFT JOIN edition AS e ON e.version = b.version AND e.year = b.year ',
                 'FROM author AS a '."\n".'RIGHT JOIN book AS b '."\n".'ON a.id = b.author_id '."\n".'LEFT JOIN edition AS e '."\n".'ON e.version = b.version '."\n".'AND e.year = b.year '."\n",
             ),
             array(
-                'author', 
-                'a', 
+                'author',
+                'a',
                 array(
                     array('book', 'b', 'a.id = b.author_id', null),
                     array('reward', 'r', 'author_id', QueryBuilder::LEFT_JOIN),
-                ), 
+                ),
                 'FROM author AS a INNER JOIN book AS b ON a.id = b.author_id LEFT JOIN reward AS r ON b.author_id = r.author_id ',
                 'FROM author AS a '."\n".'INNER JOIN book AS b '."\n".'ON a.id = b.author_id '."\n".'LEFT JOIN reward AS r '."\n".'ON b.author_id = r.author_id '."\n",
             ),
             array(
-                'book', 
-                'b', 
+                'book',
+                'b',
                 array(
                     array('reward', 'r', 'author_id', null),
-                ), 
+                ),
                 'FROM book AS b INNER JOIN reward AS r ON b.author_id = r.author_id ',
                 'FROM book AS b '."\n".'INNER JOIN reward AS r '."\n".'ON b.author_id = r.author_id '."\n",
             ),
         );
     }
-    
+
     /**
      *
      * @dataProvider groupByProvider
      */
     public function testGroupBy($column, $order, $expected)
     {
-        $this->assertInstanceOf('SQL\QueryBuilder',$this->queryBuilder->groupBy($column, $order));
+        $this->assertInstanceOf('SQL\QueryBuilder', $this->queryBuilder->groupBy($column, $order));
         $this->assertEquals($expected, $this->queryBuilder->getGroupByParts());
     }
-    
+
     public function groupByProvider()
     {
         return array(
@@ -408,7 +410,7 @@ EOD;
             ),
         );
     }
-    
+
     /**
      *
      * @dataProvider getGroupByStringProvider
@@ -419,11 +421,11 @@ EOD;
         {
             $this->queryBuilder->groupBy($groupBy[0], $groupBy[1]);
         }
-        
+
         $this->assertEquals($expected, $this->queryBuilder->getGroupByString());
         $this->assertEquals($expectedFormatted, $this->queryBuilder->getGroupByString(true));
     }
-    
+
     public function getGroupByStringProvider()
     {
         return array(
@@ -460,17 +462,17 @@ EOD;
             ),
         );
     }
-    
+
     /**
      *
      * @dataProvider orderByProvider
      */
     public function testOrderBy($column, $order, $expected)
     {
-        $this->assertInstanceOf('SQL\QueryBuilder',$this->queryBuilder->orderBy($column, $order));
+        $this->assertInstanceOf('SQL\QueryBuilder', $this->queryBuilder->orderBy($column, $order));
         $this->assertEquals($expected, $this->queryBuilder->getOrderByParts());
     }
-    
+
     public function orderByProvider()
     {
         return array(
@@ -510,7 +512,7 @@ EOD;
             ),
         );
     }
-  
+
     /**
      *
      * @dataProvider getOrderByStringProvider
@@ -524,7 +526,7 @@ EOD;
         $this->assertEquals($expected, $this->queryBuilder->getOrderByString());
         $this->assertEquals($expectedFormatted, $this->queryBuilder->getOrderByString(true));
     }
-    
+
     public function getOrderByStringProvider()
     {
         return array(
@@ -566,17 +568,17 @@ EOD;
             ),
         );
     }
-    
+
     /**
      *
      * @dataProvider limitProvider
      */
     public function testLimit($limit, $expected)
     {
-        $this->assertInstanceOf('SQL\QueryBuilder',$this->queryBuilder->limit($limit));
+        $this->assertInstanceOf('SQL\QueryBuilder', $this->queryBuilder->limit($limit));
         $this->assertEquals($expected, $this->queryBuilder->getLimit());
     }
-    
+
     public function limitProvider()
     {
         return array(
@@ -584,17 +586,17 @@ EOD;
             array(5, 5),
         );
     }
-    
+
     /**
      *
      * @dataProvider offsetProvider
      */
     public function testOffset($offset, $expected)
     {
-        $this->assertInstanceOf('SQL\QueryBuilder',$this->queryBuilder->offset($offset));
+        $this->assertInstanceOf('SQL\QueryBuilder', $this->queryBuilder->offset($offset));
         $this->assertEquals($expected, $this->queryBuilder->getOffset());
     }
-    
+
     public function offsetProvider()
     {
         return array(
@@ -617,11 +619,11 @@ EOD;
                 $this->queryBuilder->offset($limit[1]);
             }
         }
-        
+
         $this->assertEquals($expected, $this->queryBuilder->getLimitString());
         $this->assertEquals($expectedFormatted, $this->queryBuilder->getLimitString(true));
     }
-    
+
     public function getLimitStringProvider()
     {
         return array(
@@ -642,16 +644,16 @@ EOD;
             ),
         );
     }
-    
+
     /**
      * @dataProvider optionsProvider 
      */
     public function testOptions($option, $expected)
     {
-        $this->assertInstanceOf('SQL\QueryBuilder',$this->queryBuilder->addOption($option));
+        $this->assertInstanceOf('SQL\QueryBuilder', $this->queryBuilder->addOption($option));
         $this->assertEquals($expected, $this->queryBuilder->getOptions());
     }
-    
+
     public function optionsProvider()
     {
         return array(
@@ -667,16 +669,16 @@ EOD;
             ),
         );
     }
-    
+
     public function testDistinct()
     {
-        $this->assertInstanceOf('SQL\QueryBuilder',$this->queryBuilder->distinct());
+        $this->assertInstanceOf('SQL\QueryBuilder', $this->queryBuilder->distinct());
         $this->assertEquals(array('DISTINCT'), $this->queryBuilder->getOptions());
     }
-    
+
     public function testCalcFoundRows()
     {
-        $this->assertInstanceOf('SQL\QueryBuilder',$this->queryBuilder->calcFoundRows());
+        $this->assertInstanceOf('SQL\QueryBuilder', $this->queryBuilder->calcFoundRows());
         $this->assertEquals(array('SQL_CALC_FOUND_ROWS'), $this->queryBuilder->getOptions());
     }
 
@@ -686,27 +688,27 @@ EOD;
      */
     public function testSelect($column, $alias, $expected)
     {
-        $this->assertInstanceOf('SQL\QueryBuilder',$this->queryBuilder->select($column, $alias));
+        $this->assertInstanceOf('SQL\QueryBuilder', $this->queryBuilder->select($column, $alias));
         $this->assertEquals($expected, $this->queryBuilder->getSelectParts());
     }
-    
+
     public function selectProvider()
     {
         return array(
             array(
-                null, 
+                null,
                 null,
                 array(),
             ),
             array(
-                'id', 
+                'id',
                 null,
                 array(
                     'id' => null,
                 ),
             ),
             array(
-                'CONCAT(firstname, lastname)', 
+                'CONCAT(firstname, lastname)',
                 'name',
                 array(
                     'CONCAT(firstname, lastname)' => 'name',
@@ -716,7 +718,7 @@ EOD;
                 array(
                     'id' => null,
                     'year',
-                    'CONCAT(firstname, lastname)' => 'name', 
+                    'CONCAT(firstname, lastname)' => 'name',
                 ),
                 null,
                 array(
@@ -727,7 +729,7 @@ EOD;
             ),
         );
     }
-    
+
     /**
      *
      * @dataProvider getSelectStringProvider
@@ -738,16 +740,16 @@ EOD;
         {
             $this->queryBuilder->select($select[0], $select[1]);
         }
-        
+
         foreach ($options as $option)
         {
             $this->queryBuilder->addOption($option);
         }
-        
+
         $this->assertEquals($expected, $this->queryBuilder->getSelectString());
         $this->assertEquals($expectedFormatted, $this->queryBuilder->getSelectString(true));
     }
-    
+
     public function getSelectStringProvider()
     {
         return array(
@@ -782,28 +784,28 @@ EOD;
             ),
         );
     }
-    
+
     /**
      *
      * @dataProvider whereProvider
      */
     public function testWhere($column, $value, $operator, $connector, $expected)
     {
-        $this->assertInstanceOf('SQL\QueryBuilder',$this->queryBuilder->where($column, $value, $operator, $connector));
+        $this->assertInstanceOf('SQL\QueryBuilder', $this->queryBuilder->where($column, $value, $operator, $connector));
         $this->assertEquals($expected, $this->queryBuilder->getWhereParts());
     }
-    
+
     /**
      * @expectedException \InvalidArgumentException
      */
     public function testWhereBetweenException()
     {
-        $this->assertInstanceOf('SQL\QueryBuilder',$this->queryBuilder->where('id', 5, QueryBuilder::BETWEEN));
+        $this->assertInstanceOf('SQL\QueryBuilder', $this->queryBuilder->where('id', 5, QueryBuilder::BETWEEN));
     }
-    
+
     public function testAndWhere()
     {
-        $this->assertInstanceOf('SQL\QueryBuilder',$this->queryBuilder->andWhere('id', 1, QueryBuilder::EQUALS));
+        $this->assertInstanceOf('SQL\QueryBuilder', $this->queryBuilder->andWhere('id', 1, QueryBuilder::EQUALS));
         $expected = array(
             array(
                 'column' => 'id',
@@ -814,10 +816,10 @@ EOD;
         );
         $this->assertEquals($expected, $this->queryBuilder->getWhereParts());
     }
-    
+
     public function testOrWhere()
     {
-        $this->assertInstanceOf('SQL\QueryBuilder',$this->queryBuilder->orWhere('id', 1, QueryBuilder::EQUALS));
+        $this->assertInstanceOf('SQL\QueryBuilder', $this->queryBuilder->orWhere('id', 1, QueryBuilder::EQUALS));
         $expected = array(
             array(
                 'column' => 'id',
@@ -828,7 +830,7 @@ EOD;
         );
         $this->assertEquals($expected, $this->queryBuilder->getWhereParts());
     }
-    
+
     public function whereProvider()
     {
         return array(
@@ -876,13 +878,13 @@ EOD;
             ),
             array(
                 'id',
-                array(2,5),
+                array(2, 5),
                 QueryBuilder::BETWEEN,
                 QueryBuilder::LOGICAL_AND,
                 array(
                     array(
                         'column' => 'id',
-                        'value' => array(2,5),
+                        'value' => array(2, 5),
                         'operator' => QueryBuilder::BETWEEN,
                         'connector' => QueryBuilder::LOGICAL_AND,
                     ),
@@ -890,13 +892,13 @@ EOD;
             ),
             array(
                 'title',
-                array('Dune','Fahrenheit 451'),
+                array('Dune', 'Fahrenheit 451'),
                 QueryBuilder::IN,
                 null,
                 array(
                     array(
                         'column' => 'title',
-                        'value' => array('Dune','Fahrenheit 451'),
+                        'value' => array('Dune', 'Fahrenheit 451'),
                         'operator' => QueryBuilder::IN,
                         'connector' => QueryBuilder::LOGICAL_AND,
                     ),
@@ -918,16 +920,16 @@ EOD;
             ),
         );
     }
-    
+
     /**
      * @dataProvider openWhereProvider
      */
     public function testOpenWhere($connector, $expected)
     {
-        $this->assertInstanceOf('SQL\QueryBuilder',$this->queryBuilder->openWhere($connector));
+        $this->assertInstanceOf('SQL\QueryBuilder', $this->queryBuilder->openWhere($connector));
         $this->assertEquals($expected, $this->queryBuilder->getWhereParts());
     }
-    
+
     public function openWhereProvider()
     {
         return array(
@@ -960,10 +962,10 @@ EOD;
             ),
         );
     }
-    
+
     public function testCloseWhere()
     {
-        $this->assertInstanceOf('SQL\QueryBuilder',$this->queryBuilder->closeWhere());
+        $this->assertInstanceOf('SQL\QueryBuilder', $this->queryBuilder->closeWhere());
         $expected = array(
             Array(
                 'bracket' => QueryBuilder::BRACKET_CLOSE,
@@ -983,7 +985,7 @@ EOD;
         {
             $nbWhere = count($where);
             if ($nbWhere == 4)
-            {    
+            {
                 $this->queryBuilder->where($where[0], $where[1], $where[2], $where[3]);
             }
             elseif ($nbWhere >= 1 && $nbWhere <= 2)
@@ -999,35 +1001,35 @@ EOD;
                         $this->queryBuilder->openWhere();
                     }
                 }
-                elseif($where[0] == ')')
+                elseif ($where[0] == ')')
                 {
                     $this->queryBuilder->closeWhere();
                 }
             }
         }
-        
+
 //        var_dump($expectedFormatted, $this->queryBuilder->getWhereString(true));
-        
+
         $this->assertEquals($expected, $this->queryBuilder->getWhereString());
         $this->assertEquals($expectedFormatted, $this->queryBuilder->getWhereString(true));
         $this->assertEquals($expectedBoundParameters, $this->queryBuilder->getBoundParameters());
         $this->assertEquals($expectedBoundParameters, $this->queryBuilder->getBoundParameters(false, 'where'));
         $this->assertEquals(array(), $this->queryBuilder->getBoundParameters(false, 'having'));
     }
-    
+
     public function getWhereStringProvider()
     {
         $subquery1 = new QueryBuilder();
         $subquery1
-            ->select('id')
-            ->from('author')
-            ->where('last_name', '%Her%', QueryBuilder::LIKE);
-        
+                ->select('id')
+                ->from('author')
+                ->where('last_name', '%Her%', QueryBuilder::LIKE);
+
         $subquery2 = new QueryBuilder();
         $subquery2
-            ->from('author')
-            ->where('first_name', '%Ph%', QueryBuilder::LIKE);
-        
+                ->from('author')
+                ->where('first_name', '%Ph%', QueryBuilder::LIKE);
+
         return array(
             array(
                 array(
@@ -1069,7 +1071,7 @@ EOD;
             ),
             array(
                 array(
-                    array('score', array(8,15), QueryBuilder::BETWEEN, null),
+                    array('score', array(8, 15), QueryBuilder::BETWEEN, null),
                 ),
                 'WHERE score BETWEEN ? AND ? ',
                 'WHERE score BETWEEN ? AND ? '."\n",
@@ -1080,7 +1082,7 @@ EOD;
             ),
             array(
                 array(
-                    array('score', array(8,15), QueryBuilder::NOT_BETWEEN, null),
+                    array('score', array(8, 15), QueryBuilder::NOT_BETWEEN, null),
                 ),
                 'WHERE score NOT BETWEEN ? AND ? ',
                 'WHERE score NOT BETWEEN ? AND ? '."\n",
@@ -1091,28 +1093,28 @@ EOD;
             ),
             array(
                 array(
-                    array('score', array(8,12,10,9,15), QueryBuilder::IN, null),
+                    array('score', array(8, 12, 10, 9, 15), QueryBuilder::IN, null),
                 ),
                 'WHERE score IN (?, ?, ?, ?, ?) ',
                 'WHERE score IN (?, ?, ?, ?, ?) '."\n",
-                array(8,12,10,9,15),
+                array(8, 12, 10, 9, 15),
             ),
             array(
                 array(
-                    array('score', array(8,12,10,9,15), QueryBuilder::NOT_IN, null),
+                    array('score', array(8, 12, 10, 9, 15), QueryBuilder::NOT_IN, null),
                 ),
                 'WHERE score NOT IN (?, ?, ?, ?, ?) ',
                 'WHERE score NOT IN (?, ?, ?, ?, ?) '."\n",
-                array(8,12,10,9,15),
+                array(8, 12, 10, 9, 15),
             ),
             array(
                 array(
                     array('id', 1, QueryBuilder::NOT_EQUALS, null),
-                    array('score', array(8,12,10,9,15), QueryBuilder::IN, null),
+                    array('score', array(8, 12, 10, 9, 15), QueryBuilder::IN, null),
                 ),
                 'WHERE id != ? AND score IN (?, ?, ?, ?, ?) ',
                 'WHERE id != ? '."\n".'AND score IN (?, ?, ?, ?, ?) '."\n",
-                array(1,8,12,10,9,15),
+                array(1, 8, 12, 10, 9, 15),
             ),
             array(
                 array(
@@ -1121,7 +1123,7 @@ EOD;
                 ),
                 'WHERE score <= ? OR score >= ? ',
                 'WHERE score <= ? '."\n".'OR score >= ? '."\n",
-                array(5,9),
+                array(5, 9),
             ),
             array(
                 array(
@@ -1233,21 +1235,21 @@ EOD;
      */
     public function testHaving($column, $value, $operator, $connector, $expected)
     {
-        $this->assertInstanceOf('SQL\QueryBuilder',$this->queryBuilder->having($column, $value, $operator, $connector));
+        $this->assertInstanceOf('SQL\QueryBuilder', $this->queryBuilder->having($column, $value, $operator, $connector));
         $this->assertEquals($expected, $this->queryBuilder->getHavingParts());
     }
-    
+
     /**
      * @expectedException \InvalidArgumentException
      */
     public function testHavingBetweenException()
     {
-        $this->assertInstanceOf('SQL\QueryBuilder',$this->queryBuilder->having('id', 5, QueryBuilder::BETWEEN));
+        $this->assertInstanceOf('SQL\QueryBuilder', $this->queryBuilder->having('id', 5, QueryBuilder::BETWEEN));
     }
-    
+
     public function testAndHaving()
     {
-        $this->assertInstanceOf('SQL\QueryBuilder',$this->queryBuilder->andHaving('id', 1, QueryBuilder::EQUALS));
+        $this->assertInstanceOf('SQL\QueryBuilder', $this->queryBuilder->andHaving('id', 1, QueryBuilder::EQUALS));
         $expected = array(
             array(
                 'column' => 'id',
@@ -1258,10 +1260,10 @@ EOD;
         );
         $this->assertEquals($expected, $this->queryBuilder->getHavingParts());
     }
-    
+
     public function testOrHaving()
     {
-        $this->assertInstanceOf('SQL\QueryBuilder',$this->queryBuilder->orHaving('id', 1, QueryBuilder::EQUALS));
+        $this->assertInstanceOf('SQL\QueryBuilder', $this->queryBuilder->orHaving('id', 1, QueryBuilder::EQUALS));
         $expected = array(
             array(
                 'column' => 'id',
@@ -1272,7 +1274,7 @@ EOD;
         );
         $this->assertEquals($expected, $this->queryBuilder->getHavingParts());
     }
-    
+
     public function havingProvider()
     {
         return array(
@@ -1320,13 +1322,13 @@ EOD;
             ),
             array(
                 'id',
-                array(2,5),
+                array(2, 5),
                 QueryBuilder::BETWEEN,
                 QueryBuilder::LOGICAL_AND,
                 array(
                     array(
                         'column' => 'id',
-                        'value' => array(2,5),
+                        'value' => array(2, 5),
                         'operator' => QueryBuilder::BETWEEN,
                         'connector' => QueryBuilder::LOGICAL_AND,
                     ),
@@ -1334,13 +1336,13 @@ EOD;
             ),
             array(
                 'title',
-                array('Dune','Fahrenheit 451'),
+                array('Dune', 'Fahrenheit 451'),
                 QueryBuilder::IN,
                 null,
                 array(
                     array(
                         'column' => 'title',
-                        'value' => array('Dune','Fahrenheit 451'),
+                        'value' => array('Dune', 'Fahrenheit 451'),
                         'operator' => QueryBuilder::IN,
                         'connector' => QueryBuilder::LOGICAL_AND,
                     ),
@@ -1362,16 +1364,16 @@ EOD;
             ),
         );
     }
-    
+
     /**
      * @dataProvider openHavingProvider
      */
     public function testOpenHaving($connector, $expected)
     {
-        $this->assertInstanceOf('SQL\QueryBuilder',$this->queryBuilder->openHaving($connector));
+        $this->assertInstanceOf('SQL\QueryBuilder', $this->queryBuilder->openHaving($connector));
         $this->assertEquals($expected, $this->queryBuilder->getHavingParts());
     }
-    
+
     public function openHavingProvider()
     {
         return array(
@@ -1404,10 +1406,10 @@ EOD;
             ),
         );
     }
-    
+
     public function testCloseHaving()
     {
-        $this->assertInstanceOf('SQL\QueryBuilder',$this->queryBuilder->closeHaving());
+        $this->assertInstanceOf('SQL\QueryBuilder', $this->queryBuilder->closeHaving());
         $expected = array(
             Array(
                 'bracket' => QueryBuilder::BRACKET_CLOSE,
@@ -1427,7 +1429,7 @@ EOD;
         {
             $nbHaving = count($having);
             if ($nbHaving == 4)
-            {    
+            {
                 $this->queryBuilder->having($having[0], $having[1], $having[2], $having[3]);
             }
             elseif ($nbHaving >= 1 && $nbHaving <= 2)
@@ -1443,20 +1445,20 @@ EOD;
                         $this->queryBuilder->openHaving();
                     }
                 }
-                elseif($having[0] == ')')
+                elseif ($having[0] == ')')
                 {
                     $this->queryBuilder->closeHaving();
                 }
             }
         }
-        
+
         $this->assertEquals($expected, $this->queryBuilder->getHavingString());
         $this->assertEquals($expectedFormatted, $this->queryBuilder->getHavingString(true));
         $this->assertEquals($expectedBoundParameters, $this->queryBuilder->getBoundParameters());
         $this->assertEquals($expectedBoundParameters, $this->queryBuilder->getBoundParameters(false, 'having'));
         $this->assertEquals(array(), $this->queryBuilder->getBoundParameters(false, 'where'));
     }
-    
+
     public function getHavingStringProvider()
     {
         return array(
@@ -1500,7 +1502,7 @@ EOD;
             ),
             array(
                 array(
-                    array('score', array(8,15), QueryBuilder::BETWEEN, null),
+                    array('score', array(8, 15), QueryBuilder::BETWEEN, null),
                 ),
                 'HAVING score BETWEEN ? AND ? ',
                 'HAVING score BETWEEN ? AND ? '."\n",
@@ -1511,7 +1513,7 @@ EOD;
             ),
             array(
                 array(
-                    array('score', array(8,15), QueryBuilder::NOT_BETWEEN, null),
+                    array('score', array(8, 15), QueryBuilder::NOT_BETWEEN, null),
                 ),
                 'HAVING score NOT BETWEEN ? AND ? ',
                 'HAVING score NOT BETWEEN ? AND ? '."\n",
@@ -1522,28 +1524,28 @@ EOD;
             ),
             array(
                 array(
-                    array('score', array(8,12,10,9,15), QueryBuilder::IN, null),
+                    array('score', array(8, 12, 10, 9, 15), QueryBuilder::IN, null),
                 ),
                 'HAVING score IN (?, ?, ?, ?, ?) ',
                 'HAVING score IN (?, ?, ?, ?, ?) '."\n",
-                array(8,12,10,9,15),
+                array(8, 12, 10, 9, 15),
             ),
             array(
                 array(
-                    array('score', array(8,12,10,9,15), QueryBuilder::NOT_IN, null),
+                    array('score', array(8, 12, 10, 9, 15), QueryBuilder::NOT_IN, null),
                 ),
                 'HAVING score NOT IN (?, ?, ?, ?, ?) ',
                 'HAVING score NOT IN (?, ?, ?, ?, ?) '."\n",
-                array(8,12,10,9,15),
+                array(8, 12, 10, 9, 15),
             ),
             array(
                 array(
                     array('id', 1, QueryBuilder::NOT_EQUALS, null),
-                    array('score', array(8,12,10,9,15), QueryBuilder::IN, null),
+                    array('score', array(8, 12, 10, 9, 15), QueryBuilder::IN, null),
                 ),
                 'HAVING id != ? AND score IN (?, ?, ?, ?, ?) ',
                 'HAVING id != ? '."\n".'AND score IN (?, ?, ?, ?, ?) '."\n",
-                array(1,8,12,10,9,15),
+                array(1, 8, 12, 10, 9, 15),
             ),
             array(
                 array(
@@ -1552,7 +1554,7 @@ EOD;
                 ),
                 'HAVING score <= ? OR score >= ? ',
                 'HAVING score <= ? '."\n".'OR score >= ? '."\n",
-                array(5,9),
+                array(5, 9),
             ),
             array(
                 array(
@@ -1583,7 +1585,7 @@ EOD;
             ),
         );
     }
- 
+
     /**
      * @dataProvider debugQueryProvider
      */
@@ -1593,26 +1595,26 @@ EOD;
         $this->assertEquals($expectedQuoted, QueryBuilder::debugQuery($query, $params, true));
         $this->assertEquals($expectedQuotedPDO, QueryBuilder::debugQuery($query, $params, true, self::$pdo));
     }
-    
+
     public function debugQueryProvider()
     {
         return array(
             array(
-                'SELECT * FROM book b WHERE b.title = ?', 
+                'SELECT * FROM book b WHERE b.title = ?',
                 array('l\'île au trésor'),
                 'SELECT * FROM book b WHERE b.title = \'l\'île au trésor\'',
                 'SELECT * FROM book b WHERE b.title = \'l\\\'île au trésor\'',
                 'SELECT * FROM book b WHERE b.title = \'l\'\'île au trésor\'',
             ),
             array(
-                'SELECT * FROM book b WHERE b.title = :title', 
+                'SELECT * FROM book b WHERE b.title = :title',
                 array('title' => 'l\'île au trésor'),
                 'SELECT * FROM book b WHERE b.title = \'l\'île au trésor\'',
                 'SELECT * FROM book b WHERE b.title = \'l\\\'île au trésor\'',
                 'SELECT * FROM book b WHERE b.title = \'l\'\'île au trésor\'',
             ),
             array(
-                'SELECT * FROM book b WHERE b.title = :title', 
+                'SELECT * FROM book b WHERE b.title = :title',
                 array(':title' => 'l\'île au trésor'),
                 'SELECT * FROM book b WHERE b.title = \'l\'île au trésor\'',
                 'SELECT * FROM book b WHERE b.title = \'l\\\'île au trésor\'',
@@ -1620,7 +1622,7 @@ EOD;
             ),
         );
     }
-    
+
     /**
      * @dataProvider getQueryStringProvider
      */
@@ -1630,19 +1632,19 @@ EOD;
         {
             $this->queryBuilder->select($select[0], isset($select[1]) ? $select[1] : null);
         }
-        
+
         $this->queryBuilder->from($from[0], isset($from[1]) ? $from[1] : null);
-        
+
         foreach ($joins as $join)
         {
             $this->queryBuilder->join($join[0], isset($join[1]) ? $join[1] : null, isset($join[2]) ? $join[2] : null, isset($join[3]) ? $join[3] : null);
         }
-        
+
         foreach ($wheres as $where)
         {
             $nbWhere = count($where);
             if ($nbWhere == 4)
-            {    
+            {
                 $this->queryBuilder->where($where[0], $where[1], $where[2], $where[3]);
             }
             elseif ($nbWhere >= 1 && $nbWhere <= 2)
@@ -1658,23 +1660,23 @@ EOD;
                         $this->queryBuilder->openWhere();
                     }
                 }
-                elseif($where[0] == ')')
+                elseif ($where[0] == ')')
                 {
                     $this->queryBuilder->closeWhere();
                 }
             }
         }
-        
+
         foreach ($groupBys as $groupBy)
         {
             $this->queryBuilder->groupBy($groupBy[0], $groupBy[1]);
         }
-        
+
         foreach ($havings as $having)
         {
             $nbHaving = count($having);
             if ($nbHaving == 4)
-            {    
+            {
                 $this->queryBuilder->having($having[0], $having[1], $having[2], $having[3]);
             }
             elseif ($nbHaving >= 1 && $nbHaving <= 2)
@@ -1690,18 +1692,18 @@ EOD;
                         $this->queryBuilder->openHaving();
                     }
                 }
-                elseif($having[0] == ')')
+                elseif ($having[0] == ')')
                 {
                     $this->queryBuilder->closeHaving();
                 }
             }
         }
-        
+
         foreach ($orderBys as $orderBy)
         {
             $this->queryBuilder->orderBy($orderBy[0], $orderBy[1]);
         }
-        
+
         if (!empty($limit))
         {
             $this->queryBuilder->limit($limit[0]);
@@ -1710,7 +1712,7 @@ EOD;
                 $this->queryBuilder->offset($limit[1]);
             }
         }
-        
+
         $this->assertEquals($expectedQuery, $this->queryBuilder->getQueryString());
         $this->assertEquals($expectedQuery, (string) $this->queryBuilder);
         $this->assertEquals($expectedFormattedQuery, $this->queryBuilder->getQueryString(true));
@@ -1718,7 +1720,7 @@ EOD;
         $this->assertEquals($expectedQuotedBoundParameters, $this->queryBuilder->getBoundParameters(true));
         $this->assertEquals($expectedDebuggedQuery, $this->queryBuilder->debug());
     }
-   
+
     public function getQueryStringProvider()
     {
         return array(
@@ -1757,7 +1759,7 @@ EOD;
                 array(
                     array('a.first_name'),
                     array('a.last_name'),
-                    array('count(b.id)','books'),
+                    array('count(b.id)', 'books'),
                 ),
                 //from
                 array('author', 'a'),
@@ -1783,7 +1785,7 @@ EOD;
                     array('a.first_name', QueryBuilder::ASC),
                 ),
                 //limit
-                array(5,0),
+                array(5, 0),
                 //expectedQuery
                 'SELECT a.first_name, a.last_name, count(b.id) AS books FROM author AS a INNER JOIN book AS b ON a.id = b.author_id WHERE b.price >= ? GROUP BY b.id HAVING score > ? ORDER BY a.last_name ASC, a.first_name ASC LIMIT 5 OFFSET 0 ',
                 //expectedFormattedQuery
@@ -1800,7 +1802,7 @@ EOD;
                 array(
                     array('a.first_name'),
                     array('a.last_name'),
-                    array('count(b.id)','books'),
+                    array('count(b.id)', 'books'),
                 ),
                 //from
                 array('author', 'a'),
@@ -1826,7 +1828,7 @@ EOD;
                     array('a.first_name', QueryBuilder::ASC),
                 ),
                 //limit
-                array(5,0),
+                array(5, 0),
                 //expectedQuery
                 'SELECT a.first_name, a.last_name, count(b.id) AS books FROM author AS a INNER JOIN book AS b ON a.id = b.author_id WHERE b.price >= ? GROUP BY b.id HAVING score > ? ORDER BY a.last_name ASC, a.first_name ASC LIMIT 5 OFFSET 0 ',
                 //expectedFormattedQuery
@@ -1840,54 +1842,54 @@ EOD;
             ),
         );
     }
-    
+
     public function testQuote()
     {
         $this->assertEquals("''' AND 1'", $this->queryBuilder->quote("' AND 1"));
-        
+
         $quote1 = $this->queryBuilder->quote(1);
         $this->assertInternalType('integer', $quote1);
         $this->assertEquals(1, $quote1);
-        
+
         $quote2 = $this->queryBuilder->quote('2');
         $this->assertInternalType('string', $quote2);
         $this->assertEquals('\'2\'', $quote2);
-        
+
         $queryBuilder = new QueryBuilder();
-        
+
         $quote3 = $queryBuilder->quote(1);
         $this->assertInternalType('integer', $quote3);
         $this->assertEquals(1, $quote3);
-        
+
         $quote4 = $queryBuilder->quote('2');
         $this->assertInternalType('string', $quote4);
         $this->assertEquals('\'2\'', $quote4);
-        
+
         $this->assertEquals("'\' AND 1'", $queryBuilder->quote("' AND 1"));
     }
-    
+
     public function testQueryWithoutPDO()
     {
         $querybuiler = new QueryBuilder();
         $querybuiler->from('book');
         $this->assertFalse($querybuiler->query());
     }
-    
+
     public function testQueryWithoutQueryStatement()
     {
         $this->assertFalse($this->queryBuilder->query());
     }
-    
+
     public function testQuery()
     {
         $this->loadSchema();
         $this->loadFixtures();
-        
+
         $this->queryBuilder->from('book');
         $this->queryBuilder->where('author_id', 2);
-        
+
         $this->assertInstanceOf('\PDOStatement', $this->queryBuilder->query());
-        
+
         $expected = array(
             array(
                 'id' => '2',
@@ -1914,17 +1916,274 @@ EOD;
                 'score' => NULL,
             ),
         );
-        
+
         $this->assertEquals($expected, $this->queryBuilder->query(\PDO::FETCH_ASSOC));
-        
+
         return $this->queryBuilder;
     }
-    
+
     /**
      * @depends testQuery
      */
     public function testQueryGetRowCount(QueryBuilder $queryBuilder)
     {
         $this->assertEquals(3, $queryBuilder->queryGetRowCount());
+    }
+
+    public function testMergeSelect()
+    {
+        $this->queryBuilder->select('id');
+        $this->queryBuilder->select('count(*)', 'nb');
+
+        $qb = new QueryBuilder();
+        $qb->select('title');
+        $qb->addOption('DISTINCT');
+
+        $this->queryBuilder->mergeSelect($qb);
+
+        $expected = array(
+            'count(*)' => 'nb',
+            'id' => null,
+            'title' => null,
+        );
+        $this->assertEquals($expected, $this->queryBuilder->getSelectParts());
+        $this->assertEquals(array('DISTINCT'), $this->queryBuilder->getOptions());
+    }
+
+    public function testMergeJoin()
+    {
+        $this->queryBuilder->join('author', 'a', 'a.id = b.author_id', QueryBuilder::INNER_JOIN);
+
+        $qb = new QueryBuilder();
+        $qb->join('editor', 'e', 'e.id = b.editor_id', QueryBuilder::LEFT_JOIN);
+
+        $this->queryBuilder->mergeJoin($qb);
+
+        $expected = array(
+            array(
+                'table' => 'author',
+                'criteria' =>
+                array(
+                   'a.id = b.author_id',
+                ),
+                'type' => QueryBuilder::INNER_JOIN,
+                'alias' => 'a',
+            ),
+            array(
+                'table' => 'editor',
+                'criteria' =>
+                array(
+                    'e.id = b.editor_id',
+                ),
+                'type' => QueryBuilder::LEFT_JOIN,
+                'alias' => 'e',
+            ),
+        );
+
+        $this->assertEquals($expected, $this->queryBuilder->getJoinParts());
+    }
+    
+    public function testMergeWhere()
+    {
+        $this->queryBuilder->where('id', 5 , QueryBuilder::LESS_THAN);
+
+        $qb = new QueryBuilder();
+        $qb
+            ->openWhere(QueryBuilder::LOGICAL_OR)
+            ->where('title', 'Dune' , QueryBuilder::NOT_EQUALS, null)
+            ->closeWhere();
+
+        $this->queryBuilder->mergeWhere($qb);
+
+        $expected = array(
+          array (
+            'column' => 'id',
+            'value' => 5,
+            'operator' => '<',
+            'connector' => 'AND',
+          ),
+          array (
+            'bracket' => '(',
+            'connector' => 'OR',
+          ),
+          array (
+            'column' => 'title',
+            'value' => 'Dune',
+            'operator' => '!=',
+            'connector' => 'AND',
+          ),
+          array (
+            'bracket' => ')',
+            'connector' => NULL,
+          ),
+        );
+
+        $this->assertEquals($expected, $this->queryBuilder->getWhereParts());
+    }
+    
+    public function testMergeGroupBy()
+    {
+        $this->queryBuilder->groupBy('id');
+
+        $qb = new QueryBuilder();
+        $qb->groupBy('score', QueryBuilder::ASC);
+
+        $this->queryBuilder->mergeGroupBy($qb);
+
+        $expected = array(
+            array (
+                'column' => 'id',
+                'order' => NULL,
+            ),
+            array (
+                'column' => 'score',
+                'order' => QueryBuilder::ASC,
+            ),
+        );
+
+        $this->assertEquals($expected, $this->queryBuilder->getGroupByParts());
+    }
+    
+    public function testMergeHaving()
+    {
+        $this->queryBuilder->having('score', 5 , QueryBuilder::LESS_THAN);
+
+        $qb = new QueryBuilder();
+        $qb
+            ->openHaving(QueryBuilder::LOGICAL_OR)
+            ->having('price', 9 , QueryBuilder::NOT_EQUALS, null)
+            ->closeHaving();
+
+        $this->queryBuilder->mergeHaving($qb);
+
+        $expected = array(
+          array (
+            'column' => 'score',
+            'value' => 5,
+            'operator' => '<',
+            'connector' => 'AND',
+          ),
+          array (
+            'bracket' => '(',
+            'connector' => 'OR',
+          ),
+          array (
+            'column' => 'price',
+            'value' => 9,
+            'operator' => '!=',
+            'connector' => 'AND',
+          ),
+          array (
+            'bracket' => ')',
+            'connector' => NULL,
+          ),
+        );
+
+        $this->assertEquals($expected, $this->queryBuilder->getHavingParts());
+    }
+    
+    public function testMergeOrderBy()
+    {
+        $this->queryBuilder->orderBy('price', QueryBuilder::DESC);
+
+        $qb = new QueryBuilder();
+        $qb->orderBy('score', QueryBuilder::ASC);
+
+        $this->queryBuilder->mergeOrderBy($qb);
+
+        $expected = array(
+              array (
+                'column' => 'price',
+                'order' => QueryBuilder::DESC,
+              ),
+              array (
+                'column' => 'score',
+                'order' => QueryBuilder::ASC,
+              ),
+        );
+
+//        echo var_export($this->queryBuilder->getOrderByParts());
+        $this->assertEquals($expected, $this->queryBuilder->getOrderByParts());
+    }
+    
+    public function testMergeLimit()
+    {
+        $this->queryBuilder
+                ->limit(20)
+                ->offset(10);
+
+        $qb = new QueryBuilder();
+        $qb
+            ->limit(50)
+            ->offset(0);
+
+        $this->queryBuilder->mergeLimit($qb);
+
+        $this->assertEquals(50, $this->queryBuilder->getLimit());
+        $this->assertEquals(0, $this->queryBuilder->getOffset());
+    }
+    
+    /**
+     *
+     * @dataProvider mergeProvider
+     */
+    public function testMerge($overwriteLimit, $mergeOrderBy, $expectedQuery, $expectedBoundParameters)
+    {
+        $this->queryBuilder
+            ->from('book', 'b')
+            ->select('id')
+            ->select('count(*)', 'nb')
+            ->join('author', 'a', 'a.id = b.author_id', QueryBuilder::INNER_JOIN)
+            ->where('id', 5 , QueryBuilder::LESS_THAN)
+            ->groupBy('id')
+            ->having('score', 5 , QueryBuilder::LESS_THAN)
+            ->orderBy('price', QueryBuilder::DESC)
+            ->limit(20)
+            ->offset(10);
+
+        $qb = new QueryBuilder();
+        $qb
+            ->from('book')
+            ->select('title')
+            ->addOption('DISTINCT')
+            ->join('editor', 'e', 'e.id = b.editor_id', QueryBuilder::LEFT_JOIN)
+            ->openWhere(QueryBuilder::LOGICAL_OR)
+            ->where('title', 'Dune' , QueryBuilder::NOT_EQUALS, null)
+            ->closeWhere()
+            ->groupBy('score', QueryBuilder::ASC)
+            ->openHaving(QueryBuilder::LOGICAL_OR)
+            ->having('price', 9 , QueryBuilder::NOT_EQUALS, null)
+            ->closeHaving()
+            ->orderBy('score', QueryBuilder::ASC)
+            ->limit(50)
+            ->offset(0);
+       
+        $this->queryBuilder->merge($qb, $overwriteLimit, $mergeOrderBy);
+        $this->assertEquals($expectedQuery, $this->queryBuilder->getQueryString());
+        $this->assertEquals($expectedBoundParameters, $this->queryBuilder->getBoundParameters());
+    }
+    
+    public function mergeProvider()
+    {
+        return array(
+            array(
+              true,
+              true,
+              'SELECT DISTINCT id, count(*) AS nb, title FROM book AS b INNER JOIN author AS a ON a.id = b.author_id LEFT JOIN editor AS e ON e.id = b.editor_id WHERE id < ? OR ( title != ? ) GROUP BY id, score ASC HAVING score < ? OR ( price != ? ) ORDER BY price DESC, score ASC LIMIT 50 OFFSET 0 ',
+              array(5, 'Dune', 5, 9),
+            ),
+            array(
+              false,
+              true,
+              'SELECT DISTINCT id, count(*) AS nb, title FROM book AS b INNER JOIN author AS a ON a.id = b.author_id LEFT JOIN editor AS e ON e.id = b.editor_id WHERE id < ? OR ( title != ? ) GROUP BY id, score ASC HAVING score < ? OR ( price != ? ) ORDER BY price DESC, score ASC LIMIT 20 OFFSET 10 ',
+              array(5, 'Dune', 5, 9),
+            ),
+            array(
+              true,
+              false,
+              'SELECT DISTINCT id, count(*) AS nb, title FROM book AS b INNER JOIN author AS a ON a.id = b.author_id LEFT JOIN editor AS e ON e.id = b.editor_id WHERE id < ? OR ( title != ? ) GROUP BY id, score ASC HAVING score < ? OR ( price != ? ) ORDER BY price DESC LIMIT 50 OFFSET 0 ',
+              array(5, 'Dune', 5, 9),
+            ),
+        );
     }
 }
