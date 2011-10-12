@@ -102,6 +102,18 @@ class QueryBuilder
     protected $boundParams;
     
     /**
+     *
+     * @var string 
+     */
+    protected $indentChar;
+    
+    /**
+     *
+     * @var int 
+     */
+    protected $indentCharMultiplier;
+    
+    /**
      * Constructor.
      *
      * @param  PDO $PdoConnection optional PDO database connection
@@ -126,6 +138,9 @@ class QueryBuilder
             'having' => array(),
         );
 
+        $this->indentChar = ' ';
+        $this->indentCharMultiplier = 4;
+        
         $this->setConnection($PdoConnection);
     }
 
@@ -783,7 +798,6 @@ class QueryBuilder
         $string = '';
         $useConnector = false;
 
-        $indentChar = str_repeat(' ', 4);
         $indent = 0;
         
         foreach ($criteria as $i => $currentCriterion)
@@ -797,9 +811,9 @@ class QueryBuilder
                 {
                     if ($useConnector)
                     {
-                        if ($formatted && $indent > 0)
+                        if ($formatted)
                         {
-                            $criterionString .= str_repeat($indentChar,$indent);
+                            $criterionString .= $this->indent($indent);
                         }
                         
                         $criterionString .= $currentCriterion['connector'].' ';
@@ -821,7 +835,7 @@ class QueryBuilder
                     {
                         $indent--;
                     }
-                    $criterionString .= str_repeat($indentChar,$indent);
+                    $criterionString .= $this->indent($indent);
                 }
                 
                 $criterionString .= $currentCriterion['bracket'].' ';
@@ -838,9 +852,9 @@ class QueryBuilder
             }
             else
             {
-                if ($formatted && $indent > 0)
+                if ($formatted)
                 {
-                    $criterionString .= str_repeat($indentChar,$indent);
+                    $criterionString .= $this->indent($indent);
                 }
                 
                 if ($useConnector)
@@ -941,18 +955,12 @@ class QueryBuilder
                             if ($formatted)
                             {
                                 $tempValue = "\n";
-                                if ($indent > 0)
-                                {
-                                    $tempValue .= str_repeat($indentChar,$indent);
-                                }
+                                $tempValue .= $this->indent($indent);
 
                                 $tempValue .= self::BRACKET_OPEN.' '."\n";
 
                                 $indent++;
-                                if ($indent > 0)
-                                {
-                                    $tempValue .= str_repeat($indentChar,$indent);
-                                }
+                                $tempValue .= $this->indent($indent);
                             }
                             else
                             {
@@ -966,11 +974,7 @@ class QueryBuilder
                         {
                             $tempValue .= "\n";
                             $indent--;
-                            if ($indent > 0)
-                            {
-                                $tempValue .= str_repeat($indentChar,$indent);
-                            }
-                            
+                            $tempValue .= $this->indent($indent);
                         }
                         $tempValue .= self::BRACKET_CLOSE;
                         $value = $tempValue;
@@ -1715,6 +1719,23 @@ class QueryBuilder
         return $result;
     }
 
+    /**
+     * return a indentation string repeat n times
+     * 
+     * @param int $multiplier indent string multiplier
+     * 
+     * @return String 
+     */
+    protected function indent($multiplier = 0)
+    {
+        $multiplier = (int) $multiplier;
+        if ($this->indentCharMultiplier > 0 && $multiplier > 0)
+        {
+            return str_repeat($this->indentChar,$this->indentCharMultiplier*$multiplier);
+        }
+        return '';
+    }
+    
     /**
      * Returns the full query string without value placeholders.
      *
