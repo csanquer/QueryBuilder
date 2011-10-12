@@ -1006,6 +1006,8 @@ EOD;
             }
         }
         
+//        var_dump($expectedFormatted, $this->queryBuilder->getWhereString(true));
+        
         $this->assertEquals($expected, $this->queryBuilder->getWhereString());
         $this->assertEquals($expectedFormatted, $this->queryBuilder->getWhereString(true));
         $this->assertEquals($expectedBoundParameters, $this->queryBuilder->getBoundParameters());
@@ -1015,6 +1017,17 @@ EOD;
     
     public function getWhereStringProvider()
     {
+        $subquery1 = new QueryBuilder();
+        $subquery1
+            ->select('id')
+            ->from('author')
+            ->where('last_name', '%Her%', QueryBuilder::LIKE);
+        
+        $subquery2 = new QueryBuilder();
+        $subquery2
+            ->from('author')
+            ->where('first_name', '%Ph%', QueryBuilder::LIKE);
+        
         return array(
             array(
                 array(
@@ -1154,6 +1167,62 @@ EOD;
                 'WHERE score BETWEEN ? AND ? ',
                 'WHERE score BETWEEN ? AND ? '."\n",
                 array(5, 8),
+            ),
+            array(
+                array(
+                    array('title', '%Dune%', QueryBuilder::NOT_LIKE, null),
+                    array('author_id', $subquery1, QueryBuilder::SUB_QUERY_IN, null),
+                ),
+                'WHERE title NOT LIKE ? AND author_id IN ( SELECT id FROM author WHERE last_name LIKE ? ) ',
+                'WHERE title NOT LIKE ? '."\n".'AND author_id IN '."\n".'( '."\n".'    SELECT id FROM author WHERE last_name LIKE ? '."\n".') '."\n",
+                array('%Dune%', '%Her%'),
+            ),
+            array(
+                array(
+                    array('title', '%Dune%', QueryBuilder::NOT_LIKE, null),
+                    array('author_id', $subquery1, QueryBuilder::SUB_QUERY_NOT_IN, null),
+                ),
+                'WHERE title NOT LIKE ? AND author_id NOT IN ( SELECT id FROM author WHERE last_name LIKE ? ) ',
+                'WHERE title NOT LIKE ? '."\n".'AND author_id NOT IN '."\n".'( '."\n".'    SELECT id FROM author WHERE last_name LIKE ? '."\n".') '."\n",
+                array('%Dune%', '%Her%'),
+            ),
+            array(
+                array(
+                    array('title', '%Dune%', QueryBuilder::NOT_LIKE, null),
+                    array('author_id', 'SELECT id FROM author WHERE last_name LIKE \'%Her%\'', QueryBuilder::SUB_QUERY_NOT_IN, null),
+                ),
+                'WHERE title NOT LIKE ? AND author_id NOT IN ( SELECT id FROM author WHERE last_name LIKE \'%Her%\' ) ',
+                'WHERE title NOT LIKE ? '."\n".'AND author_id NOT IN '."\n".'( '."\n".'    SELECT id FROM author WHERE last_name LIKE \'%Her%\' '."\n".') '."\n",
+                array('%Dune%'),
+            ),
+            array(
+                array(
+                    array('title', '%Dune%', QueryBuilder::NOT_LIKE, null),
+                    array('author_id', $subquery2, QueryBuilder::SUB_QUERY_EXISTS, null),
+                ),
+                'WHERE title NOT LIKE ? AND EXISTS ( SELECT * FROM author WHERE first_name LIKE ? ) ',
+                'WHERE title NOT LIKE ? '."\n".'AND EXISTS '."\n".'( '."\n".'    SELECT * FROM author WHERE first_name LIKE ? '."\n".') '."\n",
+                array('%Dune%', '%Ph%'),
+            ),
+            array(
+                array(
+                    array('title', '%Dune%', QueryBuilder::NOT_LIKE, null),
+                    array('', $subquery2, QueryBuilder::SUB_QUERY_NOT_EXISTS, null),
+                ),
+                'WHERE title NOT LIKE ? AND NOT EXISTS ( SELECT * FROM author WHERE first_name LIKE ? ) ',
+                'WHERE title NOT LIKE ? '."\n".'AND NOT EXISTS '."\n".'( '."\n".'    SELECT * FROM author WHERE first_name LIKE ? '."\n".') '."\n",
+                array('%Dune%', '%Ph%'),
+            ),
+            array(
+                array(
+                    array('title', '%Dune%', QueryBuilder::NOT_LIKE, null),
+                    array(QueryBuilder::BRACKET_OPEN, QueryBuilder::LOGICAL_OR),
+                    array('author_id', $subquery1, QueryBuilder::SUB_QUERY_NOT_IN, null),
+                    array(QueryBuilder::BRACKET_CLOSE),
+                ),
+                'WHERE title NOT LIKE ? OR ( author_id NOT IN ( SELECT id FROM author WHERE last_name LIKE ? ) ) ',
+                'WHERE title NOT LIKE ? '."\n".'OR '."\n".'( '."\n".'    author_id NOT IN '."\n".'    ( '."\n".'        SELECT id FROM author WHERE last_name LIKE ? '."\n".'    ) '."\n".') '."\n",
+                array('%Dune%', '%Her%'),
             ),
         );
     }

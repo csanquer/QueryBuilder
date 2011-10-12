@@ -897,45 +897,84 @@ class QueryBuilder
                         }
                         break;
 
-//                    case self::SUB_QUERY_IN:
-//                    case self::SUB_QUERY_NOT_IN:
-//                    case self::SUB_QUERY_EXISTS:
-//                    case self::SUB_QUERY_NOT_EXISTS:
-//                        
-//                        switch ($currentCriterion['operator'])
-//                        {
-//                            case self::SUB_QUERY_IN:
-//                                $currentCriterion['operator'] = self::IN;
-//                                break;
-//                            
-//                            case self::SUB_QUERY_NOT_IN:
-//                                $currentCriterion['operator'] = self::NOT_IN;
-//                                break;
-//                            
-//                            case self::SUB_QUERY_EXISTS:
-//                                $currentCriterion['operator'] = self::EXISTS;
-//                                break;
-//                            
-//                            case self::SUB_QUERY_NOT_EXISTS:
-//                                $currentCriterion['operator'] = self::NOT_EXISTS;
-//                                break;
-//                        }
-//                        $value = '';
-//                        
-//                        if ($currentCriterion['value'] instanceof self)
-//                        {
-//                                $value = $currentCriterion['value']->getQueryString();
-//                                $this->boundParams = array_merge($this->boundParams, $currentCriterion['value']->getBoundParameters());
-//                        }
-//                        else
-//                        {
-//                            // Raw sql
-//                            $value = $currentCriterion['value'];
-//                        }
-//
-//                        // Wrap the subquery
-//                        $value = self::BRACKET_OPEN.$value.self::BRACKET_CLOSE;
-//                        break;
+                    case self::SUB_QUERY_IN:
+                    case self::SUB_QUERY_NOT_IN:
+                    case self::SUB_QUERY_EXISTS:
+                    case self::SUB_QUERY_NOT_EXISTS:
+                        switch ($currentCriterion['operator'])
+                        {
+                            case self::SUB_QUERY_IN:
+                                $currentCriterion['operator'] = self::IN;
+                                break;
+                            
+                            case self::SUB_QUERY_NOT_IN:
+                                $currentCriterion['operator'] = self::NOT_IN;
+                                break;
+                            
+                            case self::SUB_QUERY_EXISTS:
+                                $currentCriterion['column'] = '';
+                                $currentCriterion['operator'] = self::EXISTS;
+                                break;
+                            
+                            case self::SUB_QUERY_NOT_EXISTS:
+                                $currentCriterion['column'] = '';
+                                $currentCriterion['operator'] = self::NOT_EXISTS;
+                                break;
+                        }
+                        $value = '';
+                        
+                        if ($currentCriterion['value'] instanceof self)
+                        {
+                            $value = $currentCriterion['value']->getQueryString();
+                            $boundParams = array_merge($boundParams, $currentCriterion['value']->getBoundParameters(false, null));
+                        }
+                        else
+                        {
+                            // Raw sql
+                            $value = trim($currentCriterion['value']).' ';
+                        }
+                        
+                        // Wrap the subquery
+                        $tempValue = '';
+                        if (!empty($value))
+                        {
+                            if ($formatted)
+                            {
+                                $tempValue = "\n";
+                                if ($indent > 0)
+                                {
+                                    $tempValue .= str_repeat($indentChar,$indent);
+                                }
+
+                                $tempValue .= self::BRACKET_OPEN.' '."\n";
+
+                                $indent++;
+                                if ($indent > 0)
+                                {
+                                    $tempValue .= str_repeat($indentChar,$indent);
+                                }
+                            }
+                            else
+                            {
+                                $tempValue = self::BRACKET_OPEN.' ';
+                            }
+                        }
+                        
+                        $tempValue .= $value;
+                        
+                        if ($formatted && !empty($tempValue))
+                        {
+                            $tempValue .= "\n";
+                            $indent--;
+                            if ($indent > 0)
+                            {
+                                $tempValue .= str_repeat($indentChar,$indent);
+                            }
+                            
+                        }
+                        $tempValue .= self::BRACKET_CLOSE;
+                        $value = $tempValue;
+                        break;
 
                     default:
                         $boundParams[] = $currentCriterion['value'];
