@@ -207,10 +207,7 @@ abstract class BaseQueryBuilder
         }
         elseif (is_null($section) || $section === false)
         {
-            foreach ($this->boundParams as $sectionParams)
-            {
-                 $boundParams = array_merge($boundParams, $sectionParams);
-            }
+            $boundParams = $this->mergeBoundParameters();
         }
         
         if ($quoted && !empty($boundParams))
@@ -231,6 +228,24 @@ abstract class BaseQueryBuilder
     protected function quoteBoundParameters($boundParameters)
     {
         return array_map(array($this, 'quote'), $boundParameters);
+    }
+    
+    /**
+     * Merge all BoundParameters section
+     * 
+     * @return array 
+     */
+    protected function mergeBoundParameters()
+    {
+        $boundParams = array();
+        if (!empty($this->boundParams))
+        {
+            foreach ($this->boundParams as $sectionParams)
+            {
+                 $boundParams = array_merge($boundParams, $sectionParams);
+            }
+        }
+        return $boundParams;
     }
     
     /**

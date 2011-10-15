@@ -962,6 +962,21 @@ class SelectQueryBuilder extends BaseWhereQueryBuilder
     }
 
     /**
+     * Merge all BoundParameters section
+     * 
+     * @return array 
+     */
+    protected function mergeBoundParameters()
+    {
+        $boundParams = array();
+        if (isset($this->boundParams['where']) && isset($this->boundParams['having']))
+        {
+             $boundParams = array_merge($boundParams, $this->boundParams['where'], $this->boundParams['having']);
+        }
+        return $boundParams;
+    }
+    
+    /**
      * Returns the full query string.
      *
      * @param  bool $formatted format SQL string on multiple lines, default false
