@@ -195,11 +195,31 @@ abstract class BaseQueryBuilder
      *
      * @param bool $quoted default = false, if true the bound parameters are escaped
      * @param string|null $section default = null, which bound parameters section to retrieve
-     * @abstract
      * 
      * @return array
      */
-    abstract public function getBoundParameters($quoted = false, $section = null);
+    public function getBoundParameters($quoted = false, $section = null)
+    {
+        $boundParams = array();
+        if (isset($this->boundParams[$section]))
+        {
+            $boundParams = $this->boundParams[$section];
+        }
+        elseif (is_null($section) || $section === false)
+        {
+            foreach ($this->boundParams as $sectionParams)
+            {
+                 $boundParams = array_merge($boundParams, $sectionParams);
+            }
+        }
+        
+        if ($quoted && !empty($boundParams))
+        {
+            return $this->quoteBoundParameters($boundParams);
+        }
+
+        return $boundParams;
+    }
     
     /**
      * quote each item in a bound parameters array

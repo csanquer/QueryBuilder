@@ -508,6 +508,71 @@ class SelectQueryBuilder extends BaseWhereQueryBuilder
         return $groupBy;
     }
 
+    
+    /**
+     * Adds an open bracket for nesting WHERE conditions.
+     *
+     * @param  string $connector optional logical connector, default AND
+     * @return SQL\SelectQueryBuilder
+     */
+    public function openWhere($connector = self::LOGICAL_AND)
+    {
+        return parent::openWhere($connector);
+    }
+
+    /**
+     * Adds a closing bracket for nesting WHERE conditions.
+     *
+     * @return SQL\SelectQueryBuilder
+     */
+    public function closeWhere()
+    {
+        return parent::closeWhere();
+    }
+
+    /**
+     * Adds a WHERE condition.
+     *
+     * @param  string $column column name
+     * @param  mixed $value value
+     * @param  string $operator optional comparison operator, default = '='
+     * @param  string $connector optional logical connector, default AND
+     * 
+     * @return SQL\SelectQueryBuilder
+     */
+    public function where($column, $value, $operator = self::EQUALS, $connector = self::LOGICAL_AND)
+    {
+        return parent::where($column, $value, $operator, $connector);
+    }
+
+    /**
+     * Adds an AND WHERE condition.
+     *
+     * @param  string $column colum name
+     * @param  mixed $value value
+     * @param  string $operator optional comparison operator, default = '='
+     * 
+     * @return SQL\SelectQueryBuilder
+     */
+    public function andWhere($column, $value, $operator = self::EQUALS)
+    {
+        return parent::where($column, $value, $operator, self::LOGICAL_AND);
+    }
+
+    /**
+     * Adds an OR WHERE condition.
+     *
+     * @param  string $column colum name
+     * @param  mixed $value value
+     * @param  string $operator optional comparison operator, default = '='
+     * 
+     * @return SQL\SelectQueryBuilder
+     */
+    public function orWhere($column, $value, $operator = self::EQUALS)
+    {
+        return parent::where($column, $value, $operator, self::LOGICAL_OR);
+    }
+    
     /**
      * Adds an open bracket for nesting HAVING conditions.
      *
@@ -930,28 +995,6 @@ class SelectQueryBuilder extends BaseWhereQueryBuilder
      * 
      * @return array
      */
-    public function getBoundParameters($quoted = false, $section = null)
-    {
-        if ($section == 'having')
-        {
-            $boundParams = $this->boundParams['having'];
-        }
-        elseif ($section == 'where')
-        {
-            $boundParams = $this->boundParams['where'];
-        }
-        else
-        {
-            $boundParams = array_merge($this->boundParams['where'], $this->boundParams['having']);
-        }
-        
-        if ($quoted)
-        {
-            return $this->quoteBoundParameters($boundParams);
-        }
-
-        return $boundParams;
-    }
 
     /**
      * Executes the query, but only returns the row count

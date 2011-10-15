@@ -1,5 +1,5 @@
 <?php
-namespace SQL\Test;
+namespace SQL\Test\Fixtures;
 
 /**
  * PDO fixtures Test Case class

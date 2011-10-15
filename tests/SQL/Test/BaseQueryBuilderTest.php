@@ -2,7 +2,7 @@
 
 namespace SQL\Test;
 
-use SQL\Test\PDOTestCase;
+use SQL\Test\Fixtures\PDOTestCase;
 use SQL\BaseQueryBuilder;
 
 class BaseQueryBuilderTest extends PDOTestCase
@@ -16,6 +16,19 @@ class BaseQueryBuilderTest extends PDOTestCase
     protected function setUp()
     {
         $this->queryBuilder = $this->getMockForAbstractClass('SQL\BaseQueryBuilder', array(self::$pdo));
+    }
+    
+    /**
+     * set boundsParameters public for unit tests and set its value
+     * 
+     * @param array $value 
+     */
+    private function setBoundParams($value)
+    {
+        $reflection = new \ReflectionClass($this->queryBuilder);
+        $boundParams = $reflection->getProperty('boundParams');
+        $boundParams->setAccessible(true);
+        $boundParams->setValue($this->queryBuilder, $value);
     }
     
     public function testSetPdoConnection()
@@ -145,12 +158,9 @@ class BaseQueryBuilderTest extends PDOTestCase
         $this->queryBuilder
             ->expects($this->any())
             ->method('getQueryString')
-            ->will($this->returnValue('SELECT * FROM book WHERE author_id = ?'));
+            ->will($this->returnValue('SELECT * FROM book WHERE author_id = ? '));
 
-        $this->queryBuilder
-            ->expects($this->any())
-            ->method('getBoundParameters')
-            ->will($this->returnValue(array(2)));
+        $this->setBoundParams(array('where' => array(2)));
         
         $this->assertInstanceOf('\PDOStatement', $this->queryBuilder->query());
 
@@ -182,8 +192,6 @@ class BaseQueryBuilderTest extends PDOTestCase
         );
 
         $this->assertEquals($expected, $this->queryBuilder->query(\PDO::FETCH_ASSOC));
-
-        return $this->queryBuilder;
     }
 
 }
