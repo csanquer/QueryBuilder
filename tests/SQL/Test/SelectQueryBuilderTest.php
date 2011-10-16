@@ -1348,6 +1348,44 @@ class SelectQueryBuilderTest extends PDOTestCase
         $this->assertEquals($expected, $this->queryBuilder->getJoinParts());
     }
     
+    public function testMergeWhere()
+    {
+        $this->queryBuilder->where('id', 5 , SelectQueryBuilder::LESS_THAN);
+
+        $qb = new SelectQueryBuilder();
+        $qb
+            ->openWhere(SelectQueryBuilder::LOGICAL_OR)
+            ->where('title', 'Dune' , SelectQueryBuilder::NOT_EQUALS, null)
+            ->closeWhere();
+
+        $this->queryBuilder->mergeWhere($qb);
+
+        $expected = array(
+          array (
+            'column' => 'id',
+            'value' => 5,
+            'operator' => '<',
+            'connector' => 'AND',
+          ),
+          array (
+            'bracket' => '(',
+            'connector' => 'OR',
+          ),
+          array (
+            'column' => 'title',
+            'value' => 'Dune',
+            'operator' => '!=',
+            'connector' => 'AND',
+          ),
+          array (
+            'bracket' => ')',
+            'connector' => NULL,
+          ),
+        );
+
+        $this->assertEquals($expected, $this->queryBuilder->getWhereParts());
+    }
+    
     public function testMergeGroupBy()
     {
         $this->queryBuilder->groupBy('id');
