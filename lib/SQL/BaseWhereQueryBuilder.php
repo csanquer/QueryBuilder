@@ -34,8 +34,8 @@ abstract class BaseWhereQueryBuilder extends BaseQueryBuilder
     const NOT_EXISTS = 'NOT EXISTS';
     const LIKE = 'LIKE';
     const NOT_LIKE = 'NOT LIKE';
-    const REGEX = 'REGEXP';
-    const NOT_REGEX = 'NOT REGEXP';
+    const REGEXP = 'REGEXP';
+    const NOT_REGEXP = 'NOT REGEXP';
     const BETWEEN = 'BETWEEN';
     const NOT_BETWEEN = 'NOT BETWEEN';
     const IS_NULL = 'IS NULL';
@@ -135,8 +135,8 @@ abstract class BaseWhereQueryBuilder extends BaseQueryBuilder
             self::NOT_EXISTS,
             self::LIKE,
             self::NOT_LIKE,
-            self::REGEX,
-            self::NOT_REGEX,
+            self::REGEXP,
+            self::NOT_REGEXP,
             self::BETWEEN,
             self::NOT_BETWEEN,
             self::IS_NULL,
