@@ -36,6 +36,7 @@ class DeleteQueryBuilderTest extends PDOTestCase
     public function fromProvider()
     {
         return array(
+            array(null),
             array('book'),
             array('author'),
         );

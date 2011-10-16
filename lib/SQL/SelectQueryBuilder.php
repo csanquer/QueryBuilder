@@ -116,6 +116,8 @@ class SelectQueryBuilder extends BaseWhereQueryBuilder
     /**
      * Returns the SELECT portion of the query as a string.
      *
+     * @param  bool $formatted format SQL string on multiple lines, default false
+     * 
      * @return string
      */
     public function getSelectString($formatted = false)
@@ -329,6 +331,8 @@ class SelectQueryBuilder extends BaseWhereQueryBuilder
     /**
      * Returns the JOIN portion of the query as a string.
      *
+     * @param  bool $formatted format SQL string on multiple lines, default false
+     * 
      * @return string
      */
     public function getJoinString($formatted = false)
@@ -390,6 +394,8 @@ class SelectQueryBuilder extends BaseWhereQueryBuilder
     /**
      * Returns the FROM portion of the query, including all JOINs, as a string.
      *
+     * @param  bool $formatted format SQL string on multiple lines, default false
+     * 
      * @return string
      */
     public function getFromString($formatted = false)
@@ -474,6 +480,8 @@ class SelectQueryBuilder extends BaseWhereQueryBuilder
     /**
      * Returns the GROUP BY portion of the query as a string.
      *
+     * @param  bool $formatted format SQL string on multiple lines, default false
+     * 
      * @return string
      */
     public function getGroupByString($formatted = false)
@@ -647,6 +655,8 @@ class SelectQueryBuilder extends BaseWhereQueryBuilder
     /**
      * Returns the HAVING portion of the query as a string.
      *
+     * @param  bool $formatted format SQL string on multiple lines, default false
+     * 
      * @return string
      */
     public function getHavingString($formatted = false)
@@ -696,7 +706,8 @@ class SelectQueryBuilder extends BaseWhereQueryBuilder
     /**
      * Returns the ORDER BY portion of the query as a string.
      *
-     * @param  bool $includeText optional include 'ORDER BY' text, default true
+     * @param  bool $formatted format SQL string on multiple lines, default false
+     * 
      * @return string
      */
     public function getOrderByString($formatted = false)
@@ -785,7 +796,8 @@ class SelectQueryBuilder extends BaseWhereQueryBuilder
     /**
      * Returns the LIMIT portion of the query as a string.
      *
-     * @param  bool $includeText optional include 'LIMIT' text, default true
+     * @param  bool $formatted format SQL string on multiple lines, default false
+     * 
      * @return string
      */
     public function getLimitString($formatted = false)
@@ -1028,7 +1040,7 @@ class SelectQueryBuilder extends BaseWhereQueryBuilder
      * 
      * @return int|false
      */
-    public function queryGetRowCount()
+    public function count()
     {
 
         // Save the existing select, order and limit arrays

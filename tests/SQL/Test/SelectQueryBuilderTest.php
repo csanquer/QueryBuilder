@@ -1284,7 +1284,7 @@ class SelectQueryBuilderTest extends PDOTestCase
         );
     }
 
-    public function testQueryGetRowCount()
+    public function testCount()
     {
         $this->loadSchema();
         $this->loadFixtures();
@@ -1292,7 +1292,7 @@ class SelectQueryBuilderTest extends PDOTestCase
         $this->queryBuilder->from('book');
         $this->queryBuilder->where('author_id', 2);
         
-        $this->assertEquals(3, $this->queryBuilder->queryGetRowCount());
+        $this->assertEquals(3, $this->queryBuilder->count());
     }
 
     public function testMergeSelect()

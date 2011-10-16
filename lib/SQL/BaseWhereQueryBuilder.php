@@ -485,7 +485,8 @@ abstract class BaseWhereQueryBuilder extends BaseQueryBuilder
     /**
      * Returns the WHERE portion of the query as a string.
      *
-     * @param bool $formatted
+     * @param  bool $formatted format SQL string on multiple lines, default false
+     * 
      * @return string
      */
     public function getWhereString($formatted = false)

@@ -62,6 +62,8 @@ class DeleteQueryBuilder extends BaseWhereQueryBuilder
     /**
      * Returns the FROM portion of the query as a string.
      *
+     * @param  bool $formatted format SQL string on multiple lines, default false
+     * 
      * @return string
      */
     public function getFromString($formatted = false)
