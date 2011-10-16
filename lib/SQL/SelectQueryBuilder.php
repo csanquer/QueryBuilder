@@ -848,6 +848,18 @@ class SelectQueryBuilder extends BaseWhereQueryBuilder
 
         return $this;
     }
+
+    /**
+     * Merges the given QueryBuilder's WHEREs into this QueryBuilder.
+     *
+     * @param  \SQL\BaseWhereQueryBuilder $QueryBuilder to merge 
+     * 
+     * @return \SQL\SelectQueryBuilder the current QueryBuilder
+     */
+    public function mergeWhere(BaseWhereQueryBuilder $QueryBuilder)
+    {
+        return parent::mergeWhere($QueryBuilder);
+    }
     
     /**
      * Merges the given QueryBuilder's GROUP BYs into this QueryBuilder.
