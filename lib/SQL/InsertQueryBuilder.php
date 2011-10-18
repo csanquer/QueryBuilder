@@ -29,10 +29,27 @@ class InsertQueryBuilder extends BaseQueryBuilder
         $this->boundParams['values'] = array();
         $this->boundParams['select'] = array();
     }
+    
+    /**
+     * Merge all BoundParameters section
+     * 
+     * @return array 
+     */
+    protected function mergeBoundParameters()
+    {
+        $boundParams = array();
+        if (isset($this->boundParams['values']) && isset($this->boundParams['select']))
+        {
+             $boundParams = array_merge($boundParams, $this->boundParams['values'], $this->boundParams['select']);
+        }
+        return $boundParams;
+    }
+    
     /**
      * Sets the INTO table with optional columns.
      *
      * @param  string $table table name
+     * @param  array $columns array of columns to use, default = array()
      * 
      * @return SQL\InsertQueryBuilder
      */
@@ -184,7 +201,39 @@ class InsertQueryBuilder extends BaseQueryBuilder
      */
     public function getValuesString($formatted = false)
     {
+        $string = '';
+        $first = true;
+        foreach ($this->sqlParts['values'] as $values)
+        {
+            if (!$first)
+            {
+                $string .= ', ';
+                if ($formatted)
+                {
+                    $string .= "\n";
+                }
+            }
+            else
+            {
+                $first = false;
+            }
+            
+            foreach ($values as $value)
+            {
+                $this->boundParams['values'][] = $value;
+            }
+            
+            $string .= self::BRACKET_OPEN
+                .substr(str_repeat('?, ', count($values)), 0, -2)
+                .self::BRACKET_CLOSE.' ';
+            
+        }
         
+        if (!empty($string))
+        {
+            $string = 'VALUES '.($formatted ? "\n" : '').$string.($formatted ? " \n" : ' ');
+        }
+        return $string;
     }
     
     /**
@@ -229,7 +278,10 @@ class InsertQueryBuilder extends BaseQueryBuilder
      */
     public function getSelectString($formatted = false)
     {
+        $selectQueryBuilder = $this->getSelectPart();
+        $this->boundParams['select'] = $selectQueryBuilder->getBoundParameters();
         
+        return $selectQueryBuilder->getQueryString($formatted);
     }
     
     /**
@@ -241,7 +293,7 @@ class InsertQueryBuilder extends BaseQueryBuilder
      */
     public function getQueryString($formatted = false)
     {
-        //return empty string if from part is not set
+        //return empty string if into part is not set
         $tableInto = $this->getIntoTable();
         if (empty($tableInto))
         {
@@ -249,6 +301,16 @@ class InsertQueryBuilder extends BaseQueryBuilder
         }
         
         $string = $this->getIntoString($formatted);
+        
+        $selectQueryBuilder = $this->getSelectPart();
+        if ($selectQueryBuilder instanceof SelectQueryBuilder)
+        {
+            $string .= $this->getSelectString($formatted);
+        }
+        else
+        {
+            $string .= $this->getValuesString($formatted);
+        }
         
         return $string;
     }
