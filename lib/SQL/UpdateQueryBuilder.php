@@ -44,6 +44,251 @@ class UpdateQueryBuilder extends BaseWhereQueryBuilder
     }
     
     /**
+     * Sets the UPDATE table 
+     *
+     * @param  string $table table name
+     * 
+     * @return SQL\UpdateQueryBuilder
+     */
+    public function table($table)
+    {
+        $this->sqlParts['table'] = (string) $table;
+        return $this;
+    }
+
+    /**
+     * Returns the UPDATE table.
+     *
+     * @return string
+     */
+    public function getTable()
+    {
+        return $this->getTablePart();
+    }
+    
+    /**
+     * Returns the UPDATE table part.
+     *
+     * @return string
+     */
+    public function getTablePart()
+    {
+        return $this->getSQLPart('table');
+    }
+    
+    /**
+     * get UPDATE query string part
+     * 
+     * @param  bool $formatted format SQL string on multiple lines, default false
+     * 
+     * @return string 
+     */
+    public function getTableString($formatted = false)
+    {
+        $update = '';
+
+        $table = $this->getTable();
+        
+        if (!empty($table))
+        {
+            $update = trim($table).' ';
+            
+        }
+
+        if (!empty($update))
+        {
+            $options ='';
+            // Add any execution options.
+            if (!empty($this->options))
+            {
+                $options = implode(' ', $this->options).' ';
+            }
+            
+            $update = 'UPDATE '.$options.$update;
+            
+            if ($formatted)
+            {
+                $update .= "\n";
+            }
+        }
+
+        return $update;
+    }
+    
+    /**
+     * set a SET column clause
+     * 
+     * @param string $column
+     * @param string|SQL\SelectQueryBuilder $expression
+     * @param mixed $values
+     * 
+     * @return SQL\UpdateQueryBuilder 
+     */
+    public function set($column, $expression, $values = null)
+    {
+        if ($expression instanceof SelectQueryBuilder)
+        {
+            $values = null;
+        }
+        
+        $this->sqlParts['set'][] = array(
+            'column' => (string) $column,
+            'expression' => $expression,
+            'values' => $values,
+        );
+        
+        return $this;
+    }
+    
+    /**
+     * Returns the SET query part.
+     *
+     * @return array
+     */
+    public function getSet()
+    {
+        return $this->getSetParts();
+    }
+    
+    /**
+     * Returns the SET part.
+     *
+     * @return array
+     */
+    public function getSetParts()
+    {
+        return $this->getSQLPart('set');
+    }
+    
+    /**
+     * get SET query string part
+     * 
+     * @param  bool $formatted format SQL string on multiple lines, default false
+     * 
+     * @return string 
+     */
+    public function getSetString($formatted = false)
+    {
+        $string = '';
+        $first = true;
+        foreach ($this->sqlParts['set'] as $set)
+        {
+            if (!$first)
+            {
+                $string .= ', ';
+                if ($formatted)
+                {
+                    $string .= "\n";
+                }
+            }
+            else
+            {
+                $first = false;
+            }
+            
+            if ($set['expression'] instanceof SelectQueryBuilder) 
+            {
+                $expression = $set['expression']->getQueryString($formatted);
+                $this->boundParams['set'] = array_merge($this->boundParams['set'], $set['expression']->getBoundParameters());
+            }
+            else
+            {
+                $expression = $set['expression'];
+                
+                if (!is_null($set['values']))
+                {
+                    $this->boundParams['set'] = array_merge($this->boundParams['set'], $set['values']);
+                }
+            }
+            
+            $string .= $set['column'].' = '.$expression;
+        }
+        
+        if (!empty($string))
+        {
+            $string = 'SET '.($formatted ? "\n" : '').$string.($formatted ? " \n" : ' ');
+        }
+        return $string;
+    }
+        
+    /**
+     * Adds an open bracket for nesting WHERE conditions.
+     *
+     * @param  string $connector optional logical connector, default AND
+     * 
+     * @return SQL\UpdateQueryBuilder
+     */
+    public function openWhere($connector = self::LOGICAL_AND)
+    {
+        return parent::openWhere($connector);
+    }
+
+    /**
+     * Adds a closing bracket for nesting WHERE conditions.
+     *
+     * @return SQL\UpdateQueryBuilder
+     */
+    public function closeWhere()
+    {
+        return parent::closeWhere();
+    }
+
+    /**
+     * Adds a WHERE condition.
+     *
+     * @param  string $column column name
+     * @param  mixed $value value
+     * @param  string $operator optional comparison operator, default = '='
+     * @param  string $connector optional logical connector, default AND
+     * 
+     * @return SQL\UpdateQueryBuilder
+     */
+    public function where($column, $value, $operator = self::EQUALS, $connector = self::LOGICAL_AND)
+    {
+        return parent::where($column, $value, $operator, $connector);
+    }
+
+    /**
+     * Adds an AND WHERE condition.
+     *
+     * @param  string $column colum name
+     * @param  mixed $value value
+     * @param  string $operator optional comparison operator, default = '='
+     * 
+     * @return SQL\UpdateQueryBuilder
+     */
+    public function andWhere($column, $value, $operator = self::EQUALS)
+    {
+        return parent::where($column, $value, $operator, self::LOGICAL_AND);
+    }
+
+    /**
+     * Adds an OR WHERE condition.
+     *
+     * @param  string $column colum name
+     * @param  mixed $value value
+     * @param  string $operator optional comparison operator, default = '='
+     * 
+     * @return \SQL\DeleteQueryBuilder
+     */
+    public function orWhere($column, $value, $operator = self::EQUALS)
+    {
+        return parent::where($column, $value, $operator, self::LOGICAL_OR);
+    }
+    
+    /**
+     * Merges the given QueryBuilder's WHEREs into this QueryBuilder.
+     *
+     * @param  \SQL\BaseWhereQueryBuilder $QueryBuilder to merge 
+     * 
+     * @return SQL\UpdateQueryBuilder the current QueryBuilder
+     */
+    public function mergeWhere(BaseWhereQueryBuilder $QueryBuilder)
+    {
+        return parent::mergeWhere($QueryBuilder);
+    }
+    
+    /**
      * Returns the full query string.
      *
      * @param  bool $formatted format SQL string on multiple lines, default false
@@ -52,6 +297,15 @@ class UpdateQueryBuilder extends BaseWhereQueryBuilder
      */
     public function getQueryString($formatted = false)
     {
+        //return empty string if into part is not set
+        $table = $this->getTable();
+        if (empty($table))
+        {
+            return '';
+        }
         
+        return $this->getTableString($formatted)
+            .$this->getSetString($formatted)
+            .$this->getWhereString($formatted);
     }
 }
