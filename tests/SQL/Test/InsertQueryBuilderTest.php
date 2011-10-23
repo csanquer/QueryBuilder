@@ -85,4 +85,36 @@ class InsertQueryBuilderTest extends PDOTestCase
             ),
         );
     }
+    
+    /**
+     * @dataProvider valuesProvider
+     */
+    public function testValues($values, $expectedValues)
+    {
+        $this->assertInstanceOf('SQL\InsertQueryBuilder', $this->queryBuilder->values($values));
+        $this->assertEquals($expectedValues, $this->queryBuilder->getValuesPart());
+        $this->assertEquals($expectedValues, $this->queryBuilder->getValues());
+    }
+    
+    public function valuesProvider()
+    {
+        return array(
+            array(
+                array(1, 'Dune'),
+                array(
+                    array(1, 'Dune')
+                ),
+            ),
+            array(
+                array(
+                    array(1, 'Dune'),
+                    array(2, 'The Man in the High Castles'),
+                ),
+                array(
+                    array(1, 'Dune'),
+                    array(2, 'The Man in the High Castles'),
+                ),
+            ),
+        );
+    }
 }
