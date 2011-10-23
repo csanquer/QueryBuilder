@@ -186,6 +186,7 @@ class InsertQueryBuilder extends BaseQueryBuilder
      */
     public function getValuesString($formatted = false)
     {
+        $this->boundParams['values'] = array();
         $string = '';
         $first = true;
         foreach ($this->sqlParts['values'] as $values)

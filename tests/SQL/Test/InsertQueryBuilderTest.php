@@ -121,16 +121,16 @@ class InsertQueryBuilderTest extends PDOTestCase
     /**
      * @dataProvider getValuesStringProvider
      */
-    public function testGetValuesString($values, $expected, $expectedFormatted)
+    public function testGetValuesString($values, $expectedBoundParameters, $expected, $expectedFormatted)
     {
         foreach ($values as $value)
         {
             $this->queryBuilder->values($value);
         }
-        var_dump($expected, $this->queryBuilder->getValuesString());
-        var_dump($expectedFormatted, $this->queryBuilder->getValuesString(true));
+        
         $this->assertEquals($expected, $this->queryBuilder->getValuesString());
         $this->assertEquals($expectedFormatted, $this->queryBuilder->getValuesString(true));
+        $this->assertEquals($expectedBoundParameters, $this->queryBuilder->getBoundParameters());
     }
     
     public function getValuesStringProvider()
@@ -140,6 +140,7 @@ class InsertQueryBuilderTest extends PDOTestCase
                 array(
                     array(1, 'Dune'),
                 ),
+                array(1, 'Dune'),
                 'VALUES (?, ?) ',
                 'VALUES '."\n".'(?, ?) '."\n",
             ),
@@ -148,6 +149,7 @@ class InsertQueryBuilderTest extends PDOTestCase
                     array(1, 'Dune'),
                     array(2, 'The Man in the High Castles'),
                 ),
+                array(1, 'Dune', 2, 'The Man in the High Castles'),
                 'VALUES (?, ?), (?, ?) ',
                 'VALUES '."\n".'(?, ?), '."\n".'(?, ?) '."\n",
             ),
@@ -158,6 +160,7 @@ class InsertQueryBuilderTest extends PDOTestCase
                         array(2, 'The Man in the High Castles'),
                     ),
                 ),
+                array(1, 'Dune', 2, 'The Man in the High Castles'),
                 'VALUES (?, ?), (?, ?) ',
                 'VALUES '."\n".'(?, ?), '."\n".'(?, ?) '."\n",
             ),
