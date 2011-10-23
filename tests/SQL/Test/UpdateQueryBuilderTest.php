@@ -126,10 +126,7 @@ class UpdateQueryBuilderTest extends PDOTestCase
     {
         foreach ($sets as $set)
         {
-            if (!empty($set))
-            {
-                $this->queryBuilder->set($set[0], $set[1], $set[2]);
-            }
+            $this->queryBuilder->set($set[0], $set[1], $set[2]);
         }
         
         $this->assertEquals($expected, $this->queryBuilder->getSetString());
@@ -239,5 +236,82 @@ class UpdateQueryBuilderTest extends PDOTestCase
         );
 
         $this->assertEquals($expected, $this->queryBuilder->getWhereParts());
+    }
+    
+    /**
+     * @dataProvider getQueryStringProvider
+     */
+    public function testGetQueryString($table, $sets, $wheres, $expectedBoundParameters, $expected, $expectedFormatted)
+    {
+        $this->queryBuilder->table($table);
+        
+        foreach ($sets as $set)
+        {
+            $this->queryBuilder->set($set[0], $set[1], $set[2]);
+        }
+        
+        foreach ($wheres as $where)
+        {
+            $nbWhere = count($where);
+            if ($nbWhere == 4)
+            {
+                $this->queryBuilder->where($where[0], $where[1], $where[2], $where[3]);
+            }
+            elseif ($nbWhere >= 1 && $nbWhere <= 2)
+            {
+                if ($where[0] == '(')
+                {
+                    if (isset($where[1]))
+                    {
+                        $this->queryBuilder->openWhere($where[1]);
+                    }
+                    else
+                    {
+                        $this->queryBuilder->openWhere();
+                    }
+                }
+                elseif ($where[0] == ')')
+                {
+                    $this->queryBuilder->closeWhere();
+                }
+            }
+        }
+        
+        $this->assertEquals($expected, $this->queryBuilder->getQueryString());
+        $this->assertEquals($expectedFormatted, $this->queryBuilder->getQueryString(true));
+        $this->assertEquals($expectedBoundParameters, $this->queryBuilder->getBoundParameters());
+    }
+    
+    public function getQueryStringProvider()
+    {
+        $select1 = new SelectQueryBuilder();
+        $select1->select('AVG(price)');
+        $select1->from('OldBook', 'o');
+        
+        return array(
+            array(
+                '',
+                array(
+                ),
+                array(
+                ),
+                array(),
+                '',
+                '',
+            ),
+            array(
+                'book',
+                array(
+                    array('score', null, 5),
+                    array('price', null, 8),
+                ),
+                array(
+                    array('title', 'Dune', UpdateQueryBuilder::EQUALS, null),
+                ),
+                array(5, 8, 'Dune'),
+                'UPDATE book SET score = ?, price = ? WHERE title = ? ',
+                'UPDATE book '."\n".'SET '."\n".'score = ?, '."\n".'price = ? '."\n".'WHERE title = ? '."\n",
+            ),
+        );
     }
 }
