@@ -3,6 +3,7 @@
 namespace SQL;
 
 use SQL\BaseWhereQueryBuilder;
+use SQL\SelectWhereQueryBuilder;
 
 /**
  * Class for building programmatically PDO Update queries 
@@ -169,6 +170,7 @@ class UpdateQueryBuilder extends BaseWhereQueryBuilder
      */
     public function getSetString($formatted = false)
     {
+        $this->boundParams['set'] = array();
         $string = '';
         $first = true;
         foreach ($this->sqlParts['set'] as $set)
@@ -188,17 +190,21 @@ class UpdateQueryBuilder extends BaseWhereQueryBuilder
             
             if ($set['expression'] instanceof SelectQueryBuilder) 
             {
-                $expression = $set['expression']->getQueryString($formatted);
+                $expression = self::BRACKET_OPEN.($formatted? "\n" : '').$set['expression']->getQueryString($formatted).self::BRACKET_CLOSE;
                 $this->boundParams['set'] = array_merge($this->boundParams['set'], $set['expression']->getBoundParameters());
+            }
+            elseif (!is_null($set['expression']) && $set['expression'] != '')
+            {
+                $expression = $set['expression'];
+                if (!is_null($set['values']) && strpos($set['expression'], '?'))
+                {
+                    $this->boundParams['set'][] = $set['values'];
+                }
             }
             else
             {
-                $expression = $set['expression'];
-                
-                if (!is_null($set['values']))
-                {
-                    $this->boundParams['set'] = array_merge($this->boundParams['set'], $set['values']);
-                }
+                $expression = '?';
+                $this->boundParams['set'][] = $set['values'];
             }
             
             $string .= $set['column'].' = '.$expression;
