@@ -166,4 +166,128 @@ class InsertQueryBuilderTest extends PDOTestCase
             ),
         );
     }
+    
+    public function testSelect()
+    {
+        $select = new SelectQueryBuilder();
+        
+        $this->assertInstanceOf('SQL\InsertQueryBuilder', $this->queryBuilder->select($select));
+        $this->assertEquals($select, $this->queryBuilder->getSelectPart($select));
+        $this->assertEquals($select, $this->queryBuilder->getSelect($select));
+    }
+    
+    /**
+     * @dataProvider getSelectStringProvider
+     */
+    public function testGetSelectString($selectQueryBuilder, $expectedBoundParameters, $expected, $expectedFormatted)
+    {
+        $this->queryBuilder->select($selectQueryBuilder);
+        
+        $this->assertEquals($expected, $this->queryBuilder->getSelectString());
+        $this->assertEquals($expectedFormatted, $this->queryBuilder->getSelectString(true));
+        $this->assertEquals($expectedBoundParameters, $this->queryBuilder->getBoundParameters());
+    }
+    
+    public function getSelectStringProvider()
+    {
+        $select1 = new SelectQueryBuilder();
+        $select1->select('id');
+        $select1->select('title');
+        $select1->from('OldBook', 'o');
+        $select1->where('price', 8, SelectQueryBuilder::GREATER_THAN_OR_EQUAL);
+        
+        return array(
+            array(
+                $select1,
+                array(8),
+                'SELECT id, title FROM OldBook AS o WHERE price >= ? ',
+                'SELECT id, title '."\n".'FROM OldBook AS o '."\n".'WHERE price >= ? '."\n",
+            ),
+        );
+    }
+    
+    /**
+     * @dataProvider getQueryStringProvider
+     */
+    public function testGetQueryString($table, $columns, $values, $select, $expectedBoundParameters, $expected, $expectedFormatted)
+    {
+        $this->queryBuilder->into($table, $columns);
+        
+        foreach ($values as $value)
+        {
+            $this->queryBuilder->values($value);
+        }
+        
+        if (!empty($select))
+        {
+            $this->queryBuilder->select($select);
+        }
+        
+        $this->assertEquals($expected, $this->queryBuilder->getQueryString());
+        $this->assertEquals($expectedFormatted, $this->queryBuilder->getQueryString(true));
+    }
+    
+    public function getQueryStringProvider()
+    {
+        $select1 = new SelectQueryBuilder();
+        $select1->select('id');
+        $select1->select('title');
+        $select1->from('OldBook', 'o');
+        $select1->where('price', 8, SelectQueryBuilder::GREATER_THAN_OR_EQUAL);
+        
+        return array(
+            array(
+                '',
+                array(),
+                array(),
+                null,
+                array(),
+                '',
+                '',
+            ),
+            array(
+                'book',
+                array('id', 'title'),
+                array(
+                    array(1, 'Dune'),
+                ),
+                null,
+                array(1, 'Dune'),
+                'INSERT INTO book (id, title) VALUES (?, ?) ',
+                'INSERT INTO book (id, title) '."\n".'VALUES '."\n".'(?, ?) '."\n",
+            ),
+            array(
+                'book',
+                array('id', 'title'),
+                array(
+                    array(1, 'Dune'),
+                    array(2, 'The Man in the High Castles'),
+                ),
+                null,
+                array(1, 'Dune', 2, 'The Man in the High Castles'),
+                'INSERT INTO book (id, title) VALUES (?, ?), (?, ?) ',
+                'INSERT INTO book (id, title) '."\n".'VALUES '."\n".'(?, ?), '."\n".'(?, ?) '."\n",
+            ),
+            array(
+                'book',
+                array('id', 'title'),
+                array(),
+                $select1,
+                array(1, 'Dune', 2, 'The Man in the High Castles'),
+                'INSERT INTO book (id, title) SELECT id, title FROM OldBook AS o WHERE price >= ? ',
+                'INSERT INTO book (id, title) '."\n".'SELECT id, title '."\n".'FROM OldBook AS o '."\n".'WHERE price >= ? '."\n",
+            ),
+            array(
+                'book',
+                array('id', 'title'),
+                array(
+                    array(3, 'Do Androids Dream of Electric Sheep?'),
+                ),
+                $select1,
+                array(1, 'Dune', 2, 'The Man in the High Castles'),
+                'INSERT INTO book (id, title) SELECT id, title FROM OldBook AS o WHERE price >= ? ',
+                'INSERT INTO book (id, title) '."\n".'SELECT id, title '."\n".'FROM OldBook AS o '."\n".'WHERE price >= ? '."\n",
+            ),
+        );
+    }
 }
