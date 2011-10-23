@@ -31,21 +31,6 @@ class InsertQueryBuilder extends BaseQueryBuilder
     }
     
     /**
-     * Merge all BoundParameters section
-     * 
-     * @return array 
-     */
-    protected function mergeBoundParameters()
-    {
-        $boundParams = array();
-        if (isset($this->boundParams['values']) && isset($this->boundParams['select']))
-        {
-             $boundParams = array_merge($boundParams, $this->boundParams['values'], $this->boundParams['select']);
-        }
-        return $boundParams;
-    }
-    
-    /**
      * Sets the INTO table with optional columns.
      *
      * @param  string $table table name
