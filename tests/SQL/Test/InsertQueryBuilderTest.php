@@ -117,4 +117,50 @@ class InsertQueryBuilderTest extends PDOTestCase
             ),
         );
     }
+    
+    /**
+     * @dataProvider getValuesStringProvider
+     */
+    public function testGetValuesString($values, $expected, $expectedFormatted)
+    {
+        foreach ($values as $value)
+        {
+            $this->queryBuilder->values($value);
+        }
+        var_dump($expected, $this->queryBuilder->getValuesString());
+        var_dump($expectedFormatted, $this->queryBuilder->getValuesString(true));
+        $this->assertEquals($expected, $this->queryBuilder->getValuesString());
+        $this->assertEquals($expectedFormatted, $this->queryBuilder->getValuesString(true));
+    }
+    
+    public function getValuesStringProvider()
+    {
+        return array(
+            array(
+                array(
+                    array(1, 'Dune'),
+                ),
+                'VALUES (?, ?) ',
+                'VALUES '."\n".'(?, ?) '."\n",
+            ),
+            array(
+                array(
+                    array(1, 'Dune'),
+                    array(2, 'The Man in the High Castles'),
+                ),
+                'VALUES (?, ?), (?, ?) ',
+                'VALUES '."\n".'(?, ?), '."\n".'(?, ?) '."\n",
+            ),
+            array(
+                array(
+                    array(
+                        array(1, 'Dune'),
+                        array(2, 'The Man in the High Castles'),
+                    ),
+                ),
+                'VALUES (?, ?), (?, ?) ',
+                'VALUES '."\n".'(?, ?), '."\n".'(?, ?) '."\n",
+            ),
+        );
+    }
 }

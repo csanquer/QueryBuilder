@@ -12,6 +12,12 @@ namespace SQL;
 abstract class BaseQueryBuilder
 {
     /**
+     * Brackets for grouping criteria.
+     */
+    const BRACKET_OPEN = '(';
+    const BRACKET_CLOSE = ')';
+    
+    /**
      * PDO database connection to use in executing the query.
      *
      * @var PDO

@@ -42,12 +42,6 @@ abstract class BaseWhereQueryBuilder extends BaseQueryBuilder
     const IS_NOT_NULL = 'IS NOT NULL';
 
     /**
-     * Brackets for grouping criteria.
-     */
-    const BRACKET_OPEN = '(';
-    const BRACKET_CLOSE = ')';
-
-    /**
      * Specifies that the where() column name is the full where field, eg where('users.password = password(?)', 'test', QueryBuilder::RAW_WHERE)
      */
     const RAW_CRITERIA = 'raw';

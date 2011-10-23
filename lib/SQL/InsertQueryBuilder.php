@@ -210,7 +210,7 @@ class InsertQueryBuilder extends BaseQueryBuilder
             
             $string .= self::BRACKET_OPEN
                 .substr(str_repeat('?, ', count($values)), 0, -2)
-                .self::BRACKET_CLOSE.' ';
+                .self::BRACKET_CLOSE.'';
             
         }
         
