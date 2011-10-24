@@ -1286,7 +1286,6 @@ class SelectQueryBuilderTest extends PDOTestCase
 
     public function testCount()
     {
-        $this->loadSchema();
         $this->clearFixtures();
         $this->loadFixtures();
 

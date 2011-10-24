@@ -152,7 +152,6 @@ class BaseQueryBuilderTest extends PDOTestCase
 
     public function testQuery()
     {
-        $this->loadSchema();
         $this->clearFixtures();
         $this->loadFixtures();
         

@@ -17,6 +17,7 @@ class PDOTestCase extends \PHPUnit_Framework_TestCase
         try
         {
             self::$pdo = new \PDO('sqlite::memory:');
+            self::loadSchema();
         }
         catch (\PDOException $e)
         {
@@ -29,7 +30,7 @@ class PDOTestCase extends \PHPUnit_Framework_TestCase
         self::$pdo = null;
     }
     
-    protected function loadSchema()
+    protected static function loadSchema()
     {
         $sql = <<<SQL
 CREATE TABLE author
