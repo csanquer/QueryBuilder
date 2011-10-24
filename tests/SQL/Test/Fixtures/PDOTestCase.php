@@ -63,6 +63,25 @@ SQL;
         }
     }
 
+    protected function clearFixtures()
+    {
+        $sql = <<<TRU
+DELETE FROM book;
+DELETE FROM author;
+TRU;
+        if (self::$pdo instanceof \PDO)
+        {
+            try
+            {
+                self::$pdo->exec($sql);
+            }
+            catch (\PDOException $e)
+            {
+                echo $e->getMessage();
+            }
+        }
+    }
+    
     protected function loadFixtures()
     {
         $sql = <<<EOD
