@@ -1,9 +1,5 @@
 <?php
 
-namespace SQL;
-
-use SQL\BaseWhereQueryBuilder;
-
 /**
  * Class for building programmatically PDO Select queries 
  * 
@@ -32,9 +28,9 @@ class SelectQueryBuilder extends BaseWhereQueryBuilder
      * Constructor.
      *
      * @param  PDO $PdoConnection optional PDO database connection
-     * @return SQL\SelectQueryBuilder
+     * @return SelectQueryBuilder
      */
-    public function __construct(\PDO $PdoConnection = null)
+    public function __construct(PDO $PdoConnection = null)
     {
         parent::__construct($PdoConnection);
         
@@ -52,7 +48,7 @@ class SelectQueryBuilder extends BaseWhereQueryBuilder
     /**
      * Adds SQL_CALC_FOUND_ROWS execution option.
      *
-     * @return SQL\SelectQueryBuilder
+     * @return SelectQueryBuilder
      */
     public function calcFoundRows()
     {
@@ -62,7 +58,7 @@ class SelectQueryBuilder extends BaseWhereQueryBuilder
     /**
      * Adds DISTINCT execution option.
      *
-     * @return SQL\SelectQueryBuilder
+     * @return SelectQueryBuilder
      */
     public function distinct()
     {
@@ -75,7 +71,7 @@ class SelectQueryBuilder extends BaseWhereQueryBuilder
      * @param  string $column column name, table name, or expression, or array of column (index = column and value = alias)
      * @param  string $alias optional alias
      * 
-     * @return SQL\SelectQueryBuilder
+     * @return SelectQueryBuilder
      */
     public function select($column, $alias = null)
     {
@@ -170,7 +166,7 @@ class SelectQueryBuilder extends BaseWhereQueryBuilder
      *
      * @param  string $table table name
      * @param  string $alias optional alias
-     * @return SQL\SelectQueryBuilder
+     * @return SelectQueryBuilder
      */
     public function from($table, $alias = null)
     {
@@ -220,7 +216,7 @@ class SelectQueryBuilder extends BaseWhereQueryBuilder
      * @param  string|array $criteria optional ON criteria
      * @param  string $type optional type of join, default INNER JOIN
 
-     * @return SQL\SelectQueryBuilder
+     * @return SelectQueryBuilder
      */
     public function join($table, $alias = null, $criteria = null, $type = self::INNER_JOIN)
     {
@@ -253,7 +249,7 @@ class SelectQueryBuilder extends BaseWhereQueryBuilder
      * @param  string $table table name
      * @param  string|array $criteria optional ON criteria
      * @param  string $alias optional alias
-     * @return SQL\SelectQueryBuilder
+     * @return SelectQueryBuilder
      */
     public function innerJoin($table, $alias = null, $criteria = null)
     {
@@ -267,7 +263,7 @@ class SelectQueryBuilder extends BaseWhereQueryBuilder
      * @param  string $alias optional alias
      * @param  string|array $criteria optional ON criteria
      * 
-     * @return SQL\SelectQueryBuilder
+     * @return SelectQueryBuilder
      */
     public function leftJoin($table, $alias = null, $criteria = null)
     {
@@ -281,7 +277,7 @@ class SelectQueryBuilder extends BaseWhereQueryBuilder
      * @param  string $alias optional alias
      * @param  string|array $criteria optional ON criteria
      * 
-     * @return SQL\SelectQueryBuilder
+     * @return SelectQueryBuilder
      */
     public function rightJoin($table, $alias = null, $criteria = null)
     {
@@ -447,7 +443,7 @@ class SelectQueryBuilder extends BaseWhereQueryBuilder
      * @param  string $column column name
      * @param  string $order optional order direction, default empty (specific to MySQL)
      * 
-     * @return SQL\SelectQueryBuilder
+     * @return SelectQueryBuilder
      */
     public function groupBy($column, $order = null)
     {
@@ -521,7 +517,7 @@ class SelectQueryBuilder extends BaseWhereQueryBuilder
      * Adds an open bracket for nesting WHERE conditions.
      *
      * @param  string $connector optional logical connector, default AND
-     * @return SQL\SelectQueryBuilder
+     * @return SelectQueryBuilder
      */
     public function openWhere($connector = self::LOGICAL_AND)
     {
@@ -531,7 +527,7 @@ class SelectQueryBuilder extends BaseWhereQueryBuilder
     /**
      * Adds a closing bracket for nesting WHERE conditions.
      *
-     * @return SQL\SelectQueryBuilder
+     * @return SelectQueryBuilder
      */
     public function closeWhere()
     {
@@ -546,7 +542,7 @@ class SelectQueryBuilder extends BaseWhereQueryBuilder
      * @param  string $operator optional comparison operator, default = '='
      * @param  string $connector optional logical connector, default AND
      * 
-     * @return SQL\SelectQueryBuilder
+     * @return SelectQueryBuilder
      */
     public function where($column, $value, $operator = self::EQUALS, $connector = self::LOGICAL_AND)
     {
@@ -560,7 +556,7 @@ class SelectQueryBuilder extends BaseWhereQueryBuilder
      * @param  mixed $value value
      * @param  string $operator optional comparison operator, default = '='
      * 
-     * @return SQL\SelectQueryBuilder
+     * @return SelectQueryBuilder
      */
     public function andWhere($column, $value, $operator = self::EQUALS)
     {
@@ -574,7 +570,7 @@ class SelectQueryBuilder extends BaseWhereQueryBuilder
      * @param  mixed $value value
      * @param  string $operator optional comparison operator, default = '='
      * 
-     * @return SQL\SelectQueryBuilder
+     * @return SelectQueryBuilder
      */
     public function orWhere($column, $value, $operator = self::EQUALS)
     {
@@ -585,7 +581,7 @@ class SelectQueryBuilder extends BaseWhereQueryBuilder
      * Adds an open bracket for nesting HAVING conditions.
      *
      * @param  string $connector optional logical connector, default AND
-     * @return SQL\SelectQueryBuilder
+     * @return SelectQueryBuilder
      */
     public function openHaving($connector = self::LOGICAL_AND)
     {
@@ -595,7 +591,7 @@ class SelectQueryBuilder extends BaseWhereQueryBuilder
     /**
      * Adds a closing bracket for nesting HAVING conditions.
      *
-     * @return SQL\SelectQueryBuilder
+     * @return SelectQueryBuilder
      */
     public function closeHaving()
     {
@@ -609,7 +605,7 @@ class SelectQueryBuilder extends BaseWhereQueryBuilder
      * @param  mixed $value value
      * @param  string $operator optional comparison operator, default =
      * @param  string $connector optional logical connector, default AND
-     * @return SQL\SelectQueryBuilder
+     * @return SelectQueryBuilder
      */
     public function having($column, $value, $operator = self::EQUALS, $connector = self::LOGICAL_AND)
     {
@@ -622,7 +618,7 @@ class SelectQueryBuilder extends BaseWhereQueryBuilder
      * @param  string $column colum name
      * @param  mixed $value value
      * @param  string $operator optional comparison operator, default =
-     * @return SQL\SelectQueryBuilder
+     * @return SelectQueryBuilder
      */
     public function andHaving($column, $value, $operator = self::EQUALS)
     {
@@ -635,7 +631,7 @@ class SelectQueryBuilder extends BaseWhereQueryBuilder
      * @param  string $column colum name
      * @param  mixed $value value
      * @param  string $operator optional comparison operator, default =
-     * @return SQL\SelectQueryBuilder
+     * @return SelectQueryBuilder
      */
     public function orHaving($column, $value, $operator = self::EQUALS)
     {
@@ -676,7 +672,7 @@ class SelectQueryBuilder extends BaseWhereQueryBuilder
      *
      * @param  string $column column name
      * @param  string $order optional order direction, default ASC
-     * @return SQL\SelectQueryBuilder
+     * @return SelectQueryBuilder
      */
     public function orderBy($column, $order = self::ASC)
     {
@@ -747,7 +743,7 @@ class SelectQueryBuilder extends BaseWhereQueryBuilder
      *
      * @param  int $limit number of rows to return
      * 
-     * @return SQL\SelectQueryBuilder
+     * @return SelectQueryBuilder
      */
     public function limit($limit)
     {
@@ -761,7 +757,7 @@ class SelectQueryBuilder extends BaseWhereQueryBuilder
      * 
      * @param  int $offset start row number 
      * 
-     * @return SQL\SelectQueryBuilder
+     * @return SelectQueryBuilder
      */
     public function offset($offset)
     {
@@ -825,9 +821,9 @@ class SelectQueryBuilder extends BaseWhereQueryBuilder
     /**
      * Merges the given QueryBuilder's SELECT into this QueryBuilder.
      *
-     * @param  \SQL\SelectQueryBuilder $QueryBuilder to merge 
+     * @param  \SelectQueryBuilder $QueryBuilder to merge 
      * 
-     * @return \SQL\SelectQueryBuilder the current QueryBuilder
+     * @return \SelectQueryBuilder the current QueryBuilder
      */
     public function mergeSelect(SelectQueryBuilder $QueryBuilder)
     {
@@ -847,9 +843,9 @@ class SelectQueryBuilder extends BaseWhereQueryBuilder
     /**
      * Merges the given QueryBuilder's JOINs into this QueryBuilder.
      *
-     * @param  \SQL\SelectQueryBuilder $QueryBuilder to merge 
+     * @param  \SelectQueryBuilder $QueryBuilder to merge 
      * 
-     * @return \SQL\SelectQueryBuilder the current QueryBuilder
+     * @return \SelectQueryBuilder the current QueryBuilder
      */
     public function mergeJoin(SelectQueryBuilder $QueryBuilder)
     {
@@ -864,9 +860,9 @@ class SelectQueryBuilder extends BaseWhereQueryBuilder
     /**
      * Merges the given QueryBuilder's WHEREs into this QueryBuilder.
      *
-     * @param  \SQL\BaseWhereQueryBuilder $QueryBuilder to merge 
+     * @param  \BaseWhereQueryBuilder $QueryBuilder to merge 
      * 
-     * @return \SQL\SelectQueryBuilder the current QueryBuilder
+     * @return \SelectQueryBuilder the current QueryBuilder
      */
     public function mergeWhere(BaseWhereQueryBuilder $QueryBuilder)
     {
@@ -876,9 +872,9 @@ class SelectQueryBuilder extends BaseWhereQueryBuilder
     /**
      * Merges the given QueryBuilder's GROUP BYs into this QueryBuilder.
      *
-     * @param  \SQL\SelectQueryBuilder $QueryBuilder to merge 
+     * @param  \SelectQueryBuilder $QueryBuilder to merge 
      * 
-     * @return \SQL\SelectQueryBuilder the current QueryBuilder
+     * @return \SelectQueryBuilder the current QueryBuilder
      */
     public function mergeGroupBy(SelectQueryBuilder $QueryBuilder)
     {
@@ -893,9 +889,9 @@ class SelectQueryBuilder extends BaseWhereQueryBuilder
     /**
      * Merges the given QueryBuilder's HAVINGs into this QueryBuilder.
      *
-     * @param  \SQL\SelectQueryBuilder $QueryBuilder to merge 
+     * @param  \SelectQueryBuilder $QueryBuilder to merge 
      * 
-     * @return \SQL\SelectQueryBuilder the current QueryBuilder
+     * @return \SelectQueryBuilder the current QueryBuilder
      */
     public function mergeHaving(SelectQueryBuilder $QueryBuilder)
     {
@@ -925,9 +921,9 @@ class SelectQueryBuilder extends BaseWhereQueryBuilder
     /**
      * Merges the given QueryBuilder's ORDER BYs into this QueryBuilder.
      *
-     * @param  \SQL\SelectQueryBuilder $QueryBuilder to merge 
+     * @param  \SelectQueryBuilder $QueryBuilder to merge 
      * 
-     * @return \SQL\SelectQueryBuilder the current QueryBuilder
+     * @return \SelectQueryBuilder the current QueryBuilder
      */
     public function mergeOrderBy(SelectQueryBuilder $QueryBuilder)
     {
@@ -942,9 +938,9 @@ class SelectQueryBuilder extends BaseWhereQueryBuilder
     /**
      * Merges the given QueryBuilder's LIMITs into this QueryBuilder.
      *
-     * @param  \SQL\SelectQueryBuilder $QueryBuilder to merge 
+     * @param  \SelectQueryBuilder $QueryBuilder to merge 
      * 
-     * @return \SQL\SelectQueryBuilder the current QueryBuilder
+     * @return \SelectQueryBuilder the current QueryBuilder
      */
     public function mergeLimit(SelectQueryBuilder $QueryBuilder)
     {
@@ -957,11 +953,11 @@ class SelectQueryBuilder extends BaseWhereQueryBuilder
     /**
      * Merges the given QueryBuilder's HAVINGs into this QueryBuilder.
      *
-     * @param  \SQL\SelectQueryBuilder $QueryBuilder to merge 
+     * @param  \SelectQueryBuilder $QueryBuilder to merge 
      * @param  bool $overwriteLimit optional overwrite limit, default = true
      * @param  bool $mergeOrderBy optional merge order by clause, default = true
      * 
-     * @return \SQL\SelectQueryBuilder the current QueryBuilder
+     * @return \SelectQueryBuilder the current QueryBuilder
      */
     public function merge(SelectQueryBuilder $QueryBuilder, $overwriteLimit = true, $mergeOrderBy = true)
     {
@@ -1064,7 +1060,7 @@ class SelectQueryBuilder extends BaseWhereQueryBuilder
 
         // Fetch the count from the query result
         $result = false;
-        if ($stmt instanceof \PDOStatement)
+        if ($stmt instanceof PDOStatement)
         {
             $result = $stmt->fetchColumn();
             $stmt->closeCursor();

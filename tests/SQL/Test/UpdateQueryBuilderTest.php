@@ -1,15 +1,10 @@
 <?php
-namespace SQL\Test;
-
-use SQL\Test\Fixtures\PDOTestCase;
-use SQL\UpdateQueryBuilder;
-use SQL\SelectQueryBuilder;
 
 class UpdateQueryBuilderTest extends PDOTestCase
 {
 
     /**
-     * @var \SQL\UpdateQueryBuilder
+     * @var UpdateQueryBuilder
      */
     protected $queryBuilder;
 
@@ -24,7 +19,7 @@ class UpdateQueryBuilderTest extends PDOTestCase
    
     public function testTable()
     {
-        $this->assertInstanceOf('SQL\UpdateQueryBuilder', $this->queryBuilder->table('book'));
+        $this->assertInstanceOf('UpdateQueryBuilder', $this->queryBuilder->table('book'));
         $this->assertEquals('book', $this->queryBuilder->getTablePart());
         $this->assertEquals('book', $this->queryBuilder->getTable());
     }
@@ -68,7 +63,7 @@ class UpdateQueryBuilderTest extends PDOTestCase
      */
     public function testSet($column, $expression, $value, $expected)
     {
-        $this->assertInstanceOf('SQL\UpdateQueryBuilder', $this->queryBuilder->set($column, $expression, $value));
+        $this->assertInstanceOf('UpdateQueryBuilder', $this->queryBuilder->set($column, $expression, $value));
         $this->assertEquals($expected, $this->queryBuilder->getSetParts());
         $this->assertEquals($expected, $this->queryBuilder->getSet());
     }
@@ -187,17 +182,17 @@ class UpdateQueryBuilderTest extends PDOTestCase
     
     public function testWhere()
     {
-        $this->assertInstanceOf('SQL\UpdateQueryBuilder', $this->queryBuilder->Where('id', 1, SelectQueryBuilder::EQUALS, SelectQueryBuilder::LOGICAL_AND));
+        $this->assertInstanceOf('UpdateQueryBuilder', $this->queryBuilder->Where('id', 1, SelectQueryBuilder::EQUALS, SelectQueryBuilder::LOGICAL_AND));
     }
 
     public function testAndWhere()
     {
-        $this->assertInstanceOf('SQL\UpdateQueryBuilder', $this->queryBuilder->andWhere('id', 1, SelectQueryBuilder::EQUALS));
+        $this->assertInstanceOf('UpdateQueryBuilder', $this->queryBuilder->andWhere('id', 1, SelectQueryBuilder::EQUALS));
     }
 
     public function testOrWhere()
     {
-        $this->assertInstanceOf('SQL\UpdateQueryBuilder', $this->queryBuilder->orWhere('id', 1, SelectQueryBuilder::EQUALS));
+        $this->assertInstanceOf('UpdateQueryBuilder', $this->queryBuilder->orWhere('id', 1, SelectQueryBuilder::EQUALS));
     }
     
     public function testMergeWhere()

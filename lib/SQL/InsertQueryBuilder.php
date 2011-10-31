@@ -1,9 +1,5 @@
 <?php
 
-namespace SQL;
-
-use SQL\BaseQueryBuilder;
-
 /**
  * Class for building programmatically PDO Insert queries 
  * 
@@ -16,9 +12,9 @@ class InsertQueryBuilder extends BaseQueryBuilder
      *
      * @param  PDO $PdoConnection optional PDO database connection
      * 
-     * @return SQL\InsertQueryBuilder
+     * @return InsertQueryBuilder
      */
-    public function __construct(\PDO $PdoConnection = null)
+    public function __construct(PDO $PdoConnection = null)
     {
         parent::__construct($PdoConnection);
         
@@ -36,7 +32,7 @@ class InsertQueryBuilder extends BaseQueryBuilder
      * @param  string $table table name
      * @param  array $columns array of columns to use, default = array()
      * 
-     * @return SQL\InsertQueryBuilder
+     * @return InsertQueryBuilder
      */
     public function into($table, $columns = array())
     {
@@ -225,9 +221,9 @@ class InsertQueryBuilder extends BaseQueryBuilder
     /**
      * set SELECT Query clause from a SelectQueryBuilder
      * 
-     * @param SQL\SelectQueryBuilder $queryBuilder
+     * @param SelectQueryBuilder $queryBuilder
      * 
-     * @return SQL\InsertQueryBuilder 
+     * @return InsertQueryBuilder 
      */
     public function select(SelectQueryBuilder $queryBuilder)
     {
@@ -238,7 +234,7 @@ class InsertQueryBuilder extends BaseQueryBuilder
     /**
      * get SELECT query part
      * 
-     * @return SQL\SelectQueryBuilder 
+     * @return SelectQueryBuilder 
      */
     public function getSelectPart()
     {
@@ -248,7 +244,7 @@ class InsertQueryBuilder extends BaseQueryBuilder
     /**
      * get SELECT query clause
      * 
-     * @return SQL\SelectQueryBuilder 
+     * @return SelectQueryBuilder 
      */
     public function getSelect()
     {

@@ -1,22 +1,16 @@
 <?php
 
-namespace SQL\Test;
-
-use SQL\Test\Fixtures\PDOTestCase;
-use SQL\BaseWhereQueryBuilder;
-use SQL\SelectQueryBuilder;
-
 class BaseWhereQueryBuilderTest extends PDOTestCase
 {
     /**
      *
-     * @var SQL\BaseWhereQueryBuilder
+     * @var BaseWhereQueryBuilder
      */
     protected $queryBuilder;
     
     protected function setUp()
     {
-        $this->queryBuilder = $this->getMockForAbstractClass('SQL\BaseWhereQueryBuilder', array(self::$pdo));
+        $this->queryBuilder = $this->getMockForAbstractClass('BaseWhereQueryBuilder', array(self::$pdo));
     }
     
     /**
@@ -25,7 +19,7 @@ class BaseWhereQueryBuilderTest extends PDOTestCase
      */
     public function testWhere($column, $value, $operator, $connector, $expected)
     {
-        $this->assertInstanceOf('SQL\BaseWhereQueryBuilder', $this->queryBuilder->where($column, $value, $operator, $connector));
+        $this->assertInstanceOf('BaseWhereQueryBuilder', $this->queryBuilder->where($column, $value, $operator, $connector));
         $this->assertEquals($expected, $this->queryBuilder->getWhereParts());
     }
 
@@ -34,12 +28,12 @@ class BaseWhereQueryBuilderTest extends PDOTestCase
      */
     public function testWhereBetweenException()
     {
-        $this->assertInstanceOf('SQL\BaseWhereQueryBuilder', $this->queryBuilder->where('id', 5, BaseWhereQueryBuilder::BETWEEN));
+        $this->assertInstanceOf('BaseWhereQueryBuilder', $this->queryBuilder->where('id', 5, BaseWhereQueryBuilder::BETWEEN));
     }
 
     public function testAndWhere()
     {
-        $this->assertInstanceOf('SQL\BaseWhereQueryBuilder', $this->queryBuilder->andWhere('id', 1, BaseWhereQueryBuilder::EQUALS));
+        $this->assertInstanceOf('BaseWhereQueryBuilder', $this->queryBuilder->andWhere('id', 1, BaseWhereQueryBuilder::EQUALS));
         $expected = array(
             array(
                 'column' => 'id',
@@ -53,7 +47,7 @@ class BaseWhereQueryBuilderTest extends PDOTestCase
 
     public function testOrWhere()
     {
-        $this->assertInstanceOf('SQL\BaseWhereQueryBuilder', $this->queryBuilder->orWhere('id', 1, BaseWhereQueryBuilder::EQUALS));
+        $this->assertInstanceOf('BaseWhereQueryBuilder', $this->queryBuilder->orWhere('id', 1, BaseWhereQueryBuilder::EQUALS));
         $expected = array(
             array(
                 'column' => 'id',
@@ -160,7 +154,7 @@ class BaseWhereQueryBuilderTest extends PDOTestCase
      */
     public function testOpenWhere($connector, $expected)
     {
-        $this->assertInstanceOf('SQL\BaseWhereQueryBuilder', $this->queryBuilder->openWhere($connector));
+        $this->assertInstanceOf('BaseWhereQueryBuilder', $this->queryBuilder->openWhere($connector));
         $this->assertEquals($expected, $this->queryBuilder->getWhereParts());
     }
 
@@ -199,7 +193,7 @@ class BaseWhereQueryBuilderTest extends PDOTestCase
 
     public function testCloseWhere()
     {
-        $this->assertInstanceOf('SQL\BaseWhereQueryBuilder', $this->queryBuilder->closeWhere());
+        $this->assertInstanceOf('BaseWhereQueryBuilder', $this->queryBuilder->closeWhere());
         $expected = array(
             Array(
                 'bracket' => BaseWhereQueryBuilder::BRACKET_CLOSE,

@@ -1,16 +1,10 @@
 <?php
 
-namespace SQL\Test;
-
-use SQL\Test\Fixtures\PDOTestCase;
-use SQL\DeleteQueryBuilder;
-use SQL\SelectQueryBuilder;
-
 class DeleteQueryBuilderTest extends PDOTestCase
 {
 
     /**
-     * @var \SQL\DeleteQueryBuilder
+     * @var DeleteQueryBuilder
      */
     protected $queryBuilder;
 
@@ -28,7 +22,7 @@ class DeleteQueryBuilderTest extends PDOTestCase
      */
     public function testFrom($table)
     {
-        $this->assertInstanceOf('SQL\DeleteQueryBuilder', $this->queryBuilder->from($table));
+        $this->assertInstanceOf('DeleteQueryBuilder', $this->queryBuilder->from($table));
         $this->assertEquals($table, $this->queryBuilder->getFromTable());
         $this->assertEquals($table, $this->queryBuilder->getFromPart());
     }
@@ -78,17 +72,17 @@ class DeleteQueryBuilderTest extends PDOTestCase
     
     public function testWhere()
     {
-        $this->assertInstanceOf('SQL\DeleteQueryBuilder', $this->queryBuilder->Where('id', 1, DeleteQueryBuilder::EQUALS, SelectQueryBuilder::LOGICAL_AND));
+        $this->assertInstanceOf('DeleteQueryBuilder', $this->queryBuilder->Where('id', 1, DeleteQueryBuilder::EQUALS, SelectQueryBuilder::LOGICAL_AND));
     }
 
     public function testAndWhere()
     {
-        $this->assertInstanceOf('SQL\DeleteQueryBuilder', $this->queryBuilder->andWhere('id', 1, DeleteQueryBuilder::EQUALS));
+        $this->assertInstanceOf('DeleteQueryBuilder', $this->queryBuilder->andWhere('id', 1, DeleteQueryBuilder::EQUALS));
     }
 
     public function testOrWhere()
     {
-        $this->assertInstanceOf('SQL\DeleteQueryBuilder', $this->queryBuilder->orWhere('id', 1, DeleteQueryBuilder::EQUALS));
+        $this->assertInstanceOf('DeleteQueryBuilder', $this->queryBuilder->orWhere('id', 1, DeleteQueryBuilder::EQUALS));
     }
     
     

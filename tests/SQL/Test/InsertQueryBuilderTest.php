@@ -1,16 +1,10 @@
 <?php
 
-namespace SQL\Test;
-
-use SQL\Test\Fixtures\PDOTestCase;
-use SQL\InsertQueryBuilder;
-use SQL\SelectQueryBuilder;
-
 class InsertQueryBuilderTest extends PDOTestCase
 {
 
     /**
-     * @var \SQL\InsertQueryBuilder
+     * @var InsertQueryBuilder
      */
     protected $queryBuilder;
 
@@ -28,7 +22,7 @@ class InsertQueryBuilderTest extends PDOTestCase
      */
     public function testInto($table, $columns, $expectedIntoPart)
     {
-        $this->assertInstanceOf('SQL\InsertQueryBuilder', $this->queryBuilder->into($table, $columns));
+        $this->assertInstanceOf('InsertQueryBuilder', $this->queryBuilder->into($table, $columns));
         $this->assertEquals($expectedIntoPart, $this->queryBuilder->getIntoPart());
         $this->assertEquals($expectedIntoPart['table'], $this->queryBuilder->getIntoTable());
         $this->assertEquals($expectedIntoPart['columns'], $this->queryBuilder->getIntoColumns());
@@ -91,7 +85,7 @@ class InsertQueryBuilderTest extends PDOTestCase
      */
     public function testValues($values, $expectedValues)
     {
-        $this->assertInstanceOf('SQL\InsertQueryBuilder', $this->queryBuilder->values($values));
+        $this->assertInstanceOf('InsertQueryBuilder', $this->queryBuilder->values($values));
         $this->assertEquals($expectedValues, $this->queryBuilder->getValuesPart());
         $this->assertEquals($expectedValues, $this->queryBuilder->getValues());
     }
@@ -171,7 +165,7 @@ class InsertQueryBuilderTest extends PDOTestCase
     {
         $select = new SelectQueryBuilder();
         
-        $this->assertInstanceOf('SQL\InsertQueryBuilder', $this->queryBuilder->select($select));
+        $this->assertInstanceOf('InsertQueryBuilder', $this->queryBuilder->select($select));
         $this->assertEquals($select, $this->queryBuilder->getSelectPart($select));
         $this->assertEquals($select, $this->queryBuilder->getSelect($select));
     }

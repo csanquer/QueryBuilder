@@ -1,10 +1,5 @@
 <?php
 
-namespace SQL;
-
-use SQL\BaseWhereQueryBuilder;
-use SQL\SelectWhereQueryBuilder;
-
 /**
  * Class for building programmatically PDO Update queries 
  * 
@@ -17,9 +12,9 @@ class UpdateQueryBuilder extends BaseWhereQueryBuilder
      *
      * @param  PDO $PdoConnection optional PDO database connection
      * 
-     * @return SQL\UpdateQueryBuilder
+     * @return UpdateQueryBuilder
      */
-    public function __construct(\PDO $PdoConnection = null)
+    public function __construct(PDO $PdoConnection = null)
     {
         parent::__construct($PdoConnection);
         
@@ -49,7 +44,7 @@ class UpdateQueryBuilder extends BaseWhereQueryBuilder
      *
      * @param  string $table table name
      * 
-     * @return SQL\UpdateQueryBuilder
+     * @return UpdateQueryBuilder
      */
     public function table($table)
     {
@@ -120,10 +115,10 @@ class UpdateQueryBuilder extends BaseWhereQueryBuilder
      * set a SET column clause
      * 
      * @param string $column
-     * @param string|SQL\SelectQueryBuilder $expression
+     * @param string|SelectQueryBuilder $expression
      * @param mixed $values
      * 
-     * @return SQL\UpdateQueryBuilder 
+     * @return UpdateQueryBuilder 
      */
     public function set($column, $expression, $values = null)
     {
@@ -222,7 +217,7 @@ class UpdateQueryBuilder extends BaseWhereQueryBuilder
      *
      * @param  string $connector optional logical connector, default AND
      * 
-     * @return SQL\UpdateQueryBuilder
+     * @return UpdateQueryBuilder
      */
     public function openWhere($connector = self::LOGICAL_AND)
     {
@@ -232,7 +227,7 @@ class UpdateQueryBuilder extends BaseWhereQueryBuilder
     /**
      * Adds a closing bracket for nesting WHERE conditions.
      *
-     * @return SQL\UpdateQueryBuilder
+     * @return UpdateQueryBuilder
      */
     public function closeWhere()
     {
@@ -247,7 +242,7 @@ class UpdateQueryBuilder extends BaseWhereQueryBuilder
      * @param  string $operator optional comparison operator, default = '='
      * @param  string $connector optional logical connector, default AND
      * 
-     * @return SQL\UpdateQueryBuilder
+     * @return UpdateQueryBuilder
      */
     public function where($column, $value, $operator = self::EQUALS, $connector = self::LOGICAL_AND)
     {
@@ -261,7 +256,7 @@ class UpdateQueryBuilder extends BaseWhereQueryBuilder
      * @param  mixed $value value
      * @param  string $operator optional comparison operator, default = '='
      * 
-     * @return SQL\UpdateQueryBuilder
+     * @return UpdateQueryBuilder
      */
     public function andWhere($column, $value, $operator = self::EQUALS)
     {
@@ -275,7 +270,7 @@ class UpdateQueryBuilder extends BaseWhereQueryBuilder
      * @param  mixed $value value
      * @param  string $operator optional comparison operator, default = '='
      * 
-     * @return \SQL\DeleteQueryBuilder
+     * @return \DeleteQueryBuilder
      */
     public function orWhere($column, $value, $operator = self::EQUALS)
     {
@@ -285,9 +280,9 @@ class UpdateQueryBuilder extends BaseWhereQueryBuilder
     /**
      * Merges the given QueryBuilder's WHEREs into this QueryBuilder.
      *
-     * @param  \SQL\BaseWhereQueryBuilder $QueryBuilder to merge 
+     * @param  \BaseWhereQueryBuilder $QueryBuilder to merge 
      * 
-     * @return SQL\UpdateQueryBuilder the current QueryBuilder
+     * @return UpdateQueryBuilder the current QueryBuilder
      */
     public function mergeWhere(BaseWhereQueryBuilder $QueryBuilder)
     {

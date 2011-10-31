@@ -1,7 +1,5 @@
 <?php
 
-namespace SQL;
-
 /**
  * Abstract Base class for Queries
  * 
@@ -61,9 +59,9 @@ abstract class BaseQueryBuilder
      * Constructor.
      *
      * @param  PDO $PdoConnection optional PDO database connection
-     * @return SQL\BaseQueryBuilder
+     * @return BaseQueryBuilder
      */
-    public function __construct(\PDO $PdoConnection = null)
+    public function __construct(PDO $PdoConnection = null)
     {
         $this->options = array();
         $this->sqlParts = array();
@@ -90,9 +88,9 @@ abstract class BaseQueryBuilder
      * Sets the PDO database connection to use in executing this query.
      *
      * @param  PDO $PdoConnection optional PDO database connection
-     * @return SQL\BaseQueryBuilder
+     * @return BaseQueryBuilder
      */
-    public function setConnection(\PDO $connection = null)
+    public function setConnection(PDO $connection = null)
     {
         $this->connection = $connection;
 
@@ -138,7 +136,7 @@ abstract class BaseQueryBuilder
      * 
      * @return string|false
      */
-    public static function quoteValue($value, \PDO $connection = null)
+    public static function quoteValue($value, PDO $connection = null)
     {
         if (is_int($value) || is_float($value))
         {
@@ -148,7 +146,7 @@ abstract class BaseQueryBuilder
         {
             // If a PDO database connection is set, use it to quote the value using
             // the underlying database. Otherwise, quote it manually.
-            if ($connection instanceof \PDO)
+            if ($connection instanceof PDO)
             {
                 return $connection->quote($value);
             }
@@ -163,7 +161,7 @@ abstract class BaseQueryBuilder
      * Adds an execution option like DISTINCT or SQL_CALC_FOUND_ROWS.
      *
      * @param  string $option execution option to add
-     * @return SQL\BaseQueryBuilder
+     * @return BaseQueryBuilder
      */
     public function addOption($option)
     {
@@ -284,7 +282,7 @@ abstract class BaseQueryBuilder
      * 
      * @return string The debugged query
      */
-    public static function debugQuery($query, $params, $quoted = true, \PDO $connection = null)
+    public static function debugQuery($query, $params, $quoted = true, PDO $connection = null)
     {
         $keys = array();
         // build a regular expression for each parameter
@@ -350,7 +348,7 @@ abstract class BaseQueryBuilder
         $PdoConnection = $this->getConnection();
 
         // If no PDO database connection is set, the query cannot be executed.
-        if (!$PdoConnection instanceof \PDO)
+        if (!$PdoConnection instanceof PDO)
         {
             return false;
         }

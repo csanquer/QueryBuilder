@@ -1,9 +1,5 @@
 <?php
 
-namespace SQL;
-
-use SQL\BaseQueryBuilder;
-
 /**
  * Abstract Base class for Queries with Where Clauses
  * 
@@ -59,9 +55,9 @@ abstract class BaseWhereQueryBuilder extends BaseQueryBuilder
      *
      * @param  PDO $PdoConnection optional PDO database connection
      * 
-     * @return SQL\BaseWhereQueryBuilder
+     * @return BaseWhereQueryBuilder
      */
-    public function __construct(\PDO $PdoConnection = null)
+    public function __construct(PDO $PdoConnection = null)
     {
         parent::__construct($PdoConnection);
         
@@ -75,7 +71,7 @@ abstract class BaseWhereQueryBuilder extends BaseQueryBuilder
      *
      * @param  array $criteria WHERE or HAVING criteria
      * @param  string $connector optional logical connector, default AND
-     * @return SQL\BaseWhereQueryBuilder
+     * @return BaseWhereQueryBuilder
      */
     protected function openCriteria(array &$criteria, $connector = self::LOGICAL_AND)
     {
@@ -92,7 +88,7 @@ abstract class BaseWhereQueryBuilder extends BaseQueryBuilder
      * HAVING criteria.
      *
      * @param  array $criteria WHERE or HAVING criteria
-     * @return SQL\BaseWhereQueryBuilder
+     * @return BaseWhereQueryBuilder
      */
     protected function closeCriteria(array &$criteria)
     {
@@ -112,7 +108,7 @@ abstract class BaseWhereQueryBuilder extends BaseQueryBuilder
      * @param  mixed $value value
      * @param  string $operator optional comparison operator, default =
      * @param  string $connector optional logical connector, default AND
-     * @return SQL\BaseWhereQueryBuilder
+     * @return BaseWhereQueryBuilder
      */
     protected function criteria(array &$criteria, $column, $value, $operator = self::EQUALS, $connector = self::LOGICAL_AND)
     {
@@ -409,7 +405,7 @@ abstract class BaseWhereQueryBuilder extends BaseQueryBuilder
      * Adds an open bracket for nesting WHERE conditions.
      *
      * @param  string $connector optional logical connector, default AND
-     * @return SQL\BaseWhereQueryBuilder
+     * @return BaseWhereQueryBuilder
      */
     public function openWhere($connector = self::LOGICAL_AND)
     {
@@ -419,7 +415,7 @@ abstract class BaseWhereQueryBuilder extends BaseQueryBuilder
     /**
      * Adds a closing bracket for nesting WHERE conditions.
      *
-     * @return SQL\BaseWhereQueryBuilder
+     * @return BaseWhereQueryBuilder
      */
     public function closeWhere()
     {
@@ -433,7 +429,7 @@ abstract class BaseWhereQueryBuilder extends BaseQueryBuilder
      * @param  mixed $value value
      * @param  string $operator optional comparison operator, default =
      * @param  string $connector optional logical connector, default AND
-     * @return SQL\BaseWhereQueryBuilder
+     * @return BaseWhereQueryBuilder
      */
     public function where($column, $value, $operator = self::EQUALS, $connector = self::LOGICAL_AND)
     {
@@ -446,7 +442,7 @@ abstract class BaseWhereQueryBuilder extends BaseQueryBuilder
      * @param  string $column colum name
      * @param  mixed $value value
      * @param  string $operator optional comparison operator, default =
-     * @return SQL\BaseWhereQueryBuilder
+     * @return BaseWhereQueryBuilder
      */
     public function andWhere($column, $value, $operator = self::EQUALS)
     {
@@ -459,7 +455,7 @@ abstract class BaseWhereQueryBuilder extends BaseQueryBuilder
      * @param  string $column colum name
      * @param  mixed $value value
      * @param  string $operator optional comparison operator, default =
-     * @return SQL\BaseWhereQueryBuilder
+     * @return BaseWhereQueryBuilder
      */
     public function orWhere($column, $value, $operator = self::EQUALS)
     {
@@ -498,9 +494,9 @@ abstract class BaseWhereQueryBuilder extends BaseQueryBuilder
     /**
      * Merges the given QueryBuilder's WHEREs into this QueryBuilder.
      *
-     * @param  \SQL\BaseWhereQueryBuilder $QueryBuilder to merge 
+     * @param  \BaseWhereQueryBuilder $QueryBuilder to merge 
      * 
-     * @return \SQL\BaseWhereQueryBuilder the current QueryBuilder
+     * @return \BaseWhereQueryBuilder the current QueryBuilder
      */
     public function mergeWhere(BaseWhereQueryBuilder $QueryBuilder)
     {

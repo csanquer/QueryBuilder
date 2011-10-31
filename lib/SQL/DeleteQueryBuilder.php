@@ -1,9 +1,5 @@
 <?php
 
-namespace SQL;
-
-use SQL\BaseWhereQueryBuilder;
-
 /**
  * Class for building programmatically PDO Delete queries 
  * 
@@ -16,9 +12,9 @@ class DeleteQueryBuilder extends BaseWhereQueryBuilder
      *
      * @param  PDO $PdoConnection optional PDO database connection
      * 
-     * @return SQL\DeleteQueryBuilder
+     * @return DeleteQueryBuilder
      */
-    public function __construct(\PDO $PdoConnection = null)
+    public function __construct(PDO $PdoConnection = null)
     {
         parent::__construct($PdoConnection);
         
@@ -31,7 +27,7 @@ class DeleteQueryBuilder extends BaseWhereQueryBuilder
      *
      * @param  string $table table name
      * 
-     * @return SQL\DeleteQueryBuilder
+     * @return DeleteQueryBuilder
      */
     public function from($table)
     {
@@ -99,7 +95,7 @@ class DeleteQueryBuilder extends BaseWhereQueryBuilder
      *
      * @param  string $connector optional logical connector, default AND
      * 
-     * @return \SQL\DeleteQueryBuilder
+     * @return \DeleteQueryBuilder
      */
     public function openWhere($connector = self::LOGICAL_AND)
     {
@@ -109,7 +105,7 @@ class DeleteQueryBuilder extends BaseWhereQueryBuilder
     /**
      * Adds a closing bracket for nesting WHERE conditions.
      *
-     * @return \SQL\DeleteQueryBuilder
+     * @return \DeleteQueryBuilder
      */
     public function closeWhere()
     {
@@ -124,7 +120,7 @@ class DeleteQueryBuilder extends BaseWhereQueryBuilder
      * @param  string $operator optional comparison operator, default = '='
      * @param  string $connector optional logical connector, default AND
      * 
-     * @return \SQL\DeleteQueryBuilder
+     * @return \DeleteQueryBuilder
      */
     public function where($column, $value, $operator = self::EQUALS, $connector = self::LOGICAL_AND)
     {
@@ -138,7 +134,7 @@ class DeleteQueryBuilder extends BaseWhereQueryBuilder
      * @param  mixed $value value
      * @param  string $operator optional comparison operator, default = '='
      * 
-     * @return \SQL\DeleteQueryBuilder
+     * @return \DeleteQueryBuilder
      */
     public function andWhere($column, $value, $operator = self::EQUALS)
     {
@@ -152,7 +148,7 @@ class DeleteQueryBuilder extends BaseWhereQueryBuilder
      * @param  mixed $value value
      * @param  string $operator optional comparison operator, default = '='
      * 
-     * @return \SQL\DeleteQueryBuilder
+     * @return \DeleteQueryBuilder
      */
     public function orWhere($column, $value, $operator = self::EQUALS)
     {
@@ -162,9 +158,9 @@ class DeleteQueryBuilder extends BaseWhereQueryBuilder
     /**
      * Merges the given QueryBuilder's WHEREs into this QueryBuilder.
      *
-     * @param  \SQL\BaseWhereQueryBuilder $QueryBuilder to merge 
+     * @param  \BaseWhereQueryBuilder $QueryBuilder to merge 
      * 
-     * @return \SQL\DeleteQueryBuilder the current QueryBuilder
+     * @return \DeleteQueryBuilder the current QueryBuilder
      */
     public function mergeWhere(BaseWhereQueryBuilder $QueryBuilder)
     {

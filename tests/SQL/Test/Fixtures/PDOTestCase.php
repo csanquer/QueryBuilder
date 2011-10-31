@@ -1,5 +1,4 @@
 <?php
-namespace SQL\Test\Fixtures;
 
 /**
  * PDO fixtures Test Case class
@@ -8,7 +7,7 @@ class PDOTestCase extends \PHPUnit_Framework_TestCase
 {
     /**
      *
-     * @var \PDO 
+     * @var PDO 
      */
     protected static $pdo;
     
@@ -16,10 +15,10 @@ class PDOTestCase extends \PHPUnit_Framework_TestCase
     {
         try
         {
-            self::$pdo = new \PDO('sqlite::memory:');
+            self::$pdo = new PDO('sqlite::memory:');
             self::loadSchema();
         }
-        catch (\PDOException $e)
+        catch (PDOException $e)
         {
             echo $e->getMessage();
         }
@@ -51,13 +50,13 @@ CREATE TABLE book
 );
 SQL;
 
-        if (self::$pdo instanceof \PDO)
+        if (self::$pdo instanceof PDO)
         {
             try
             {
                 self::$pdo->exec($sql);
             }
-            catch (\PDOException $e)
+            catch (PDOException $e)
             {
                 echo $e->getMessage();
             }
@@ -70,13 +69,13 @@ SQL;
 DELETE FROM book;
 DELETE FROM author;
 TRU;
-        if (self::$pdo instanceof \PDO)
+        if (self::$pdo instanceof PDO)
         {
             try
             {
                 self::$pdo->exec($sql);
             }
-            catch (\PDOException $e)
+            catch (PDOException $e)
             {
                 echo $e->getMessage();
             }
@@ -98,13 +97,13 @@ INSERT INTO book (id, title, author_id, published_at, price, score) VALUES (5,'T
 INSERT INTO book (id, title, author_id, published_at, price, score) VALUES (6,'The Lord of the Rings', 1, '1954-01-01 00:00:00', 12.6, 5);
 EOD;
 
-        if (self::$pdo instanceof \PDO)
+        if (self::$pdo instanceof PDO)
         {
             try
             {
                 self::$pdo->exec($sql);
             }
-            catch (\PDOException $e)
+            catch (PDOException $e)
             {
                 echo $e->getMessage();
             }
