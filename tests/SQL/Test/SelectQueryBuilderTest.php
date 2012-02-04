@@ -34,11 +34,16 @@ class SelectQueryBuilderTest extends PDOTestCase
 
     public function fromProvider()
     {
+        $q = new SelectQueryBuilder();
+        $q->select(array('id', 'lastname'));
+        $q->from('author', 'a');
+        
         return array(
             array('book', null),
             array('author', null),
             array('book', 'b'),
             array('author', 'a'),
+            array($q, 'a1'),
         );
     }
 
@@ -208,6 +213,10 @@ class SelectQueryBuilderTest extends PDOTestCase
 
     public function GetFromStringProvider()
     {
+        $q = new SelectQueryBuilder();
+        $q->select(array('id', 'lastname'));
+        $q->from('author', 'a');
+        
         return array(
             array(
                 'book',
@@ -222,6 +231,13 @@ class SelectQueryBuilderTest extends PDOTestCase
                 array(),
                 'FROM book AS b ',
                 'FROM book AS b '."\n",
+            ),
+            array(
+                $q,
+                'a1',
+                array(),
+                'FROM (SELECT id, lastname FROM author AS a ) AS a1 ',
+                'FROM ( '."\n".'SELECT id, lastname '."\n".'FROM author AS a '."\n".') AS a1 '."\n",
             ),
             array(
                 'author',
