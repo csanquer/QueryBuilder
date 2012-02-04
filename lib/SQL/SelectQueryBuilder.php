@@ -46,6 +46,7 @@ class SelectQueryBuilder extends BaseWhereQueryBuilder
         $this->sqlParts['orderBy'] = array();
         $this->sqlParts['limit'] = array('limit' => 0, 'offset' => 0);
         
+        $this->boundParams['from'] = array();
         $this->boundParams['having'] = array();
     }
 
@@ -168,13 +169,13 @@ class SelectQueryBuilder extends BaseWhereQueryBuilder
     /**
      * Sets the FROM table with optional alias.
      *
-     * @param  string $table table name
+     * @param  \SQL\SelectQueryBuilder|string $table table name or SELECT Query
      * @param  string $alias optional alias
      * @return SQL\SelectQueryBuilder
      */
     public function from($table, $alias = null)
     {
-        $this->sqlParts['from']['table'] = (string) $table;
+        $this->sqlParts['from']['table'] = $table;
         $this->sqlParts['from']['alias'] = (string) $alias;
 
         return $this;
@@ -406,19 +407,15 @@ class SelectQueryBuilder extends BaseWhereQueryBuilder
         {
 
             // Allow the user to pass a QueryBuilder into from
-//            if ($this->sqlParts['from']['table'] instanceof self)
-//            {
-//                $from .= self::BRACKET_OPEN.$this->sqlParts['from']['table']->getQueryString($usePlaceholders).self::BRACKET_CLOSE;
-//
-//                if ($usePlaceholders)
-//                {
-//                    $this->fromPlaceholderValues = $this->sqlParts['from']['table']->getPlaceholderValues();
-//                }
-//            }
-//            else
-//            {
-            $from .= $this->sqlParts['from']['table'];
-//            }
+            if ($this->sqlParts['from']['table'] instanceof self)
+            {
+                $from .= self::BRACKET_OPEN.($formatted ? " \n" : '').$this->sqlParts['from']['table']->getQueryString($formatted).self::BRACKET_CLOSE;
+                $this->boundParams['from'] = array_merge($this->boundParams['from'], $this->sqlParts['from']['table']->getBoundParameters(false, null));
+            }
+            else
+            {
+                $from .= $this->sqlParts['from']['table'];
+            }
 
             if (!empty($this->sqlParts['from']['alias']))
             {
