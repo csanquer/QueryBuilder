@@ -1051,7 +1051,7 @@ class SelectQueryBuilder extends BaseWhereQueryBuilder
         $this->sqlParts['select']['COUNT(*)'] = null;
 
         // Run the query
-        $stmt = $this->query();
+        $stmt = $this->query(null);
 
         // Restore the values
         $this->sqlParts['select'] = $old_select;
