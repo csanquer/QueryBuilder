@@ -339,27 +339,27 @@ abstract class BaseQueryBuilder
      *
      * @see PDOStatement::fetch() and PDOStatement::fetchAll()
      * 
-     * @param int $fetch_style default = null , a PDO_FETCH constant to return a result as array or null to return a PDOStatement
+     * @param int $fetch_style default = \PDO::FETCH_ASSOC , a PDO_FETCH constant to return a result as array or null to return a PDOStatement
      * 
-     * @return array|PDOStatement|false , return PDOStatement if $fetch_style is null , otherwise an array , false if something goes wrong
+     * @return array|PDOStatement|string|false , return PDOStatement if $fetch_style is null , or an array , or a SQL string if there is no PDO , or false if something goes wrong
      * 
      * @throws PDOException if a error occured with PDO
      */
-    public function query($fetch_style = null)
+    public function query($fetch_style = \PDO::FETCH_ASSOC)
     {
         $PdoConnection = $this->getConnection();
-
-        // If no PDO database connection is set, the query cannot be executed.
-        if (!$PdoConnection instanceof \PDO)
-        {
-            return false;
-        }
 
         $queryString = $this->getQueryString();
 
         // Only execute if a query is set.
         if (!empty($queryString))
         {
+            // If no PDO database connection is set, the query cannot be executed so we return the SQL string.
+            if (!$PdoConnection instanceof \PDO)
+            {
+                return $this->debug(true, true);
+            }
+            
             $PdoStatement = $PdoConnection->prepare($queryString);
             $PdoStatement->execute($this->getBoundParameters());
 
@@ -372,10 +372,8 @@ abstract class BaseQueryBuilder
                 return $PdoStatement->fetchAll($fetch_style);
             }
         }
-        else
-        {
-            return false;
-        }
+        
+        return false;
     }
 
 }

@@ -137,7 +137,7 @@ class BaseQueryBuilderTest extends PDOTestCase
             ->expects($this->any())
             ->method('getQueryString')
             ->will($this->returnValue('SELECT * FROM book'));
-        $this->assertFalse($querybuiler->query());
+        $this->assertEquals('SELECT * FROM book', $querybuiler->query());
     }
 
     public function testQueryWithoutQueryStatement()
@@ -162,7 +162,7 @@ class BaseQueryBuilderTest extends PDOTestCase
 
         $this->setBoundParams(array('where' => array(2)));
         
-        $this->assertInstanceOf('\PDOStatement', $this->queryBuilder->query());
+        $this->assertInstanceOf('\PDOStatement', $this->queryBuilder->query(null));
 
         $expected = array(
             array(
@@ -192,6 +192,7 @@ class BaseQueryBuilderTest extends PDOTestCase
         );
 
         $this->assertEquals($expected, $this->queryBuilder->query(\PDO::FETCH_ASSOC));
+        $this->assertEquals($expected, $this->queryBuilder->query());
     }
 
 }
