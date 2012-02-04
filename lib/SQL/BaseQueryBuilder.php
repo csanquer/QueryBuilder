@@ -278,45 +278,47 @@ abstract class BaseQueryBuilder
      * $params are are in the same order as specified in $query
      *
      * @param string $query The sql query with parameter placeholders
-     * @param array $params The array of substitution parameters
+     * @param array $params default = empty array , The array of substitution parameters
      * @param bool $quote default = true, if true quote each parameter
      * @param PDO $connection default = null , PDO connection (used to quote values)
      * 
      * @return string The debugged query
      */
-    public static function debugQuery($query, $params, $quoted = true, \PDO $connection = null)
+    public static function debugQuery($query, $params = array(), $quoted = true, \PDO $connection = null)
     {
-        $keys = array();
-        // build a regular expression for each parameter
-        foreach ($params as $key => $value)
+        if (!empty($params) && is_array($params))
         {
-            if (is_string($key))
+            $keys = array();
+            // build a regular expression for each parameter
+            foreach ($params as $key => $value)
             {
-                if (strpos($key, ':') === 0)
+                if (is_string($key))
                 {
-                    $keys[] = '/'.$key.'/';
+                    if (strpos($key, ':') === 0)
+                    {
+                        $keys[] = '/'.$key.'/';
+                    }
+                    else
+                    {
+                        $keys[] = '/:'.$key.'/';
+                    }
                 }
                 else
                 {
-                    $keys[] = '/:'.$key.'/';
+                    $keys[] = '/[?]/';
+                }
+
+                if ($quoted)
+                {
+                    $params[$key] = self::quoteValue($value, $connection);
+                }
+                elseif (is_string($value) && !is_numeric($value))
+                {
+                    $params[$key] = '\''.$value.'\'';
                 }
             }
-            else
-            {
-                $keys[] = '/[?]/';
-            }
-            
-            if ($quoted)
-            {
-                $params[$key] = self::quoteValue($value, $connection);
-            }
-            elseif (is_string($value) && !is_numeric($value))
-            {
-                $params[$key] = '\''.$value.'\'';
-            }
+            $query = preg_replace($keys, $params, $query, 1);
         }
-        $query = preg_replace($keys, $params, $query, 1);
-
         return $query;
     }
 
