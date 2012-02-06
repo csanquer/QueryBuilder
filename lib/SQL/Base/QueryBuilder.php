@@ -61,7 +61,7 @@ abstract class QueryBuilder
      * Constructor.
      *
      * @param  PDO $PdoConnection optional PDO database connection
-     * @return SQL\BaseQueryBuilder
+     * @return SQL\Base\QueryBuilder
      */
     public function __construct(\PDO $PdoConnection = null)
     {
@@ -90,7 +90,7 @@ abstract class QueryBuilder
      * Sets the PDO database connection to use in executing this query.
      *
      * @param  PDO $PdoConnection optional PDO database connection
-     * @return SQL\BaseQueryBuilder
+     * @return SQL\Base\QueryBuilder
      */
     public function setConnection(\PDO $connection = null)
     {
@@ -163,7 +163,7 @@ abstract class QueryBuilder
      * Adds an execution option like DISTINCT or SQL_CALC_FOUND_ROWS.
      *
      * @param  string $option execution option to add
-     * @return SQL\BaseQueryBuilder
+     * @return SQL\Base\QueryBuilder
      */
     public function addOption($option)
     {
@@ -377,5 +377,4 @@ abstract class QueryBuilder
         
         return false;
     }
-
 }
