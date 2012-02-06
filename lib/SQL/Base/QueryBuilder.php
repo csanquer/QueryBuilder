@@ -1,6 +1,6 @@
 <?php
 
-namespace SQL;
+namespace SQL\Base;
 
 /**
  * Abstract Base class for Queries
@@ -9,7 +9,7 @@ namespace SQL;
  * 
  * @author   Charles SANQUER <charles.sanquer@spyrit.net>
  */
-abstract class BaseQueryBuilder
+abstract class QueryBuilder
 {
     /**
      * Brackets for grouping criteria.

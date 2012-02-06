@@ -2,14 +2,14 @@
 
 namespace SQL;
 
-use SQL\BaseQueryBuilder;
+use SQL\Base\QueryBuilder;
 
 /**
  * Class for building programmatically PDO Insert queries 
  * 
  * @author   Charles SANQUER <charles.sanquer@spyrit.net>
  */
-class InsertQueryBuilder extends BaseQueryBuilder
+class InsertQueryBuilder extends QueryBuilder
 {
     /**
      * Constructor.

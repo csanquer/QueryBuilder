@@ -2,7 +2,7 @@
 
 namespace SQL;
 
-use SQL\BaseWhereQueryBuilder;
+use SQL\Base\WhereQueryBuilder;
 
 /**
  * Class for building programmatically PDO Select queries 
@@ -13,7 +13,7 @@ use SQL\BaseWhereQueryBuilder;
  * @author   Matt Labrum
  * @author   Charles SANQUER <charles.sanquer@spyrit.net>
  */
-class SelectQueryBuilder extends BaseWhereQueryBuilder
+class SelectQueryBuilder extends WhereQueryBuilder
 {
     /**
      * JOIN types.
@@ -861,11 +861,11 @@ class SelectQueryBuilder extends BaseWhereQueryBuilder
     /**
      * Merges the given QueryBuilder's WHEREs into this QueryBuilder.
      *
-     * @param  \SQL\BaseWhereQueryBuilder $QueryBuilder to merge 
+     * @param  \SQL\Base\WhereQueryBuilder $QueryBuilder to merge 
      * 
      * @return \SQL\SelectQueryBuilder the current QueryBuilder
      */
-    public function mergeWhere(BaseWhereQueryBuilder $QueryBuilder)
+    public function mergeWhere(WhereQueryBuilder $QueryBuilder)
     {
         return parent::mergeWhere($QueryBuilder);
     }

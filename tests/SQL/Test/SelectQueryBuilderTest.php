@@ -1036,17 +1036,17 @@ class SelectQueryBuilderTest extends PDOTestCase
 
     public function testWhere()
     {
-        $this->assertInstanceOf('SQL\BaseWhereQueryBuilder', $this->queryBuilder->Where('id', 1, SelectQueryBuilder::EQUALS, SelectQueryBuilder::LOGICAL_AND));
+        $this->assertInstanceOf('SQL\Base\WhereQueryBuilder', $this->queryBuilder->Where('id', 1, SelectQueryBuilder::EQUALS, SelectQueryBuilder::LOGICAL_AND));
     }
 
     public function testAndWhere()
     {
-        $this->assertInstanceOf('SQL\BaseWhereQueryBuilder', $this->queryBuilder->andWhere('id', 1, SelectQueryBuilder::EQUALS));
+        $this->assertInstanceOf('SQL\Base\WhereQueryBuilder', $this->queryBuilder->andWhere('id', 1, SelectQueryBuilder::EQUALS));
     }
 
     public function testOrWhere()
     {
-        $this->assertInstanceOf('SQL\BaseWhereQueryBuilder', $this->queryBuilder->orWhere('id', 1, SelectQueryBuilder::EQUALS));
+        $this->assertInstanceOf('SQL\Base\WhereQueryBuilder', $this->queryBuilder->orWhere('id', 1, SelectQueryBuilder::EQUALS));
     }
     
     /**

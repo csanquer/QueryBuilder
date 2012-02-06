@@ -3,19 +3,19 @@
 namespace SQL\Test;
 
 use SQL\Test\Fixtures\PDOTestCase;
-use SQL\BaseQueryBuilder;
+use SQL\Base\QueryBuilder;
 
-class BaseQueryBuilderTest extends PDOTestCase
+class QueryBuilderTest extends PDOTestCase
 {
     /**
      *
-     * @var SQL\BaseQueryBuilder
+     * @var SQL\Base\QueryBuilder
      */
     protected $queryBuilder;
     
     protected function setUp()
     {
-        $this->queryBuilder = $this->getMockForAbstractClass('SQL\BaseQueryBuilder', array(self::$pdo));
+        $this->queryBuilder = $this->getMockForAbstractClass('SQL\Base\QueryBuilder', array(self::$pdo));
     }
     
     /**
@@ -33,7 +33,7 @@ class BaseQueryBuilderTest extends PDOTestCase
     
     public function testSetPdoConnection()
     {
-        $queryBuilder = $this->getMockForAbstractClass('SQL\BaseQueryBuilder');
+        $queryBuilder = $this->getMockForAbstractClass('SQL\Base\QueryBuilder');
         $queryBuilder->setConnection(new \PDO('sqlite::memory:'));
         $this->assertInstanceOf('\PDO', $this->queryBuilder->getConnection());
     }
@@ -55,7 +55,7 @@ class BaseQueryBuilderTest extends PDOTestCase
         $this->assertInternalType('string', $quote2);
         $this->assertEquals('\'2\'', $quote2);
 
-        $queryBuilder = $this->getMockForAbstractClass('SQL\BaseQueryBuilder');
+        $queryBuilder = $this->getMockForAbstractClass('SQL\Base\QueryBuilder');
 
         $quote3 = $queryBuilder->quote(1);
         $this->assertInternalType('integer', $quote3);
@@ -73,7 +73,7 @@ class BaseQueryBuilderTest extends PDOTestCase
      */
     public function testOptions($option, $expected)
     {
-        $this->assertInstanceOf('SQL\BaseQueryBuilder', $this->queryBuilder->addOption($option));
+        $this->assertInstanceOf('SQL\Base\QueryBuilder', $this->queryBuilder->addOption($option));
         $this->assertEquals($expected, $this->queryBuilder->getOptions());
     }
 
@@ -98,9 +98,9 @@ class BaseQueryBuilderTest extends PDOTestCase
      */
     public function testDebugQuery($query, $params, $expected, $expectedQuoted, $expectedQuotedPDO)
     {
-        $this->assertEquals($expected, BaseQueryBuilder::debugQuery($query, $params, false));
-        $this->assertEquals($expectedQuoted, BaseQueryBuilder::debugQuery($query, $params, true));
-        $this->assertEquals($expectedQuotedPDO, BaseQueryBuilder::debugQuery($query, $params, true, self::$pdo));
+        $this->assertEquals($expected, QueryBuilder::debugQuery($query, $params, false));
+        $this->assertEquals($expectedQuoted, QueryBuilder::debugQuery($query, $params, true));
+        $this->assertEquals($expectedQuotedPDO, QueryBuilder::debugQuery($query, $params, true, self::$pdo));
     }
 
     public function debugQueryProvider()
@@ -132,7 +132,7 @@ class BaseQueryBuilderTest extends PDOTestCase
 
     public function testQueryWithoutPDO()
     {
-        $querybuiler = $this->getMockForAbstractClass('SQL\BaseQueryBuilder');
+        $querybuiler = $this->getMockForAbstractClass('SQL\Base\QueryBuilder');
         $querybuiler
             ->expects($this->any())
             ->method('getQueryString')
