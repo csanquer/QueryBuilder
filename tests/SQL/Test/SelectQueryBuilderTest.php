@@ -490,20 +490,43 @@ class SelectQueryBuilderTest extends PDOTestCase
      *
      * @dataProvider limitProvider
      */
-    public function testLimit($limit, $expected)
+    public function testLimit($limit, $expected, $offset)
     {
         $this->assertInstanceOf('SQL\SelectQueryBuilder', $this->queryBuilder->limit($limit));
         $this->assertEquals($expected, $this->queryBuilder->getLimit());
+        $this->assertEquals($offset, $this->queryBuilder->getOffset());
     }
 
     public function limitProvider()
     {
         return array(
-            array(null, 0),
-            array(5, 5),
+            array(null, 0, 0),
+            array(5, 5, 0),
         );
     }
 
+    /**
+     *
+     * @dataProvider 
+     */
+//    public function testPage()
+//    {
+//        $this->assertInstanceOf('SQL\SelectQueryBuilder', $this->queryBuilder->limit($limit));
+//        $this->assertEquals($expected, $this->queryBuilder->getLimit());
+//        $this->assertEquals($offset, $this->queryBuilder->getOffset());
+//    }
+    
+    /**
+     *
+     * @dataProvider 
+     */
+//    public function testGetPage()
+//    {
+//        $this->assertInstanceOf('SQL\SelectQueryBuilder', $this->queryBuilder->limit($limit));
+//        $this->assertEquals($expected, $this->queryBuilder->getLimit());
+//        $this->assertEquals($offset, $this->queryBuilder->getOffset());
+//    }
+    
     /**
      *
      * @dataProvider offsetProvider
@@ -522,6 +545,12 @@ class SelectQueryBuilderTest extends PDOTestCase
         );
     }
 
+    public function testOffsetWithPageAndLimit()
+    {
+        $this->queryBuilder->page(2);
+        $this->queryBuilder->limit($limit)
+    }
+    
     /**
      *
      * @dataProvider getLimitStringProvider
