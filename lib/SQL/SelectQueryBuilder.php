@@ -513,26 +513,50 @@ class SelectQueryBuilder extends WhereQueryBuilder
         return $groupBy;
     }
 
-    
     /**
      * Adds an open bracket for nesting WHERE conditions.
      *
      * @param  string $connector optional logical connector, default AND
      * @return SQL\SelectQueryBuilder
      */
-    public function openWhere($connector = self::LOGICAL_AND)
+    public function _open($connector = self::LOGICAL_AND)
     {
-        return parent::openWhere($connector);
+        return parent::_open($connector);
     }
 
+    
+    /**
+     * Adds an open bracket for nesting WHERE conditions with OR operator.
+     * 
+     * shortcut for SelectQueryBuilder::_open(SelectQueryBuilder::LOGICAL_OR)
+     * 
+     * @return SQL\SelectQueryBuilder 
+     */
+    public function _or()
+    {
+        return $this->_open(self::LOGICAL_OR);
+    }
+    
+    /**
+     * Adds an open bracket for nesting WHERE conditions with AND operator.
+     * 
+     * shortcut for SelectQueryBuilder::_open(SelectQueryBuilder::LOGICAL_AND)
+     * 
+     * @return SQL\SelectQueryBuilder 
+     */
+    public function _and()
+    {
+        return $this->_open(self::LOGICAL_AND);
+    }
+    
     /**
      * Adds a closing bracket for nesting WHERE conditions.
-     *
+     * 
      * @return SQL\SelectQueryBuilder
      */
-    public function closeWhere()
+    public function _close()
     {
-        return parent::closeWhere();
+        return parent::_close();
     }
 
     /**

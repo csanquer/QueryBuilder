@@ -411,21 +411,45 @@ abstract class WhereQueryBuilder extends QueryBuilder
      * @param  string $connector optional logical connector, default AND
      * @return SQL\Base\WhereQueryBuilder
      */
-    public function openWhere($connector = self::LOGICAL_AND)
+    public function _open($connector = self::LOGICAL_AND)
     {
         return $this->openCriteria($this->sqlParts['where'], $connector);
     }
 
     /**
+     * Adds an open bracket for nesting WHERE conditions with OR operator.
+     * 
+     * shortcut for WhereQueryBuilder::_open(WhereQueryBuilder::LOGICAL_OR)
+     * 
+     * @return SQL\Base\WhereQueryBuilder 
+     */
+    public function _or()
+    {
+        return $this->_open(self::LOGICAL_OR);
+    }
+    
+    /**
+     * Adds an open bracket for nesting WHERE conditions with AND operator.
+     * 
+     * shortcut for WhereQueryBuilder::_open(WhereQueryBuilder::LOGICAL_AND)
+     * 
+     * @return SQL\Base\WhereQueryBuilder 
+     */
+    public function _and()
+    {
+        return $this->_open(self::LOGICAL_AND);
+    }
+    
+    /**
      * Adds a closing bracket for nesting WHERE conditions.
-     *
+     * 
      * @return SQL\Base\WhereQueryBuilder
      */
-    public function closeWhere()
+    public function _close()
     {
         return $this->closeCriteria($this->sqlParts['where']);
     }
-
+    
     /**
      * Adds a WHERE condition.
      *
@@ -511,11 +535,11 @@ abstract class WhereQueryBuilder extends QueryBuilder
             {
                 if (strcmp($currentWhere['bracket'], self::BRACKET_OPEN) == 0)
                 {
-                    $this->openWhere($currentWhere['connector']);
+                    $this->_open($currentWhere['connector']);
                 }
                 else
                 {
-                    $this->closeWhere();
+                    $this->_close();
                 }
             }
             else

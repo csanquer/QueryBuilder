@@ -221,22 +221,46 @@ class UpdateQueryBuilder extends WhereQueryBuilder
      * Adds an open bracket for nesting WHERE conditions.
      *
      * @param  string $connector optional logical connector, default AND
+     * @return SQL\UpdateQueryBuilder
+     */
+    public function _open($connector = self::LOGICAL_AND)
+    {
+        return parent::_open($connector);
+    }
+
+    
+    /**
+     * Adds an open bracket for nesting WHERE conditions with OR operator.
+     * 
+     * shortcut for UpdateQueryBuilder::_open(UpdateQueryBuilder::LOGICAL_OR)
+     * 
+     * @return SQL\UpdateQueryBuilder 
+     */
+    public function _or()
+    {
+        return $this->_open(self::LOGICAL_OR);
+    }
+    
+    /**
+     * Adds an open bracket for nesting WHERE conditions with AND operator.
+     * 
+     * shortcut for UpdateQueryBuilder::_open(UpdateQueryBuilder::LOGICAL_AND)
+     * 
+     * @return SQL\UpdateQueryBuilder 
+     */
+    public function _and()
+    {
+        return $this->_open(self::LOGICAL_AND);
+    }
+    
+    /**
+     * Adds a closing bracket for nesting WHERE conditions.
      * 
      * @return SQL\UpdateQueryBuilder
      */
-    public function openWhere($connector = self::LOGICAL_AND)
+    public function _close()
     {
-        return parent::openWhere($connector);
-    }
-
-    /**
-     * Adds a closing bracket for nesting WHERE conditions.
-     *
-     * @return SQL\UpdateQueryBuilder
-     */
-    public function closeWhere()
-    {
-        return parent::closeWhere();
+        return parent::_close();
     }
 
     /**

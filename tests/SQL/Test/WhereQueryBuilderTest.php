@@ -6,7 +6,7 @@ use SQL\Test\Fixtures\PDOTestCase;
 use SQL\Base\WhereQueryBuilder;
 use SQL\SelectQueryBuilder;
 
-class BaseWhereQueryBuilderTest extends PDOTestCase
+class WhereQueryBuilderTest extends PDOTestCase
 {
     /**
      *
@@ -156,15 +156,15 @@ class BaseWhereQueryBuilderTest extends PDOTestCase
     }
 
     /**
-     * @dataProvider openWhereProvider
+     * @dataProvider openProvider
      */
-    public function testOpenWhere($connector, $expected)
+    public function testOpen($connector, $expected)
     {
-        $this->assertInstanceOf('SQL\Base\WhereQueryBuilder', $this->queryBuilder->openWhere($connector));
+        $this->assertInstanceOf('SQL\Base\WhereQueryBuilder', $this->queryBuilder->_open($connector));
         $this->assertEquals($expected, $this->queryBuilder->getWhereParts());
     }
 
-    public function openWhereProvider()
+    public function openProvider()
     {
         return array(
             array(
@@ -197,9 +197,31 @@ class BaseWhereQueryBuilderTest extends PDOTestCase
         );
     }
 
-    public function testCloseWhere()
+    public function testOr()
     {
-        $this->assertInstanceOf('SQL\Base\WhereQueryBuilder', $this->queryBuilder->closeWhere());
+        $expected = array(Array(
+            'bracket' => WhereQueryBuilder::BRACKET_OPEN,
+            'connector' => WhereQueryBuilder::LOGICAL_OR,
+        ));
+
+        $this->assertInstanceOf('SQL\Base\WhereQueryBuilder', $this->queryBuilder->_or());
+        $this->assertEquals($expected, $this->queryBuilder->getWhereParts());
+    }
+    
+    public function testAnd()
+    {
+        $expected = array(Array(
+            'bracket' => WhereQueryBuilder::BRACKET_OPEN,
+            'connector' => WhereQueryBuilder::LOGICAL_AND,
+        ));
+        
+        $this->assertInstanceOf('SQL\Base\WhereQueryBuilder', $this->queryBuilder->_and());
+        $this->assertEquals($expected, $this->queryBuilder->getWhereParts());
+    }
+    
+    public function testClose()
+    {
+        $this->assertInstanceOf('SQL\Base\WhereQueryBuilder', $this->queryBuilder->_close());
         $expected = array(
             Array(
                 'bracket' => WhereQueryBuilder::BRACKET_CLOSE,
@@ -228,16 +250,16 @@ class BaseWhereQueryBuilderTest extends PDOTestCase
                 {
                     if (isset($where[1]))
                     {
-                        $this->queryBuilder->openWhere($where[1]);
+                        $this->queryBuilder->_open($where[1]);
                     }
                     else
                     {
-                        $this->queryBuilder->openWhere();
+                        $this->queryBuilder->_open();
                     }
                 }
                 elseif ($where[0] == ')')
                 {
-                    $this->queryBuilder->closeWhere();
+                    $this->queryBuilder->_close();
                 }
             }
         }
@@ -467,9 +489,9 @@ class BaseWhereQueryBuilderTest extends PDOTestCase
 
         $qb = new SelectQueryBuilder();
         $qb
-            ->openWhere(SelectQueryBuilder::LOGICAL_OR)
+            ->_open(SelectQueryBuilder::LOGICAL_OR)
             ->where('title', 'Dune' , SelectQueryBuilder::NOT_EQUALS, null)
-            ->closeWhere();
+            ->_close();
 
         $this->queryBuilder->mergeWhere($qb);
 

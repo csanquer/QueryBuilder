@@ -98,22 +98,46 @@ class DeleteQueryBuilder extends WhereQueryBuilder
      * Adds an open bracket for nesting WHERE conditions.
      *
      * @param  string $connector optional logical connector, default AND
+     * @return \SQL\DeleteQueryBuilder
+     */
+    public function _open($connector = self::LOGICAL_AND)
+    {
+        return parent::_open($connector);
+    }
+
+    
+    /**
+     * Adds an open bracket for nesting WHERE conditions with OR operator.
+     * 
+     * shortcut for DeleteQueryBuilder::_open(DeleteQueryBuilder::LOGICAL_OR)
+     * 
+     * @return \SQL\DeleteQueryBuilder 
+     */
+    public function _or()
+    {
+        return $this->_open(self::LOGICAL_OR);
+    }
+    
+    /**
+     * Adds an open bracket for nesting WHERE conditions with AND operator.
+     * 
+     * shortcut for DeleteQueryBuilder::_open(DeleteQueryBuilder::LOGICAL_AND)
+     * 
+     * @return \SQL\DeleteQueryBuilder 
+     */
+    public function _and()
+    {
+        return $this->_open(self::LOGICAL_AND);
+    }
+    
+    /**
+     * Adds a closing bracket for nesting WHERE conditions.
      * 
      * @return \SQL\DeleteQueryBuilder
      */
-    public function openWhere($connector = self::LOGICAL_AND)
+    public function _close()
     {
-        return parent::openWhere($connector);
-    }
-
-    /**
-     * Adds a closing bracket for nesting WHERE conditions.
-     *
-     * @return \SQL\DeleteQueryBuilder
-     */
-    public function closeWhere()
-    {
-        return parent::closeWhere();
+        return parent::_close();
     }
 
     /**
