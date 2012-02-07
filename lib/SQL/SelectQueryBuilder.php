@@ -780,7 +780,7 @@ class SelectQueryBuilder extends WhereQueryBuilder
     {
         return $this
             ->limit($maxPerPage)
-            ->setPage($page);
+            ->page($page);
     }
     
     /**
@@ -801,33 +801,6 @@ class SelectQueryBuilder extends WhereQueryBuilder
     }
     
     /**
-     * get Page.
-     * 
-     * @return int 
-     * 
-     * @throws Exception 
-     */
-    public function getPage()
-    {
-        $limit = $this->getSQLPart('limit');
-        
-        if (!empty($limit['offset']))
-        {
-            $limit['page'] = ($limit['offset']/$limit['limit'])+1;
-        }
-        
-        return isset($limit['page']) ? $limit['page'] : null;
-        
-        $limit = $this->getLimit();
-        if (is_null($limit))
-        {
-            throw new Exception('You must set a limit (max item per page).');
-        }
-        
-        return ($this->getOffset()/$limit)+1;
-    }
-
-    /**
      * Returns the LIMIT on number of rows to return.
      *
      * @return int|string
@@ -836,6 +809,37 @@ class SelectQueryBuilder extends WhereQueryBuilder
     {
         $limit = $this->getSQLPart('limit');
         return isset($limit['limit']) ? $limit['limit'] : null;
+    }
+    
+    protected function calculatePageAndOffset()
+    {
+        $limit = $this->getSQLPart('limit');
+        
+        if (!empty($limit['limit']))
+        {
+            if (is_null($limit['offset']) && !empty($limit['page']))
+            {
+                $limit['offset'] = ($limit['page'] - 1) * $limit['limit'];
+            }
+
+            if (empty($limit['page']) && !is_null($limit['offset']))
+            {
+                $limit['page'] = ($limit['offset']/$limit['limit'])+1;
+            }
+            $this->sqlParts['limit'] = $limit;
+        }
+    }
+    
+    /**
+     * get Page.
+     * 
+     * @return int 
+     */
+    public function getPage()
+    {
+        $this->calculatePageAndOffset();
+        $limit = $this->getSQLPart('limit');
+        return isset($limit['page']) ? $limit['page'] : null;
     }
 
     /**
@@ -846,18 +850,8 @@ class SelectQueryBuilder extends WhereQueryBuilder
      */
     public function getOffset()
     {
+        $this->calculatePageAndOffset();
         $limit = $this->getSQLPart('limit');
-        
-        if (!empty($limit['page']) && !is_null($limit['limit']))
-        {
-            $limit['offset'] = $limit['limit'] * ($limit['page']-1);
-        }
-        
-        if (empty($limit['page']) && !is_null($limit['limit']))
-        {
-            $limit['page'] = $limit['limit'] * ($limit['page']-1);
-        }
-        
         return isset($limit['offset']) ? $limit['offset'] : null;
     }
 
@@ -870,6 +864,7 @@ class SelectQueryBuilder extends WhereQueryBuilder
      */
     public function getLimitString($formatted = false)
     {
+        $this->calculatePageAndOffset();
         $limitString = '';
 
         if (!empty($this->sqlParts['limit']['limit']))
