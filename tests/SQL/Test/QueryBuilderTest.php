@@ -35,7 +35,7 @@ class QueryBuilderTest extends PDOTestCase
     {
         $queryBuilder = $this->getMockForAbstractClass('SQL\Base\QueryBuilder');
         $queryBuilder->setConnection(new \PDO('sqlite::memory:'));
-        $this->assertInstanceOf('\PDO', $this->queryBuilder->getConnection());
+        $this->assertInstanceOf('\PDO', $queryBuilder->getConnection());
     }
 
     public function testGetPdoConnection()
