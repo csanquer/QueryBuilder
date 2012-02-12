@@ -4,14 +4,15 @@ Classes used to build programmatically standard SQL Queries (with some MySQL
 specific functions). These classes must be used with PDO and parameters are always 
 bound .
 
-Based on original work by Justin Stayton.
+Based on original work by Justin Stayton (https://github.com/jstayton/QueryBuilder)
+And some classes from Propel ORM project (https://github.com/propelorm/Propel) .
 
 Licensing
 ---------
 
 Copyright (C) 2009-2010 Justin Stayton <justin.stayton@gmail.com>
 Copyright (C) 2011 Matt Labrum
-Copyright (C) 2011 Charles SANQUER <charles.sanquer@spyrit.net>
+Copyright (C) 2011-2012 Charles SANQUER <charles.sanquer@spyrit.net>
 
 This file is part of SQLQueryBuilder.
 
