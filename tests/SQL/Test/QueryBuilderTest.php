@@ -3,6 +3,8 @@
 namespace SQL\Test;
 
 use SQL\Test\Fixtures\PDOTestCase;
+use SQL\Exception\QueryBuilderException;
+use SQL\Proxy\QueryConditionalProxy;
 use SQL\Base\QueryBuilder;
 
 class QueryBuilderTest extends PDOTestCase
@@ -195,4 +197,56 @@ class QueryBuilderTest extends PDOTestCase
         $this->assertEquals($expected, $this->queryBuilder->query());
     }
 
+    public function testConditionalMethods()
+    {
+        $this->assertSame($this->queryBuilder, $this->queryBuilder->_if(true));
+        $this->assertSame($this->queryBuilder, $this->queryBuilder->_endif());
+        
+        $this->assertInstanceOf('\SQL\Proxy\QueryConditionalProxy', $this->queryBuilder->_if(false));
+        $this->assertSame($this->queryBuilder, $this->queryBuilder->_endif());
+        
+        $this->assertSame($this->queryBuilder, $this->queryBuilder->_if(true));
+        $this->assertInstanceOf('\SQL\Proxy\QueryConditionalProxy', $this->queryBuilder->_elseif(false));
+        $this->assertInstanceOf('\SQL\Proxy\QueryConditionalProxy', $this->queryBuilder->_else(false));
+        $this->assertSame($this->queryBuilder, $this->queryBuilder->_endif());
+        
+        $this->assertInstanceOf('\SQL\Proxy\QueryConditionalProxy', $this->queryBuilder->_if(false));
+        $this->assertSame($this->queryBuilder, $this->queryBuilder->_elseif(true));
+        $this->assertInstanceOf('\SQL\Proxy\QueryConditionalProxy', $this->queryBuilder->_else(false));
+        $this->assertSame($this->queryBuilder, $this->queryBuilder->_endif());
+        
+        $this->assertInstanceOf('\SQL\Proxy\QueryConditionalProxy', $this->queryBuilder->_if(false));
+        $this->assertInstanceOf('\SQL\Proxy\QueryConditionalProxy', $this->queryBuilder->_elseif(false));
+        $this->assertSame($this->queryBuilder, $this->queryBuilder->_else());
+        $this->assertSame($this->queryBuilder, $this->queryBuilder->_endif());
+        
+        $this->assertSame($this->queryBuilder, $this->queryBuilder->_if(true));
+        $this->assertInstanceOf('\SQL\Proxy\QueryConditionalProxy', $this->queryBuilder->_if(false));
+        $this->assertSame($this->queryBuilder, $this->queryBuilder->_endif());
+        $this->assertSame($this->queryBuilder, $this->queryBuilder->_endif());
+    }
+    
+    /**
+     * @expectedException SQL\Exception\QueryBuilderException
+     */
+    public function testElseIfAlone()
+    {
+        $this->queryBuilder->_elseif(true);
+    }
+    
+    /**
+     * @expectedException SQL\Exception\QueryBuilderException
+     */
+    public function testElseAlone()
+    {
+        $this->queryBuilder->_else(true);
+    }
+    
+    /**
+     * @expectedException SQL\Exception\QueryBuilderException
+     */
+    public function testEndIfAlone()
+    {
+        $this->queryBuilder->_endif(true);
+    }
 }
