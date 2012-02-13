@@ -5,7 +5,7 @@
  * 
  * @author   Charles SANQUER <charles.sanquer@spyrit.net>
  */
-class UpdateQueryBuilder extends BaseWhereQueryBuilder
+class UpdateQueryBuilder extends WhereQueryBuilder
 {
     /**
      * Constructor.
@@ -216,22 +216,46 @@ class UpdateQueryBuilder extends BaseWhereQueryBuilder
      * Adds an open bracket for nesting WHERE conditions.
      *
      * @param  string $connector optional logical connector, default AND
+     * @return UpdateQueryBuilder
+     */
+    public function _open($connector = self::LOGICAL_AND)
+    {
+        return parent::_open($connector);
+    }
+
+    
+    /**
+     * Adds an open bracket for nesting WHERE conditions with OR operator.
+     * 
+     * shortcut for UpdateQueryBuilder::_open(UpdateQueryBuilder::LOGICAL_OR)
+     * 
+     * @return UpdateQueryBuilder 
+     */
+    public function _or()
+    {
+        return $this->_open(self::LOGICAL_OR);
+    }
+    
+    /**
+     * Adds an open bracket for nesting WHERE conditions with AND operator.
+     * 
+     * shortcut for UpdateQueryBuilder::_open(UpdateQueryBuilder::LOGICAL_AND)
+     * 
+     * @return UpdateQueryBuilder 
+     */
+    public function _and()
+    {
+        return $this->_open(self::LOGICAL_AND);
+    }
+    
+    /**
+     * Adds a closing bracket for nesting WHERE conditions.
      * 
      * @return UpdateQueryBuilder
      */
-    public function openWhere($connector = self::LOGICAL_AND)
+    public function _close()
     {
-        return parent::openWhere($connector);
-    }
-
-    /**
-     * Adds a closing bracket for nesting WHERE conditions.
-     *
-     * @return UpdateQueryBuilder
-     */
-    public function closeWhere()
-    {
-        return parent::closeWhere();
+        return parent::_close();
     }
 
     /**
@@ -270,7 +294,7 @@ class UpdateQueryBuilder extends BaseWhereQueryBuilder
      * @param  mixed $value value
      * @param  string $operator optional comparison operator, default = '='
      * 
-     * @return \DeleteQueryBuilder
+     * @return UpdateQueryBuilder
      */
     public function orWhere($column, $value, $operator = self::EQUALS)
     {
@@ -280,11 +304,11 @@ class UpdateQueryBuilder extends BaseWhereQueryBuilder
     /**
      * Merges the given QueryBuilder's WHEREs into this QueryBuilder.
      *
-     * @param  \BaseWhereQueryBuilder $QueryBuilder to merge 
+     * @param  WhereQueryBuilder $QueryBuilder to merge 
      * 
      * @return UpdateQueryBuilder the current QueryBuilder
      */
-    public function mergeWhere(BaseWhereQueryBuilder $QueryBuilder)
+    public function mergeWhere(WhereQueryBuilder $QueryBuilder)
     {
         return parent::mergeWhere($QueryBuilder);
     }

@@ -194,6 +194,28 @@ class UpdateQueryBuilderTest extends PDOTestCase
     {
         $this->assertInstanceOf('UpdateQueryBuilder', $this->queryBuilder->orWhere('id', 1, SelectQueryBuilder::EQUALS));
     }
+
+    public function testOr()
+    {
+        $expected = array(Array(
+            'bracket' => UpdateQueryBuilder::BRACKET_OPEN,
+            'connector' => UpdateQueryBuilder::LOGICAL_OR,
+        ));
+
+        $this->assertInstanceOf('UpdateQueryBuilder', $this->queryBuilder->_or());
+        $this->assertEquals($expected, $this->queryBuilder->getWhereParts());
+    }
+    
+    public function testAnd()
+    {
+        $expected = array(Array(
+            'bracket' => UpdateQueryBuilder::BRACKET_OPEN,
+            'connector' => UpdateQueryBuilder::LOGICAL_AND,
+        ));
+        
+        $this->assertInstanceOf('UpdateQueryBuilder', $this->queryBuilder->_and());
+        $this->assertEquals($expected, $this->queryBuilder->getWhereParts());
+    }
     
     public function testMergeWhere()
     {
@@ -201,9 +223,9 @@ class UpdateQueryBuilderTest extends PDOTestCase
 
         $qb = new SelectQueryBuilder();
         $qb
-            ->openWhere(SelectQueryBuilder::LOGICAL_OR)
+            ->_open(SelectQueryBuilder::LOGICAL_OR)
             ->where('title', 'Dune' , SelectQueryBuilder::NOT_EQUALS, null)
-            ->closeWhere();
+            ->_close();
 
         $this->queryBuilder->mergeWhere($qb);
 
@@ -258,16 +280,16 @@ class UpdateQueryBuilderTest extends PDOTestCase
                 {
                     if (isset($where[1]))
                     {
-                        $this->queryBuilder->openWhere($where[1]);
+                        $this->queryBuilder->_open($where[1]);
                     }
                     else
                     {
-                        $this->queryBuilder->openWhere();
+                        $this->queryBuilder->_open();
                     }
                 }
                 elseif ($where[0] == ')')
                 {
-                    $this->queryBuilder->closeWhere();
+                    $this->queryBuilder->_close();
                 }
             }
         }

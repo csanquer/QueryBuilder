@@ -9,7 +9,7 @@
  * @author   Matt Labrum
  * @author   Charles SANQUER <charles.sanquer@spyrit.net>
  */
-class SelectQueryBuilder extends BaseWhereQueryBuilder
+class SelectQueryBuilder extends WhereQueryBuilder
 {
     /**
      * JOIN types.
@@ -40,8 +40,9 @@ class SelectQueryBuilder extends BaseWhereQueryBuilder
         $this->sqlParts['groupBy'] = array();
         $this->sqlParts['having'] = array();
         $this->sqlParts['orderBy'] = array();
-        $this->sqlParts['limit'] = array('limit' => 0, 'offset' => 0);
+        $this->sqlParts['limit'] = array('limit' => 0, 'offset' => 0, 'page' => 0);
         
+        $this->boundParams['from'] = array();
         $this->boundParams['having'] = array();
     }
 
@@ -164,13 +165,13 @@ class SelectQueryBuilder extends BaseWhereQueryBuilder
     /**
      * Sets the FROM table with optional alias.
      *
-     * @param  string $table table name
+     * @param  SelectQueryBuilder|string $table table name or SELECT Query
      * @param  string $alias optional alias
      * @return SelectQueryBuilder
      */
     public function from($table, $alias = null)
     {
-        $this->sqlParts['from']['table'] = (string) $table;
+        $this->sqlParts['from']['table'] = $table;
         $this->sqlParts['from']['alias'] = (string) $alias;
 
         return $this;
@@ -402,19 +403,15 @@ class SelectQueryBuilder extends BaseWhereQueryBuilder
         {
 
             // Allow the user to pass a QueryBuilder into from
-//            if ($this->sqlParts['from']['table'] instanceof self)
-//            {
-//                $from .= self::BRACKET_OPEN.$this->sqlParts['from']['table']->getQueryString($usePlaceholders).self::BRACKET_CLOSE;
-//
-//                if ($usePlaceholders)
-//                {
-//                    $this->fromPlaceholderValues = $this->sqlParts['from']['table']->getPlaceholderValues();
-//                }
-//            }
-//            else
-//            {
-            $from .= $this->sqlParts['from']['table'];
-//            }
+            if ($this->sqlParts['from']['table'] instanceof self)
+            {
+                $from .= self::BRACKET_OPEN.($formatted ? " \n" : '').$this->sqlParts['from']['table']->getQueryString($formatted).self::BRACKET_CLOSE;
+                $this->boundParams['from'] = array_merge($this->boundParams['from'], $this->sqlParts['from']['table']->getBoundParameters(false, null));
+            }
+            else
+            {
+                $from .= $this->sqlParts['from']['table'];
+            }
 
             if (!empty($this->sqlParts['from']['alias']))
             {
@@ -512,26 +509,50 @@ class SelectQueryBuilder extends BaseWhereQueryBuilder
         return $groupBy;
     }
 
-    
     /**
      * Adds an open bracket for nesting WHERE conditions.
      *
      * @param  string $connector optional logical connector, default AND
      * @return SelectQueryBuilder
      */
-    public function openWhere($connector = self::LOGICAL_AND)
+    public function _open($connector = self::LOGICAL_AND)
     {
-        return parent::openWhere($connector);
+        return parent::_open($connector);
     }
 
+    
+    /**
+     * Adds an open bracket for nesting WHERE conditions with OR operator.
+     * 
+     * shortcut for SelectQueryBuilder::_open(SelectQueryBuilder::LOGICAL_OR)
+     * 
+     * @return SelectQueryBuilder 
+     */
+    public function _or()
+    {
+        return $this->_open(self::LOGICAL_OR);
+    }
+    
+    /**
+     * Adds an open bracket for nesting WHERE conditions with AND operator.
+     * 
+     * shortcut for SelectQueryBuilder::_open(SelectQueryBuilder::LOGICAL_AND)
+     * 
+     * @return SelectQueryBuilder 
+     */
+    public function _and()
+    {
+        return $this->_open(self::LOGICAL_AND);
+    }
+    
     /**
      * Adds a closing bracket for nesting WHERE conditions.
-     *
+     * 
      * @return SelectQueryBuilder
      */
-    public function closeWhere()
+    public function _close()
     {
-        return parent::closeWhere();
+        return parent::_close();
     }
 
     /**
@@ -762,10 +783,43 @@ class SelectQueryBuilder extends BaseWhereQueryBuilder
     public function offset($offset)
     {
         $this->sqlParts['limit']['offset'] = (int) $offset;
-
+        $this->sqlParts['limit']['page'] = null;
+        
         return $this;
     }
-
+    
+    /**
+     * set limit and offset by pagination
+     * 
+     * @param int $page
+     * @param int $maxPerPage 
+     * 
+     * @return SelectQueryBuilder
+     */
+    public function paginate($page, $maxPerPage)
+    {
+        return $this
+            ->limit($maxPerPage)
+            ->page($page);
+    }
+    
+    /**
+     * set the page number (offset related to limit), 
+     * 
+     * @param type $page
+     * 
+     * @return SelectQueryBuilder
+     * 
+     * @throws Exception 
+     * 
+     */
+    public function page($page)
+    {
+        $this->sqlParts['limit']['page'] = empty($page) ? 1 : (int) $page;
+        $this->sqlParts['limit']['offset'] = null;
+        return $this;
+    }
+    
     /**
      * Returns the LIMIT on number of rows to return.
      *
@@ -776,6 +830,37 @@ class SelectQueryBuilder extends BaseWhereQueryBuilder
         $limit = $this->getSQLPart('limit');
         return isset($limit['limit']) ? $limit['limit'] : null;
     }
+    
+    protected function calculatePageAndOffset()
+    {
+        $limit = $this->getSQLPart('limit');
+        
+        if (!empty($limit['limit']))
+        {
+            if (is_null($limit['offset']) && !empty($limit['page']))
+            {
+                $limit['offset'] = ($limit['page'] - 1) * $limit['limit'];
+            }
+
+            if (empty($limit['page']) && !is_null($limit['offset']))
+            {
+                $limit['page'] = ($limit['offset']/$limit['limit'])+1;
+            }
+            $this->sqlParts['limit'] = $limit;
+        }
+    }
+    
+    /**
+     * get Page.
+     * 
+     * @return int 
+     */
+    public function getPage()
+    {
+        $this->calculatePageAndOffset();
+        $limit = $this->getSQLPart('limit');
+        return isset($limit['page']) ? $limit['page'] : null;
+    }
 
     /**
      * Returns the LIMIT row number to start at.
@@ -785,6 +870,7 @@ class SelectQueryBuilder extends BaseWhereQueryBuilder
      */
     public function getOffset()
     {
+        $this->calculatePageAndOffset();
         $limit = $this->getSQLPart('limit');
         return isset($limit['offset']) ? $limit['offset'] : null;
     }
@@ -798,32 +884,33 @@ class SelectQueryBuilder extends BaseWhereQueryBuilder
      */
     public function getLimitString($formatted = false)
     {
-        $limit = '';
+        $this->calculatePageAndOffset();
+        $limitString = '';
 
         if (!empty($this->sqlParts['limit']['limit']))
         {
-            $limit .= 'LIMIT '.((int) $this->sqlParts['limit']['limit']).' ';
+            $limitString .= 'LIMIT '.((int) $this->sqlParts['limit']['limit']).' ';
             if ($formatted)
             {
-                $limit .= "\n";
+                $limitString .= "\n";
             }
 
-            $limit .= 'OFFSET '.((int) $this->sqlParts['limit']['offset']).' ';
+            $limitString .= 'OFFSET '.((int) $this->sqlParts['limit']['offset']).' ';
             if ($formatted)
             {
-                $limit .= "\n";
+                $limitString .= "\n";
             }
         }
 
-        return $limit;
+        return $limitString;
     }
 
     /**
      * Merges the given QueryBuilder's SELECT into this QueryBuilder.
      *
-     * @param  \SelectQueryBuilder $QueryBuilder to merge 
+     * @param  SelectQueryBuilder $QueryBuilder to merge 
      * 
-     * @return \SelectQueryBuilder the current QueryBuilder
+     * @return SelectQueryBuilder the current QueryBuilder
      */
     public function mergeSelect(SelectQueryBuilder $QueryBuilder)
     {
@@ -843,9 +930,9 @@ class SelectQueryBuilder extends BaseWhereQueryBuilder
     /**
      * Merges the given QueryBuilder's JOINs into this QueryBuilder.
      *
-     * @param  \SelectQueryBuilder $QueryBuilder to merge 
+     * @param  SelectQueryBuilder $QueryBuilder to merge 
      * 
-     * @return \SelectQueryBuilder the current QueryBuilder
+     * @return SelectQueryBuilder the current QueryBuilder
      */
     public function mergeJoin(SelectQueryBuilder $QueryBuilder)
     {
@@ -860,11 +947,11 @@ class SelectQueryBuilder extends BaseWhereQueryBuilder
     /**
      * Merges the given QueryBuilder's WHEREs into this QueryBuilder.
      *
-     * @param  \BaseWhereQueryBuilder $QueryBuilder to merge 
+     * @param  WhereQueryBuilder $QueryBuilder to merge 
      * 
-     * @return \SelectQueryBuilder the current QueryBuilder
+     * @return SelectQueryBuilder the current QueryBuilder
      */
-    public function mergeWhere(BaseWhereQueryBuilder $QueryBuilder)
+    public function mergeWhere(WhereQueryBuilder $QueryBuilder)
     {
         return parent::mergeWhere($QueryBuilder);
     }
@@ -872,9 +959,9 @@ class SelectQueryBuilder extends BaseWhereQueryBuilder
     /**
      * Merges the given QueryBuilder's GROUP BYs into this QueryBuilder.
      *
-     * @param  \SelectQueryBuilder $QueryBuilder to merge 
+     * @param  SelectQueryBuilder $QueryBuilder to merge 
      * 
-     * @return \SelectQueryBuilder the current QueryBuilder
+     * @return SelectQueryBuilder the current QueryBuilder
      */
     public function mergeGroupBy(SelectQueryBuilder $QueryBuilder)
     {
@@ -889,9 +976,9 @@ class SelectQueryBuilder extends BaseWhereQueryBuilder
     /**
      * Merges the given QueryBuilder's HAVINGs into this QueryBuilder.
      *
-     * @param  \SelectQueryBuilder $QueryBuilder to merge 
+     * @param  SelectQueryBuilder $QueryBuilder to merge 
      * 
-     * @return \SelectQueryBuilder the current QueryBuilder
+     * @return SelectQueryBuilder the current QueryBuilder
      */
     public function mergeHaving(SelectQueryBuilder $QueryBuilder)
     {
@@ -921,9 +1008,9 @@ class SelectQueryBuilder extends BaseWhereQueryBuilder
     /**
      * Merges the given QueryBuilder's ORDER BYs into this QueryBuilder.
      *
-     * @param  \SelectQueryBuilder $QueryBuilder to merge 
+     * @param  SelectQueryBuilder $QueryBuilder to merge 
      * 
-     * @return \SelectQueryBuilder the current QueryBuilder
+     * @return SelectQueryBuilder the current QueryBuilder
      */
     public function mergeOrderBy(SelectQueryBuilder $QueryBuilder)
     {
@@ -938,9 +1025,9 @@ class SelectQueryBuilder extends BaseWhereQueryBuilder
     /**
      * Merges the given QueryBuilder's LIMITs into this QueryBuilder.
      *
-     * @param  \SelectQueryBuilder $QueryBuilder to merge 
+     * @param  SelectQueryBuilder $QueryBuilder to merge 
      * 
-     * @return \SelectQueryBuilder the current QueryBuilder
+     * @return SelectQueryBuilder the current QueryBuilder
      */
     public function mergeLimit(SelectQueryBuilder $QueryBuilder)
     {
@@ -953,11 +1040,11 @@ class SelectQueryBuilder extends BaseWhereQueryBuilder
     /**
      * Merges the given QueryBuilder's HAVINGs into this QueryBuilder.
      *
-     * @param  \SelectQueryBuilder $QueryBuilder to merge 
+     * @param  SelectQueryBuilder $QueryBuilder to merge 
      * @param  bool $overwriteLimit optional overwrite limit, default = true
      * @param  bool $mergeOrderBy optional merge order by clause, default = true
      * 
-     * @return \SelectQueryBuilder the current QueryBuilder
+     * @return SelectQueryBuilder the current QueryBuilder
      */
     public function merge(SelectQueryBuilder $QueryBuilder, $overwriteLimit = true, $mergeOrderBy = true)
     {
@@ -1051,7 +1138,7 @@ class SelectQueryBuilder extends BaseWhereQueryBuilder
         $this->sqlParts['select']['COUNT(*)'] = null;
 
         // Run the query
-        $stmt = $this->query();
+        $stmt = $this->query(null);
 
         // Restore the values
         $this->sqlParts['select'] = $old_select;

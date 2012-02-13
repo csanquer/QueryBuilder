@@ -7,7 +7,7 @@
  * 
  * @author   Charles SANQUER <charles.sanquer@spyrit.net>
  */
-abstract class BaseWhereQueryBuilder extends BaseQueryBuilder
+abstract class WhereQueryBuilder extends QueryBuilder
 {
     /**
      * Logical operators.
@@ -55,7 +55,7 @@ abstract class BaseWhereQueryBuilder extends BaseQueryBuilder
      *
      * @param  PDO $PdoConnection optional PDO database connection
      * 
-     * @return BaseWhereQueryBuilder
+     * @return WhereQueryBuilder
      */
     public function __construct(PDO $PdoConnection = null)
     {
@@ -71,7 +71,7 @@ abstract class BaseWhereQueryBuilder extends BaseQueryBuilder
      *
      * @param  array $criteria WHERE or HAVING criteria
      * @param  string $connector optional logical connector, default AND
-     * @return BaseWhereQueryBuilder
+     * @return WhereQueryBuilder
      */
     protected function openCriteria(array &$criteria, $connector = self::LOGICAL_AND)
     {
@@ -88,7 +88,7 @@ abstract class BaseWhereQueryBuilder extends BaseQueryBuilder
      * HAVING criteria.
      *
      * @param  array $criteria WHERE or HAVING criteria
-     * @return BaseWhereQueryBuilder
+     * @return WhereQueryBuilder
      */
     protected function closeCriteria(array &$criteria)
     {
@@ -108,7 +108,7 @@ abstract class BaseWhereQueryBuilder extends BaseQueryBuilder
      * @param  mixed $value value
      * @param  string $operator optional comparison operator, default =
      * @param  string $connector optional logical connector, default AND
-     * @return BaseWhereQueryBuilder
+     * @return WhereQueryBuilder
      */
     protected function criteria(array &$criteria, $column, $value, $operator = self::EQUALS, $connector = self::LOGICAL_AND)
     {
@@ -405,23 +405,47 @@ abstract class BaseWhereQueryBuilder extends BaseQueryBuilder
      * Adds an open bracket for nesting WHERE conditions.
      *
      * @param  string $connector optional logical connector, default AND
-     * @return BaseWhereQueryBuilder
+     * @return WhereQueryBuilder
      */
-    public function openWhere($connector = self::LOGICAL_AND)
+    public function _open($connector = self::LOGICAL_AND)
     {
         return $this->openCriteria($this->sqlParts['where'], $connector);
     }
 
     /**
-     * Adds a closing bracket for nesting WHERE conditions.
-     *
-     * @return BaseWhereQueryBuilder
+     * Adds an open bracket for nesting WHERE conditions with OR operator.
+     * 
+     * shortcut for WhereQueryBuilder::_open(WhereQueryBuilder::LOGICAL_OR)
+     * 
+     * @return WhereQueryBuilder 
      */
-    public function closeWhere()
+    public function _or()
+    {
+        return $this->_open(self::LOGICAL_OR);
+    }
+    
+    /**
+     * Adds an open bracket for nesting WHERE conditions with AND operator.
+     * 
+     * shortcut for WhereQueryBuilder::_open(WhereQueryBuilder::LOGICAL_AND)
+     * 
+     * @return WhereQueryBuilder 
+     */
+    public function _and()
+    {
+        return $this->_open(self::LOGICAL_AND);
+    }
+    
+    /**
+     * Adds a closing bracket for nesting WHERE conditions.
+     * 
+     * @return WhereQueryBuilder
+     */
+    public function _close()
     {
         return $this->closeCriteria($this->sqlParts['where']);
     }
-
+    
     /**
      * Adds a WHERE condition.
      *
@@ -429,7 +453,7 @@ abstract class BaseWhereQueryBuilder extends BaseQueryBuilder
      * @param  mixed $value value
      * @param  string $operator optional comparison operator, default =
      * @param  string $connector optional logical connector, default AND
-     * @return BaseWhereQueryBuilder
+     * @return WhereQueryBuilder
      */
     public function where($column, $value, $operator = self::EQUALS, $connector = self::LOGICAL_AND)
     {
@@ -442,7 +466,7 @@ abstract class BaseWhereQueryBuilder extends BaseQueryBuilder
      * @param  string $column colum name
      * @param  mixed $value value
      * @param  string $operator optional comparison operator, default =
-     * @return BaseWhereQueryBuilder
+     * @return WhereQueryBuilder
      */
     public function andWhere($column, $value, $operator = self::EQUALS)
     {
@@ -455,7 +479,7 @@ abstract class BaseWhereQueryBuilder extends BaseQueryBuilder
      * @param  string $column colum name
      * @param  mixed $value value
      * @param  string $operator optional comparison operator, default =
-     * @return BaseWhereQueryBuilder
+     * @return WhereQueryBuilder
      */
     public function orWhere($column, $value, $operator = self::EQUALS)
     {
@@ -494,11 +518,11 @@ abstract class BaseWhereQueryBuilder extends BaseQueryBuilder
     /**
      * Merges the given QueryBuilder's WHEREs into this QueryBuilder.
      *
-     * @param  \BaseWhereQueryBuilder $QueryBuilder to merge 
+     * @param  WhereQueryBuilder $QueryBuilder to merge 
      * 
-     * @return \BaseWhereQueryBuilder the current QueryBuilder
+     * @return WhereQueryBuilder the current QueryBuilder
      */
-    public function mergeWhere(BaseWhereQueryBuilder $QueryBuilder)
+    public function mergeWhere(WhereQueryBuilder $QueryBuilder)
     {
         foreach ($QueryBuilder->getWhereParts() as $currentWhere)
         {
@@ -507,11 +531,11 @@ abstract class BaseWhereQueryBuilder extends BaseQueryBuilder
             {
                 if (strcmp($currentWhere['bracket'], self::BRACKET_OPEN) == 0)
                 {
-                    $this->openWhere($currentWhere['connector']);
+                    $this->_open($currentWhere['connector']);
                 }
                 else
                 {
-                    $this->closeWhere();
+                    $this->_close();
                 }
             }
             else

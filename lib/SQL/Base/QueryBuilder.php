@@ -7,14 +7,15 @@
  * 
  * @author   Charles SANQUER <charles.sanquer@spyrit.net>
  */
-abstract class BaseQueryBuilder
+abstract class QueryBuilder
 {
     /**
      * Brackets for grouping criteria.
      */
+
     const BRACKET_OPEN = '(';
     const BRACKET_CLOSE = ')';
-    
+
     /**
      * PDO database connection to use in executing the query.
      *
@@ -42,24 +43,31 @@ abstract class BaseQueryBuilder
      * @var array
      */
     protected $boundParams;
-    
+
     /**
      *
      * @var string 
      */
     protected $indentChar;
-    
+
     /**
      *
      * @var int 
      */
     protected $indentCharMultiplier;
+
+    /**
+     * flags for boolean functions
+     * 
+     * @var QueryConditionalProxy 
+     */
+	protected $conditionalProxy = null;
     
     /**
      * Constructor.
      *
      * @param  PDO $PdoConnection optional PDO database connection
-     * @return BaseQueryBuilder
+     * @return QueryBuilder
      */
     public function __construct(PDO $PdoConnection = null)
     {
@@ -70,7 +78,7 @@ abstract class BaseQueryBuilder
 
         $this->indentChar = ' ';
         $this->indentCharMultiplier = 4;
-        
+
         $this->setConnection($PdoConnection);
     }
 
@@ -83,12 +91,12 @@ abstract class BaseQueryBuilder
     {
         return $this->getQueryString(false);
     }
-    
+
     /**
      * Sets the PDO database connection to use in executing this query.
      *
      * @param  PDO $PdoConnection optional PDO database connection
-     * @return BaseQueryBuilder
+     * @return QueryBuilder
      */
     public function setConnection(PDO $connection = null)
     {
@@ -116,7 +124,7 @@ abstract class BaseQueryBuilder
      * @return string
      */
     abstract public function getQueryString($formatted = false);
-    
+
     /**
      * Safely escapes a value for use in a query.
      *
@@ -152,7 +160,7 @@ abstract class BaseQueryBuilder
             }
             else
             {
-                return '\''.addslashes($value).'\'';
+                return '\'' . addslashes($value) . '\'';
             }
         }
     }
@@ -161,7 +169,7 @@ abstract class BaseQueryBuilder
      * Adds an execution option like DISTINCT or SQL_CALC_FOUND_ROWS.
      *
      * @param  string $option execution option to add
-     * @return BaseQueryBuilder
+     * @return QueryBuilder
      */
     public function addOption($option)
     {
@@ -172,7 +180,7 @@ abstract class BaseQueryBuilder
 
         return $this;
     }
-    
+
     /**
      * get Options
      * 
@@ -193,7 +201,7 @@ abstract class BaseQueryBuilder
     {
         return isset($this->sqlParts[$section]) ? $this->sqlParts[$section] : null;
     }
-    
+
     /**
      * Returns all bound parameters
      *
@@ -213,7 +221,7 @@ abstract class BaseQueryBuilder
         {
             $boundParams = $this->mergeBoundParameters();
         }
-        
+
         if ($quoted && !empty($boundParams))
         {
             return $this->quoteBoundParameters($boundParams);
@@ -221,7 +229,7 @@ abstract class BaseQueryBuilder
 
         return $boundParams;
     }
-    
+
     /**
      * quote each item in a bound parameters array
      * 
@@ -233,7 +241,7 @@ abstract class BaseQueryBuilder
     {
         return array_map(array($this, 'quote'), $boundParameters);
     }
-    
+
     /**
      * Merge all BoundParameters section
      * 
@@ -246,12 +254,12 @@ abstract class BaseQueryBuilder
         {
             foreach ($this->boundParams as $sectionParams)
             {
-                 $boundParams = array_merge($boundParams, $sectionParams);
+                $boundParams = array_merge($boundParams, $sectionParams);
             }
         }
         return $boundParams;
     }
-    
+
     /**
      * return a indentation string repeat n times
      * 
@@ -264,57 +272,58 @@ abstract class BaseQueryBuilder
         $multiplier = (int) $multiplier;
         if ($this->indentCharMultiplier > 0 && $multiplier > 0)
         {
-            return str_repeat($this->indentChar,$this->indentCharMultiplier*$multiplier);
+            return str_repeat($this->indentChar, $this->indentCharMultiplier * $multiplier);
         }
         return '';
     }
-    
-    
+
     /**
      * Replaces any parameter placeholders in a query with the value of that
      * parameter. Useful for debugging. Assumes anonymous parameters from 
      * $params are are in the same order as specified in $query
      *
      * @param string $query The sql query with parameter placeholders
-     * @param array $params The array of substitution parameters
+     * @param array $params default = empty array , The array of substitution parameters
      * @param bool $quote default = true, if true quote each parameter
      * @param PDO $connection default = null , PDO connection (used to quote values)
      * 
      * @return string The debugged query
      */
-    public static function debugQuery($query, $params, $quoted = true, PDO $connection = null)
+    public static function debugQuery($query, $params = array(), $quoted = true, PDO $connection = null)
     {
-        $keys = array();
-        // build a regular expression for each parameter
-        foreach ($params as $key => $value)
+        if (!empty($params) && is_array($params))
         {
-            if (is_string($key))
+            $keys = array();
+            // build a regular expression for each parameter
+            foreach ($params as $key => $value)
             {
-                if (strpos($key, ':') === 0)
+                if (is_string($key))
                 {
-                    $keys[] = '/'.$key.'/';
+                    if (strpos($key, ':') === 0)
+                    {
+                        $keys[] = '/' . $key . '/';
+                    }
+                    else
+                    {
+                        $keys[] = '/:' . $key . '/';
+                    }
                 }
                 else
                 {
-                    $keys[] = '/:'.$key.'/';
+                    $keys[] = '/[?]/';
+                }
+
+                if ($quoted)
+                {
+                    $params[$key] = self::quoteValue($value, $connection);
+                }
+                elseif (is_string($value) && !is_numeric($value))
+                {
+                    $params[$key] = '\'' . $value . '\'';
                 }
             }
-            else
-            {
-                $keys[] = '/[?]/';
-            }
-            
-            if ($quoted)
-            {
-                $params[$key] = self::quoteValue($value, $connection);
-            }
-            elseif (is_string($value) && !is_numeric($value))
-            {
-                $params[$key] = '\''.$value.'\'';
-            }
+            $query = preg_replace($keys, $params, $query, 1);
         }
-        $query = preg_replace($keys, $params, $query, 1);
-
         return $query;
     }
 
@@ -331,33 +340,33 @@ abstract class BaseQueryBuilder
     {
         return self::debugQuery($this->getQueryString($formatted), $this->getBoundParameters(), $quoted, $this->getConnection());
     }
-    
+
     /**
      * Executes the query using the PDO database connection and return result as PDOStatement or array of scalar values or objects
      *
      * @see PDOStatement::fetch() and PDOStatement::fetchAll()
      * 
-     * @param int $fetch_style default = null , a PDO_FETCH constant to return a result as array or null to return a PDOStatement
+     * @param int $fetch_style default = PDO::FETCH_ASSOC , a PDO_FETCH constant to return a result as array or null to return a PDOStatement
      * 
-     * @return array|PDOStatement|false , return PDOStatement if $fetch_style is null , otherwise an array , false if something goes wrong
+     * @return array|PDOStatement|string|false , return PDOStatement if $fetch_style is null , or an array , or a SQL string if there is no PDO , or false if something goes wrong
      * 
      * @throws PDOException if a error occured with PDO
      */
-    public function query($fetch_style = null)
+    public function query($fetch_style = PDO::FETCH_ASSOC)
     {
         $PdoConnection = $this->getConnection();
-
-        // If no PDO database connection is set, the query cannot be executed.
-        if (!$PdoConnection instanceof PDO)
-        {
-            return false;
-        }
 
         $queryString = $this->getQueryString();
 
         // Only execute if a query is set.
         if (!empty($queryString))
         {
+            // If no PDO database connection is set, the query cannot be executed so we return the SQL string.
+            if (!$PdoConnection instanceof PDO)
+            {
+                return $this->debug(true, true);
+            }
+
             $PdoStatement = $PdoConnection->prepare($queryString);
             $PdoStatement->execute($this->getBoundParameters());
 
@@ -370,10 +379,89 @@ abstract class BaseQueryBuilder
                 return $PdoStatement->fetchAll($fetch_style);
             }
         }
-        else
+
+        return false;
+    }
+
+    // Fluid Conditions
+
+    /**
+     * Returns the current object if the condition is true,
+     * or a QueryConditionalProxy instance otherwise.
+     * Allows for conditional statements in a fluid interface.
+     *
+     * @param      bool $cond
+     *
+     * @return    QueryConditionalProxy|QueryBuilder
+     */
+    public function _if($cond)
+    {
+        $this->conditionalProxy = new QueryConditionalProxy($this, $cond, $this->conditionalProxy);
+        return $this->conditionalProxy->getQueryOrProxy();
+    }
+
+    /**
+     * Returns a QueryConditionalProxy instance.
+     * Allows for conditional statements in a fluid interface.
+     *
+     * @param      bool $cond ignored
+     *
+     * @throws     QueryBuilderException
+     * 
+     * @return    QueryConditionalProxy|QueryBuilder
+     */
+    public function _elseif($cond)
+    {
+        if (!$this->conditionalProxy)
         {
-            return false;
+            throw new QueryBuilderException('_elseif() must be called after _if()');
         }
+
+        return $this->conditionalProxy->_elseif($cond);
+    }
+
+    /**
+     * Returns a QueryConditionalProxy instance.
+     * Allows for conditional statements in a fluid interface.
+     *
+     * @throws     QueryBuilderException
+     * 
+     * @return    QueryConditionalProxy|QueryBuilder
+     */
+    public function _else()
+    {
+        if (!$this->conditionalProxy)
+        {
+            throw new QueryBuilderException('_else() must be called after _if()');
+        }
+
+        return $this->conditionalProxy->_else();
+    }
+
+    /**
+     * Returns the current object
+     * Allows for conditional statements in a fluid interface.
+     *
+     * @throws     QueryBuilderException
+     * 
+     * @return     QueryBuilder
+     */
+    public function _endif()
+    {
+        if (!$this->conditionalProxy)
+        {
+            throw new QueryBuilderException('_endif() must be called after _if()');
+        }
+
+        $this->conditionalProxy = $this->conditionalProxy->getParentProxy();
+
+        if ($this->conditionalProxy)
+        {
+            return $this->conditionalProxy->getQueryOrProxy();
+        }
+
+        // reached last level
+        return $this;
     }
 
 }

@@ -34,11 +34,16 @@ class SelectQueryBuilderTest extends PDOTestCase
 
     public function fromProvider()
     {
+        $q = new SelectQueryBuilder();
+        $q->select(array('id', 'lastname'));
+        $q->from('author', 'a');
+        
         return array(
             array('book', null),
             array('author', null),
             array('book', 'b'),
             array('author', 'a'),
+            array($q, 'a1'),
         );
     }
 
@@ -208,6 +213,10 @@ class SelectQueryBuilderTest extends PDOTestCase
 
     public function GetFromStringProvider()
     {
+        $q = new SelectQueryBuilder();
+        $q->select(array('id', 'lastname'));
+        $q->from('author', 'a');
+        
         return array(
             array(
                 'book',
@@ -222,6 +231,13 @@ class SelectQueryBuilderTest extends PDOTestCase
                 array(),
                 'FROM book AS b ',
                 'FROM book AS b '."\n",
+            ),
+            array(
+                $q,
+                'a1',
+                array(),
+                'FROM (SELECT id, lastname FROM author AS a ) AS a1 ',
+                'FROM ( '."\n".'SELECT id, lastname '."\n".'FROM author AS a '."\n".') AS a1 '."\n",
             ),
             array(
                 'author',
@@ -469,20 +485,41 @@ class SelectQueryBuilderTest extends PDOTestCase
      *
      * @dataProvider limitProvider
      */
-    public function testLimit($limit, $expected)
+    public function testLimit($limit, $expected, $offset)
     {
         $this->assertInstanceOf('SelectQueryBuilder', $this->queryBuilder->limit($limit));
         $this->assertEquals($expected, $this->queryBuilder->getLimit());
+        $this->assertEquals($offset, $this->queryBuilder->getOffset());
     }
 
     public function limitProvider()
     {
         return array(
-            array(null, 0),
-            array(5, 5),
+            array(null, 0, 0),
+            array(5, 5, 0),
         );
     }
 
+    /**
+     *
+     * @dataProvider pageProvider
+     */
+    public function testPage($page, $expected)
+    {
+        $this->assertInstanceOf('SelectQueryBuilder', $this->queryBuilder->page($page));
+        $this->assertEquals($expected, $this->queryBuilder->getPage());
+        $this->assertEquals(null, $this->queryBuilder->getOffset());
+    }
+    
+    public function pageProvider()
+    {
+        return array(
+            array(null, 1),
+            array(0, 1),
+            array(3, 3),
+        );
+    }
+    
     /**
      *
      * @dataProvider offsetProvider
@@ -491,6 +528,7 @@ class SelectQueryBuilderTest extends PDOTestCase
     {
         $this->assertInstanceOf('SelectQueryBuilder', $this->queryBuilder->offset($offset));
         $this->assertEquals($expected, $this->queryBuilder->getOffset());
+        $this->assertEquals(null, $this->queryBuilder->getPage());
     }
 
     public function offsetProvider()
@@ -501,6 +539,68 @@ class SelectQueryBuilderTest extends PDOTestCase
         );
     }
 
+    /**
+     *
+     * @dataProvider offsetWithPageAndLimitProvider
+     */
+    public function testOffsetWithPageAndLimit($page, $limit, $expected)
+    {
+        $this->queryBuilder->page($page);
+        $this->queryBuilder->limit($limit);
+        $this->assertEquals($expected, $this->queryBuilder->getOffset());
+    }
+    
+    public function offsetWithPageAndLimitProvider()
+    {
+        return array(
+            array(null, 50, 0),
+            array(1, 50, 0),
+            array(2, 50, 50),
+            array(5, 50, 200),
+        );
+    }
+    
+    /**
+     *
+     * @dataProvider pageWithOffsetAndLimitProvider
+     */
+    public function testPageWithOffsetAndLimit($offset, $limit, $expected)
+    {
+        $this->queryBuilder->offset($offset);
+        $this->queryBuilder->limit($limit);
+        $this->assertEquals($expected, $this->queryBuilder->getPage());
+    }
+    
+    public function pageWithOffsetAndLimitProvider()
+    {
+        return array(
+            array(null, 50, 1),
+            array(0, 50, 1),
+            array(100, 50, 3),
+        );
+    }
+    
+    /**
+     *
+     * @dataProvider paginateProvider
+     */
+    public function testPaginate($page, $limit, $expectedOffset, $expectedLimit)
+    {
+        $this->assertInstanceOf('SelectQueryBuilder', $this->queryBuilder->paginate($page, $limit));
+        $this->assertEquals($expectedOffset, $this->queryBuilder->getOffset());
+        $this->assertEquals($expectedLimit, $this->queryBuilder->getLimit());
+    }
+    
+    public function paginateProvider()
+    {
+        return array(
+            array(null, 50, 0, 50),
+            array(0, 50, 0, 50),
+            array(1, 50, 0, 50),
+            array(3, 50, 100, 50),
+        );
+    }
+    
     /**
      *
      * @dataProvider getLimitStringProvider
@@ -667,7 +767,7 @@ class SelectQueryBuilderTest extends PDOTestCase
     }
 
     /**
-     * @expectedException \InvalidArgumentException
+     * @expectedException InvalidArgumentException
      */
     public function testHavingBetweenException()
     {
@@ -1015,17 +1115,39 @@ class SelectQueryBuilderTest extends PDOTestCase
 
     public function testWhere()
     {
-        $this->assertInstanceOf('BaseWhereQueryBuilder', $this->queryBuilder->Where('id', 1, SelectQueryBuilder::EQUALS, SelectQueryBuilder::LOGICAL_AND));
+        $this->assertInstanceOf('SelectQueryBuilder', $this->queryBuilder->Where('id', 1, SelectQueryBuilder::EQUALS, SelectQueryBuilder::LOGICAL_AND));
     }
 
     public function testAndWhere()
     {
-        $this->assertInstanceOf('BaseWhereQueryBuilder', $this->queryBuilder->andWhere('id', 1, SelectQueryBuilder::EQUALS));
+        $this->assertInstanceOf('SelectQueryBuilder', $this->queryBuilder->andWhere('id', 1, SelectQueryBuilder::EQUALS));
     }
 
     public function testOrWhere()
     {
-        $this->assertInstanceOf('BaseWhereQueryBuilder', $this->queryBuilder->orWhere('id', 1, SelectQueryBuilder::EQUALS));
+        $this->assertInstanceOf('SelectQueryBuilder', $this->queryBuilder->orWhere('id', 1, SelectQueryBuilder::EQUALS));
+    }
+    
+    public function testOr()
+    {
+        $expected = array(Array(
+            'bracket' => SelectQueryBuilder::BRACKET_OPEN,
+            'connector' => SelectQueryBuilder::LOGICAL_OR,
+        ));
+
+        $this->assertInstanceOf('SelectQueryBuilder', $this->queryBuilder->_or());
+        $this->assertEquals($expected, $this->queryBuilder->getWhereParts());
+    }
+    
+    public function testAnd()
+    {
+        $expected = array(Array(
+            'bracket' => SelectQueryBuilder::BRACKET_OPEN,
+            'connector' => SelectQueryBuilder::LOGICAL_AND,
+        ));
+        
+        $this->assertInstanceOf('SelectQueryBuilder', $this->queryBuilder->_and());
+        $this->assertEquals($expected, $this->queryBuilder->getWhereParts());
     }
     
     /**
@@ -1061,16 +1183,16 @@ class SelectQueryBuilderTest extends PDOTestCase
                 {
                     if (isset($where[1]))
                     {
-                        $this->queryBuilder->openWhere($where[1]);
+                        $this->queryBuilder->_open($where[1]);
                     }
                     else
                     {
-                        $this->queryBuilder->openWhere();
+                        $this->queryBuilder->_open();
                     }
                 }
                 elseif ($where[0] == ')')
                 {
-                    $this->queryBuilder->closeWhere();
+                    $this->queryBuilder->_close();
                 }
             }
         }
@@ -1349,9 +1471,9 @@ class SelectQueryBuilderTest extends PDOTestCase
 
         $qb = new SelectQueryBuilder();
         $qb
-            ->openWhere(SelectQueryBuilder::LOGICAL_OR)
+            ->_open(SelectQueryBuilder::LOGICAL_OR)
             ->where('title', 'Dune' , SelectQueryBuilder::NOT_EQUALS, null)
-            ->closeWhere();
+            ->_close();
 
         $this->queryBuilder->mergeWhere($qb);
 
@@ -1507,9 +1629,9 @@ class SelectQueryBuilderTest extends PDOTestCase
             ->select('title')
             ->addOption('DISTINCT')
             ->join('editor', 'e', 'e.id = b.editor_id', SelectQueryBuilder::LEFT_JOIN)
-            ->openWhere(SelectQueryBuilder::LOGICAL_OR)
+            ->_open(SelectQueryBuilder::LOGICAL_OR)
             ->where('title', 'Dune' , SelectQueryBuilder::NOT_EQUALS, null)
-            ->closeWhere()
+            ->_close()
             ->groupBy('score', SelectQueryBuilder::ASC)
             ->openHaving(SelectQueryBuilder::LOGICAL_OR)
             ->having('price', 9 , SelectQueryBuilder::NOT_EQUALS, null)

@@ -5,7 +5,7 @@
  * 
  * @author   Charles SANQUER <charles.sanquer@spyrit.net>
  */
-class InsertQueryBuilder extends BaseQueryBuilder
+class InsertQueryBuilder extends QueryBuilder
 {
     /**
      * Constructor.

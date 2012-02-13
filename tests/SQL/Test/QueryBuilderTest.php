@@ -1,16 +1,17 @@
 <?php
 
-class BaseQueryBuilderTest extends PDOTestCase
+
+class QueryBuilderTest extends PDOTestCase
 {
     /**
      *
-     * @var BaseQueryBuilder
+     * @var QueryBuilder
      */
     protected $queryBuilder;
     
     protected function setUp()
     {
-        $this->queryBuilder = $this->getMockForAbstractClass('BaseQueryBuilder', array(self::$pdo));
+        $this->queryBuilder = $this->getMockForAbstractClass('QueryBuilder', array(self::$pdo));
     }
     
     /**
@@ -28,9 +29,9 @@ class BaseQueryBuilderTest extends PDOTestCase
     
     public function testSetPdoConnection()
     {
-        $queryBuilder = $this->getMockForAbstractClass('BaseQueryBuilder');
+        $queryBuilder = $this->getMockForAbstractClass('QueryBuilder');
         $queryBuilder->setConnection(new \PDO('sqlite::memory:'));
-        $this->assertInstanceOf('\PDO', $this->queryBuilder->getConnection());
+        $this->assertInstanceOf('\PDO', $queryBuilder->getConnection());
     }
 
     public function testGetPdoConnection()
@@ -50,7 +51,7 @@ class BaseQueryBuilderTest extends PDOTestCase
         $this->assertInternalType('string', $quote2);
         $this->assertEquals('\'2\'', $quote2);
 
-        $queryBuilder = $this->getMockForAbstractClass('BaseQueryBuilder');
+        $queryBuilder = $this->getMockForAbstractClass('QueryBuilder');
 
         $quote3 = $queryBuilder->quote(1);
         $this->assertInternalType('integer', $quote3);
@@ -68,7 +69,7 @@ class BaseQueryBuilderTest extends PDOTestCase
      */
     public function testOptions($option, $expected)
     {
-        $this->assertInstanceOf('BaseQueryBuilder', $this->queryBuilder->addOption($option));
+        $this->assertInstanceOf('QueryBuilder', $this->queryBuilder->addOption($option));
         $this->assertEquals($expected, $this->queryBuilder->getOptions());
     }
 
@@ -93,9 +94,9 @@ class BaseQueryBuilderTest extends PDOTestCase
      */
     public function testDebugQuery($query, $params, $expected, $expectedQuoted, $expectedQuotedPDO)
     {
-        $this->assertEquals($expected, BaseQueryBuilder::debugQuery($query, $params, false));
-        $this->assertEquals($expectedQuoted, BaseQueryBuilder::debugQuery($query, $params, true));
-        $this->assertEquals($expectedQuotedPDO, BaseQueryBuilder::debugQuery($query, $params, true, self::$pdo));
+        $this->assertEquals($expected, QueryBuilder::debugQuery($query, $params, false));
+        $this->assertEquals($expectedQuoted, QueryBuilder::debugQuery($query, $params, true));
+        $this->assertEquals($expectedQuotedPDO, QueryBuilder::debugQuery($query, $params, true, self::$pdo));
     }
 
     public function debugQueryProvider()
@@ -127,12 +128,12 @@ class BaseQueryBuilderTest extends PDOTestCase
 
     public function testQueryWithoutPDO()
     {
-        $querybuiler = $this->getMockForAbstractClass('BaseQueryBuilder');
+        $querybuiler = $this->getMockForAbstractClass('QueryBuilder');
         $querybuiler
             ->expects($this->any())
             ->method('getQueryString')
             ->will($this->returnValue('SELECT * FROM book'));
-        $this->assertFalse($querybuiler->query());
+        $this->assertEquals('SELECT * FROM book', $querybuiler->query());
     }
 
     public function testQueryWithoutQueryStatement()
@@ -157,7 +158,7 @@ class BaseQueryBuilderTest extends PDOTestCase
 
         $this->setBoundParams(array('where' => array(2)));
         
-        $this->assertInstanceOf('\PDOStatement', $this->queryBuilder->query());
+        $this->assertInstanceOf('\PDOStatement', $this->queryBuilder->query(null));
 
         $expected = array(
             array(
@@ -187,6 +188,59 @@ class BaseQueryBuilderTest extends PDOTestCase
         );
 
         $this->assertEquals($expected, $this->queryBuilder->query(\PDO::FETCH_ASSOC));
+        $this->assertEquals($expected, $this->queryBuilder->query());
     }
 
+    public function testConditionalMethods()
+    {
+        $this->assertSame($this->queryBuilder, $this->queryBuilder->_if(true));
+        $this->assertSame($this->queryBuilder, $this->queryBuilder->_endif());
+        
+        $this->assertInstanceOf('QueryConditionalProxy', $this->queryBuilder->_if(false));
+        $this->assertSame($this->queryBuilder, $this->queryBuilder->_endif());
+        
+        $this->assertSame($this->queryBuilder, $this->queryBuilder->_if(true));
+        $this->assertInstanceOf('QueryConditionalProxy', $this->queryBuilder->_elseif(false));
+        $this->assertInstanceOf('QueryConditionalProxy', $this->queryBuilder->_else(false));
+        $this->assertSame($this->queryBuilder, $this->queryBuilder->_endif());
+        
+        $this->assertInstanceOf('QueryConditionalProxy', $this->queryBuilder->_if(false));
+        $this->assertSame($this->queryBuilder, $this->queryBuilder->_elseif(true));
+        $this->assertInstanceOf('QueryConditionalProxy', $this->queryBuilder->_else(false));
+        $this->assertSame($this->queryBuilder, $this->queryBuilder->_endif());
+        
+        $this->assertInstanceOf('QueryConditionalProxy', $this->queryBuilder->_if(false));
+        $this->assertInstanceOf('QueryConditionalProxy', $this->queryBuilder->_elseif(false));
+        $this->assertSame($this->queryBuilder, $this->queryBuilder->_else());
+        $this->assertSame($this->queryBuilder, $this->queryBuilder->_endif());
+        
+        $this->assertSame($this->queryBuilder, $this->queryBuilder->_if(true));
+        $this->assertInstanceOf('QueryConditionalProxy', $this->queryBuilder->_if(false));
+        $this->assertSame($this->queryBuilder, $this->queryBuilder->_endif());
+        $this->assertSame($this->queryBuilder, $this->queryBuilder->_endif());
+    }
+    
+    /**
+     * @expectedException QueryBuilderException
+     */
+    public function testElseIfAlone()
+    {
+        $this->queryBuilder->_elseif(true);
+    }
+    
+    /**
+     * @expectedException QueryBuilderException
+     */
+    public function testElseAlone()
+    {
+        $this->queryBuilder->_else(true);
+    }
+    
+    /**
+     * @expectedException QueryBuilderException
+     */
+    public function testEndIfAlone()
+    {
+        $this->queryBuilder->_endif(true);
+    }
 }

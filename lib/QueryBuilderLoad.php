@@ -3,8 +3,10 @@
 class QueryBuilderLoad
 {
     protected static $classMap = array(
-        'BaseQueryBuilder'      => 'SQL/BaseQueryBuilder.php',
-        'BaseWhereQueryBuilder' => 'SQL/BaseWhereQueryBuilder.php',
+        'QueryBuilder'      => 'SQL/Base/QueryBuilder.php',
+        'WhereQueryBuilder' => 'SQL/Base/WhereQueryBuilder.php',
+        'QueryConditionalProxy' => 'SQL/Proxy/QueryConditionalProxy.php',
+        'QueryBuilderException' => 'SQL/Exception/QueryBuilderException.php',
         'DeleteQueryBuilder'    => 'SQL/DeleteQueryBuilder.php',
         'InsertQueryBuilder'    => 'SQL/InsertQueryBuilder.php',
         'UpdateQueryBuilder'    => 'SQL/UpdateQueryBuilder.php',

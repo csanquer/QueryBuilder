@@ -5,7 +5,7 @@
  * 
  * @author   Charles SANQUER <charles.sanquer@spyrit.net>
  */
-class DeleteQueryBuilder extends BaseWhereQueryBuilder
+class DeleteQueryBuilder extends WhereQueryBuilder
 {
     /**
      * Constructor.
@@ -94,22 +94,46 @@ class DeleteQueryBuilder extends BaseWhereQueryBuilder
      * Adds an open bracket for nesting WHERE conditions.
      *
      * @param  string $connector optional logical connector, default AND
-     * 
-     * @return \DeleteQueryBuilder
+     * @return DeleteQueryBuilder
      */
-    public function openWhere($connector = self::LOGICAL_AND)
+    public function _open($connector = self::LOGICAL_AND)
     {
-        return parent::openWhere($connector);
+        return parent::_open($connector);
     }
 
+    
+    /**
+     * Adds an open bracket for nesting WHERE conditions with OR operator.
+     * 
+     * shortcut for DeleteQueryBuilder::_open(DeleteQueryBuilder::LOGICAL_OR)
+     * 
+     * @return DeleteQueryBuilder 
+     */
+    public function _or()
+    {
+        return $this->_open(self::LOGICAL_OR);
+    }
+    
+    /**
+     * Adds an open bracket for nesting WHERE conditions with AND operator.
+     * 
+     * shortcut for DeleteQueryBuilder::_open(DeleteQueryBuilder::LOGICAL_AND)
+     * 
+     * @return DeleteQueryBuilder 
+     */
+    public function _and()
+    {
+        return $this->_open(self::LOGICAL_AND);
+    }
+    
     /**
      * Adds a closing bracket for nesting WHERE conditions.
-     *
-     * @return \DeleteQueryBuilder
+     * 
+     * @return DeleteQueryBuilder
      */
-    public function closeWhere()
+    public function _close()
     {
-        return parent::closeWhere();
+        return parent::_close();
     }
 
     /**
@@ -134,7 +158,7 @@ class DeleteQueryBuilder extends BaseWhereQueryBuilder
      * @param  mixed $value value
      * @param  string $operator optional comparison operator, default = '='
      * 
-     * @return \DeleteQueryBuilder
+     * @return DeleteQueryBuilder
      */
     public function andWhere($column, $value, $operator = self::EQUALS)
     {
@@ -148,7 +172,7 @@ class DeleteQueryBuilder extends BaseWhereQueryBuilder
      * @param  mixed $value value
      * @param  string $operator optional comparison operator, default = '='
      * 
-     * @return \DeleteQueryBuilder
+     * @return DeleteQueryBuilder
      */
     public function orWhere($column, $value, $operator = self::EQUALS)
     {
@@ -158,11 +182,11 @@ class DeleteQueryBuilder extends BaseWhereQueryBuilder
     /**
      * Merges the given QueryBuilder's WHEREs into this QueryBuilder.
      *
-     * @param  \BaseWhereQueryBuilder $QueryBuilder to merge 
+     * @param  WhereQueryBuilder $QueryBuilder to merge 
      * 
-     * @return \DeleteQueryBuilder the current QueryBuilder
+     * @return DeleteQueryBuilder the current QueryBuilder
      */
-    public function mergeWhere(BaseWhereQueryBuilder $QueryBuilder)
+    public function mergeWhere(WhereQueryBuilder $QueryBuilder)
     {
         return parent::mergeWhere($QueryBuilder);
     }
