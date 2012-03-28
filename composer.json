@@ -1,4 +1,7 @@
 {
+    "autoload": {
+        "psr-0": {"SQL": "lib/"}
+    },
     "name": "csanquer/querybuilder",
     "description": "SQL Query Builder library",
     "authors": [
