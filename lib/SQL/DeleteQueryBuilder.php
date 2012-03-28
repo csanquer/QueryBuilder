@@ -18,6 +18,8 @@ class DeleteQueryBuilder extends WhereQueryBuilder
     {
         parent::__construct($PdoConnection);
         
+        $this->queryType = self::TYPE_DELETE;
+        
         $this->sqlParts['from'] = null;
     }
     

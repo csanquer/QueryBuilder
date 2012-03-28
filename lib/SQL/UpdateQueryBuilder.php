@@ -18,6 +18,8 @@ class UpdateQueryBuilder extends WhereQueryBuilder
     {
         parent::__construct($PdoConnection);
         
+        $this->queryType = self::TYPE_UPDATE;
+        
         $this->sqlParts['table'] = null;
         $this->sqlParts['set'] = array();
         

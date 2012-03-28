@@ -18,6 +18,8 @@ class InsertQueryBuilder extends QueryBuilder
     {
         parent::__construct($PdoConnection);
         
+        $this->queryType = self::TYPE_INSERT;
+        
         $this->sqlParts['into'] = array('table' => null, 'columns' => array());
         $this->sqlParts['values'] = array();
         $this->sqlParts['select'] = null;
