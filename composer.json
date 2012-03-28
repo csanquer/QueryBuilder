@@ -1,0 +1,11 @@
+{
+    "name": "csanquer/querybuilder",
+    "description": "SQL Query Builder library",
+    "authors": [
+        {
+            "name": "Charles SANQUER",
+            "email": "charles.sanquer@spyrit.net"
+        }
+    ],
+    "require": {}
+}
