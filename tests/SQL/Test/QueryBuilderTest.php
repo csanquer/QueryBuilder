@@ -21,7 +21,7 @@ class QueryBuilderTest extends PDOTestCase
      */
     private function setQueryType($value)
     {
-        $reflection = new \ReflectionClass($this->queryBuilder);
+        $reflection = new ReflectionClass($this->queryBuilder);
         $type = $reflection->getProperty('queryType');
         $type->setAccessible(true);
         $type->setValue($this->queryBuilder, $value);
@@ -34,7 +34,7 @@ class QueryBuilderTest extends PDOTestCase
      */
     private function setBoundParams($value)
     {
-        $reflection = new \ReflectionClass($this->queryBuilder);
+        $reflection = new ReflectionClass($this->queryBuilder);
         $boundParams = $reflection->getProperty('boundParams');
         $boundParams->setAccessible(true);
         $boundParams->setValue($this->queryBuilder, $value);
