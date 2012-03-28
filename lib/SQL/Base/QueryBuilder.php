@@ -14,6 +14,13 @@ use SQL\Exception\QueryBuilderException;
  */
 abstract class QueryBuilder
 {
+    const TYPE_SELECT = 'select';
+    const TYPE_INSERT = 'create';
+    const TYPE_UPDATE = 'update';
+    const TYPE_DELETE = 'delete';
+ 
+    const FETCH_LAST_INSERT_ID = 'last_insert_id';
+    
     /**
      * Brackets for grouping criteria.
      */
@@ -69,6 +76,13 @@ abstract class QueryBuilder
 	protected $conditionalProxy = null;
     
     /**
+     * type of SQL Query (select,insert,update,delete)
+     * 
+     * @var string 
+     */
+    protected $queryType;
+    
+    /**
      * Constructor.
      *
      * @param  PDO $PdoConnection optional PDO database connection
@@ -97,6 +111,16 @@ abstract class QueryBuilder
         return $this->getQueryString(false);
     }
 
+    /**
+     * get SQL Query Type 
+     * 
+     * @return type 
+     */
+    public function getQueryType()
+    {
+        return $this->queryType;
+    }
+    
     /**
      * Sets the PDO database connection to use in executing this query.
      *
@@ -351,18 +375,20 @@ abstract class QueryBuilder
      *
      * @see PDOStatement::fetch() and PDOStatement::fetchAll()
      * 
-     * @param int $fetch_style default = \PDO::FETCH_ASSOC , a PDO_FETCH constant to return a result as array or null to return a PDOStatement
+     * @param int $fetchStyle default = \PDO::FETCH_ASSOC , a PDO_FETCH constant to return a result as array or null to return a PDOStatement or \SQL\Base\QueryBuilder::FETCH_LAST_INSERT_ID
      * 
      * @return array|PDOStatement|string|false , return PDOStatement if $fetch_style is null , or an array , or a SQL string if there is no PDO , or false if something goes wrong
      * 
      * @throws PDOException if a error occured with PDO
      */
-    public function query($fetch_style = \PDO::FETCH_ASSOC)
+    public function query($fetchStyle = \PDO::FETCH_ASSOC)
     {
         $PdoConnection = $this->getConnection();
 
         $queryString = $this->getQueryString();
 
+        $res = false;
+        
         // Only execute if a query is set.
         if (!empty($queryString))
         {
@@ -374,18 +400,41 @@ abstract class QueryBuilder
 
             $PdoStatement = $PdoConnection->prepare($queryString);
             $PdoStatement->execute($this->getBoundParameters());
-
-            if (is_null($fetch_style))
+            
+             
+            if (!is_null($fetchStyle))
             {
-                return $PdoStatement;
+                switch ($this->queryType)
+                {
+                    case self::TYPE_INSERT;
+                        if ($fetchStyle == self::FETCH_LAST_INSERT_ID)
+                        {
+                            $res = $PdoConnection->lastInsertId();
+                        }
+                        else
+                        {
+                            $res = $PdoStatement->rowCount();
+                        }
+                        break;
+                        
+                    case self::TYPE_SELECT;
+                        $res = $PdoStatement->fetchAll($fetchStyle);
+                        break;
+
+                    case self::TYPE_UPDATE;
+                    case self::TYPE_DELETE;
+                    default :
+                        $res = $PdoStatement->rowCount();
+                        break;
+                }
             }
             else
             {
-                return $PdoStatement->fetchAll($fetch_style);
+                $res = $PdoStatement;
             }
         }
 
-        return false;
+        return $res;
     }
 
     // Fluid Conditions

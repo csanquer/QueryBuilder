@@ -38,6 +38,8 @@ class SelectQueryBuilder extends WhereQueryBuilder
     {
         parent::__construct($PdoConnection);
         
+        $this->queryType = self::TYPE_SELECT;
+        
         $this->sqlParts['select'] = array();
         $this->sqlParts['from'] = array('table' => null, 'alias' => null);
         $this->sqlParts['join'] = array();
@@ -1112,15 +1114,6 @@ class SelectQueryBuilder extends WhereQueryBuilder
                 .$this->getOrderByString($formatted)
                 .$this->getLimitString($formatted);
     }
-
-    /**
-     * Returns all bound parameters
-     *
-     * @param bool $quoted default = false, if true the bound parameters are escaped
-     * @param string|null $section default = null, which bound parameters section to retrieve
-     * 
-     * @return array
-     */
 
     /**
      * Executes the query, but only returns the row count
