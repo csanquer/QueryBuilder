@@ -402,13 +402,10 @@ abstract class QueryBuilder
                 switch ($this->queryType)
                 {
                     case self::TYPE_INSERT;
-                        if ($fetchStyle == self::FETCH_LAST_INSERT_ID)
+                        $res = $PdoStatement->rowCount();
+                        if ($fetchStyle == self::FETCH_LAST_INSERT_ID && $res)
                         {
                             $res = $PdoConnection->lastInsertId();
-                        }
-                        else
-                        {
-                            $res = $PdoStatement->rowCount();
                         }
                         break;
                         

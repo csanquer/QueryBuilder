@@ -237,7 +237,6 @@ class QueryBuilderTest extends PDOTestCase
         ));
         $this->setQueryType(QueryBuilder::TYPE_INSERT);
         
-        $this->assertInstanceOf('\PDOStatement', $this->queryBuilder->query(null));
         $this->assertEquals(4, $this->queryBuilder->query(QueryBuilder::FETCH_LAST_INSERT_ID));
     }
     
