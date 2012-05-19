@@ -692,9 +692,9 @@ class SelectQueryBuilderTest extends PDOTestCase
             ),
             array(
                 array(
-                    'id' => null,
+                    'id',
                     'year',
-                    'CONCAT(firstname, lastname)' => 'name',
+                    'name' => 'CONCAT(firstname, lastname)',
                 ),
                 null,
                 array(

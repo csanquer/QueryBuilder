@@ -75,7 +75,7 @@ class SelectQueryBuilder extends WhereQueryBuilder
     /**
      * Adds a SELECT column, table, or expression with optional alias.
      *
-     * @param  string $column column name, table name, or expression, or array of column (index = column and value = alias)
+     * @param  string $column column name, table name, or expression, or array of column (index = alias and value = column)
      * @param  string $alias optional alias
      * 
      * @return SQL\SelectQueryBuilder
@@ -86,21 +86,14 @@ class SelectQueryBuilder extends WhereQueryBuilder
         {
             if (is_array($column))
             {
-                foreach ($column as $column => $alias)
+                foreach ($column as $alias => $column)
                 {
-                    if (is_int($column))
-                    {
-                        $this->sqlParts['select'][$alias] = null;
-                    }
-                    else
-                    {
-                        $this->sqlParts['select'][$column] = $alias;
-                    }
+                    $this->sqlParts['select'][$column] = is_string($alias) ? $alias : null;
                 }
             }
             else
             {
-                $this->sqlParts['select'][$column] = $alias;
+                $this->sqlParts['select'][$column] = is_string($alias) ? $alias : null;
             }
         }
         return $this;
