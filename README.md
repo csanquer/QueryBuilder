@@ -10,9 +10,9 @@ And some classes from Propel ORM project (https://github.com/propelorm/Propel) .
 Licensing
 ---------
 
-Copyright (C) 2009-2010 Justin Stayton <justin.stayton@gmail.com>
-Copyright (C) 2011 Matt Labrum
-Copyright (C) 2011-2012 Charles SANQUER <charles.sanquer@spyrit.net>
+* Copyright (C) 2009-2010 Justin Stayton <justin.stayton@gmail.com>
+* Copyright (C) 2011 Matt Labrum
+* Copyright (C) 2011-2012 Charles SANQUER <charles.sanquer@spyrit.net>
 
 This file is part of SQLQueryBuilder.
 
