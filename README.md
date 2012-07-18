@@ -1,7 +1,7 @@
 SQLQueryBuilder
 ===============
-Classes used to build programmatically standard SQL Queries (with some MySQL 
-specific functions). These classes must be used with PDO and parameters are always 
+Classes used to build programmatically standard SQL Queries (with some MySQL
+specific functions). These classes must be used with PDO and parameters are always
 bound .
 
 Based on original work by Justin Stayton (https://github.com/jstayton/QueryBuilder)

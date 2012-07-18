@@ -12,12 +12,12 @@ class QueryBuilderLoad
         'UpdateQueryBuilder'    => 'SQL/UpdateQueryBuilder.php',
         'SelectQueryBuilder'    => 'SQL/SelectQueryBuilder.php',
     );
-    
+
     public static function autoload($className)
     {
-        if (isset(self::$classMap[$className])) 
-        {
+        if (isset(self::$classMap[$className])) {
             require_once dirname(__FILE__).'/'.self::$classMap[$className];
+
             return true;
         }
 
@@ -26,4 +26,3 @@ class QueryBuilderLoad
 }
 
 spl_autoload_register(array('QueryBuilderLoad', 'autoload'));
-

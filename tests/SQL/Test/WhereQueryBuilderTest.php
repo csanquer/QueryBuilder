@@ -7,12 +7,12 @@ class WhereQueryBuilderTest extends PDOTestCase
      * @var WhereQueryBuilder
      */
     protected $queryBuilder;
-    
+
     protected function setUp()
     {
         $this->queryBuilder = $this->getMockForAbstractClass('WhereQueryBuilder', array(self::$pdo));
     }
-    
+
     /**
      *
      * @dataProvider whereProvider
@@ -201,18 +201,18 @@ class WhereQueryBuilderTest extends PDOTestCase
         $this->assertInstanceOf('WhereQueryBuilder', $this->queryBuilder->_or());
         $this->assertEquals($expected, $this->queryBuilder->getWhereParts());
     }
-    
+
     public function testAnd()
     {
         $expected = array(Array(
             'bracket' => WhereQueryBuilder::BRACKET_OPEN,
             'connector' => WhereQueryBuilder::LOGICAL_AND,
         ));
-        
+
         $this->assertInstanceOf('WhereQueryBuilder', $this->queryBuilder->_and());
         $this->assertEquals($expected, $this->queryBuilder->getWhereParts());
     }
-    
+
     public function testClose()
     {
         $this->assertInstanceOf('WhereQueryBuilder', $this->queryBuilder->_close());
@@ -231,28 +231,18 @@ class WhereQueryBuilderTest extends PDOTestCase
      */
     public function testGetWhereString($wheres, $expected, $expectedFormatted, $expectedBoundParameters)
     {
-        foreach ($wheres as $where)
-        {
+        foreach ($wheres as $where) {
             $nbWhere = count($where);
-            if ($nbWhere == 4)
-            {
+            if ($nbWhere == 4) {
                 $this->queryBuilder->where($where[0], $where[1], $where[2], $where[3]);
-            }
-            elseif ($nbWhere >= 1 && $nbWhere <= 2)
-            {
-                if ($where[0] == '(')
-                {
-                    if (isset($where[1]))
-                    {
+            } elseif ($nbWhere >= 1 && $nbWhere <= 2) {
+                if ($where[0] == '(') {
+                    if (isset($where[1])) {
                         $this->queryBuilder->_open($where[1]);
-                    }
-                    else
-                    {
+                    } else {
                         $this->queryBuilder->_open();
                     }
-                }
-                elseif ($where[0] == ')')
-                {
+                } elseif ($where[0] == ')') {
                     $this->queryBuilder->_close();
                 }
             }
@@ -476,7 +466,7 @@ class WhereQueryBuilderTest extends PDOTestCase
             ),
         );
     }
-    
+
     public function testMergeWhere()
     {
         $this->queryBuilder->where('id', 5 , SelectQueryBuilder::LESS_THAN);

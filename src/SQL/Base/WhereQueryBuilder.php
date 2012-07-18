@@ -2,9 +2,9 @@
 
 /**
  * Abstract Base class for Queries with Where Clauses
- * 
+ *
  * Based on original code Querybuilder from https://github.com/jstayton/QueryBuilder
- * 
+ *
  * @author   Charles SANQUER <charles.sanquer@spyrit.net>
  */
 abstract class WhereQueryBuilder extends QueryBuilder
@@ -49,28 +49,28 @@ abstract class WhereQueryBuilder extends QueryBuilder
     const SUB_QUERY_NOT_IN = 'subquery_not_in';
     const SUB_QUERY_EXISTS = 'subquery_exists';
     const SUB_QUERY_NOT_EXISTS = 'subquery_not_exists';
-    
+
     /**
      * Constructor.
      *
-     * @param  PDO $PdoConnection optional PDO database connection
-     * 
+     * @param PDO $PdoConnection optional PDO database connection
+     *
      * @return WhereQueryBuilder
      */
     public function __construct(PDO $PdoConnection = null)
     {
         parent::__construct($PdoConnection);
-        
+
         $this->sqlParts['where'] = array();
         $this->boundParams['where'] = array();
     }
-    
+
     /**
      * Adds an open bracket for nesting conditions to the specified WHERE or
      * HAVING criteria.
      *
-     * @param  array $criteria WHERE or HAVING criteria
-     * @param  string $connector optional logical connector, default AND
+     * @param  array             $criteria  WHERE or HAVING criteria
+     * @param  string            $connector optional logical connector, default AND
      * @return WhereQueryBuilder
      */
     protected function openCriteria(array &$criteria, $connector = self::LOGICAL_AND)
@@ -87,7 +87,7 @@ abstract class WhereQueryBuilder extends QueryBuilder
      * Adds a closing bracket for nesting conditions to the specified WHERE or
      * HAVING criteria.
      *
-     * @param  array $criteria WHERE or HAVING criteria
+     * @param  array             $criteria WHERE or HAVING criteria
      * @return WhereQueryBuilder
      */
     protected function closeCriteria(array &$criteria)
@@ -103,11 +103,11 @@ abstract class WhereQueryBuilder extends QueryBuilder
     /**
      * Adds a condition to the specified WHERE or HAVING criteria.
      *
-     * @param  array $criteria WHERE or HAVING criteria
-     * @param  string $column column name
-     * @param  mixed $value value
-     * @param  string $operator optional comparison operator, default =
-     * @param  string $connector optional logical connector, default AND
+     * @param  array             $criteria  WHERE or HAVING criteria
+     * @param  string            $column    column name
+     * @param  mixed             $value     value
+     * @param  string            $operator  optional comparison operator, default =
+     * @param  string            $connector optional logical connector, default AND
      * @return WhereQueryBuilder
      */
     protected function criteria(array &$criteria, $column, $value, $operator = self::EQUALS, $connector = self::LOGICAL_AND)
@@ -140,21 +140,18 @@ abstract class WhereQueryBuilder extends QueryBuilder
         {
             $operator = self::EQUALS;
         }
-        
-        if (!in_array($connector, array(self::LOGICAL_AND, self::LOGICAL_OR)))
-        {
+
+        if (!in_array($connector, array(self::LOGICAL_AND, self::LOGICAL_OR))) {
             $connector = self::LOGICAL_AND;
         }
-        
-        switch ($operator)
-        {
+
+        switch ($operator) {
             case self::BETWEEN:
             case self::NOT_BETWEEN:
-                if (!is_array($value) || count($value) != 2)
-                {
+                if (!is_array($value) || count($value) != 2) {
                     throw new \InvalidArgumentException('the operator BETWEEN need a array value with 2 elements : minimum and maximum');
                 }
-                
+
                 sort($value);
                 break;
 
@@ -162,7 +159,7 @@ abstract class WhereQueryBuilder extends QueryBuilder
             case self::NOT_IN:
                 $value = is_array($value) ? $value : array($value);
                 break;
-            
+
             case self::IS_NULL:
             case self::IS_NOT_NULL:
                 $value = null;
@@ -184,10 +181,10 @@ abstract class WhereQueryBuilder extends QueryBuilder
     /**
      * Returns the WHERE or HAVING portion of the query as a string.
      *
-     * @param  array $criteria WHERE or HAVING criteria
-     * @param  array $boundParams bound parameters section 
-     * @param  bool $formatted format SQL string on multiple lines, default false
-     * 
+     * @param array $criteria    WHERE or HAVING criteria
+     * @param array $boundParams bound parameters section
+     * @param bool  $formatted   format SQL string on multiple lines, default false
+     *
      * @return string
      */
     protected function getCriteriaString(array &$criteria, array &$boundParams, $formatted = false)
@@ -197,73 +194,56 @@ abstract class WhereQueryBuilder extends QueryBuilder
         $useConnector = false;
 
         $indent = 0;
-        
-        foreach ($criteria as $i => $currentCriterion)
-        {
+
+        foreach ($criteria as $i => $currentCriterion) {
             $criterionString = '';
-            
-            if (array_key_exists('bracket', $currentCriterion))
-            {
+
+            if (array_key_exists('bracket', $currentCriterion)) {
                 // If an open bracket, include the logical connector.
-                if (strcmp($currentCriterion['bracket'], self::BRACKET_OPEN) == 0)
-                {
-                    if ($useConnector)
-                    {
-                        if ($formatted)
-                        {
+                if (strcmp($currentCriterion['bracket'], self::BRACKET_OPEN) == 0) {
+                    if ($useConnector) {
+                        if ($formatted) {
                             $criterionString .= $this->indent($indent);
                         }
-                        
+
                         $criterionString .= $currentCriterion['connector'].' ';
-                        if ($formatted)
-                        {
+                        if ($formatted) {
                             $criterionString .= "\n";
                         }
                     }
                     $useConnector = false;
-                }
-                else
-                {
+                } else {
                     $useConnector = true;
                 }
 
-                if ($formatted && $indent > 0)
-                {
-                    if (strcmp($currentCriterion['bracket'], self::BRACKET_CLOSE) == 0)
-                    {
+                if ($formatted && $indent > 0) {
+                    if (strcmp($currentCriterion['bracket'], self::BRACKET_CLOSE) == 0) {
                         $indent--;
                     }
                     $criterionString .= $this->indent($indent);
                 }
-                
+
                 $criterionString .= $currentCriterion['bracket'].' ';
-                
-                if ($formatted)
-                {
-                    if (strcmp($currentCriterion['bracket'], self::BRACKET_OPEN) == 0)
-                    {
+
+                if ($formatted) {
+                    if (strcmp($currentCriterion['bracket'], self::BRACKET_OPEN) == 0) {
                         $indent++;
                     }
                     $criterionString .= "\n";
                 }
                 $string .= $criterionString;
-            }
-            else
-            {
-                if ($formatted)
-                {
+            } else {
+                if ($formatted) {
                     $criterionString .= $this->indent($indent);
                 }
-                
-                if ($useConnector)
-                {
+
+                if ($useConnector) {
                     $criterionString .= $currentCriterion['connector'].' ';
                 }
 
                 $useConnector = true;
 
-                switch ($currentCriterion['operator'])
-                {
+                switch ($currentCriterion['operator']) {
                     case self::BETWEEN:
                     case self::NOT_BETWEEN:
                         $value = '? '.self::LOGICAL_AND.' ?';
@@ -273,12 +253,11 @@ abstract class WhereQueryBuilder extends QueryBuilder
 
                     case self::IN:
                     case self::NOT_IN:
-                        
-                        foreach ($currentCriterion['value'] as $val)
-                        {
+
+                        foreach ($currentCriterion['value'] as $val) {
                             $boundParams[] = $val;
                         }
-                        
+
                         $value = self::BRACKET_OPEN
                             .substr(str_repeat('?, ', count($currentCriterion['value'])), 0, -2)
                             .self::BRACKET_CLOSE;
@@ -288,22 +267,17 @@ abstract class WhereQueryBuilder extends QueryBuilder
                     case self::IS_NOT_NULL:
                         $value = '';
                         break;
-                    
+
                     case self::RAW_CRITERIA:
                         $currentCriterion['column'] = trim($currentCriterion['column']);
                         $currentCriterion['operator'] = '';
                         $value = '';
-                        if (!is_null($currentCriterion['value']))
-                        {
-                            if (is_array($currentCriterion['value']))
-                            {
-                                foreach ($currentCriterion['value'] as $val)
-                                {
+                        if (!is_null($currentCriterion['value'])) {
+                            if (is_array($currentCriterion['value'])) {
+                                foreach ($currentCriterion['value'] as $val) {
                                     $boundParams[] = $val;
                                 }
-                            }
-                            else
-                            {
+                            } else {
                                 $boundParams[] = $currentCriterion['value'];
                             }
                         }
@@ -313,45 +287,39 @@ abstract class WhereQueryBuilder extends QueryBuilder
                     case self::SUB_QUERY_NOT_IN:
                     case self::SUB_QUERY_EXISTS:
                     case self::SUB_QUERY_NOT_EXISTS:
-                        switch ($currentCriterion['operator'])
-                        {
+                        switch ($currentCriterion['operator']) {
                             case self::SUB_QUERY_IN:
                                 $currentCriterion['operator'] = self::IN;
                                 break;
-                            
+
                             case self::SUB_QUERY_NOT_IN:
                                 $currentCriterion['operator'] = self::NOT_IN;
                                 break;
-                            
+
                             case self::SUB_QUERY_EXISTS:
                                 $currentCriterion['column'] = '';
                                 $currentCriterion['operator'] = self::EXISTS;
                                 break;
-                            
+
                             case self::SUB_QUERY_NOT_EXISTS:
                                 $currentCriterion['column'] = '';
                                 $currentCriterion['operator'] = self::NOT_EXISTS;
                                 break;
                         }
                         $value = '';
-                        
-                        if ($currentCriterion['value'] instanceof self)
-                        {
+
+                        if ($currentCriterion['value'] instanceof self) {
                             $value = $currentCriterion['value']->getQueryString();
                             $boundParams = array_merge($boundParams, $currentCriterion['value']->getBoundParameters(false, null));
-                        }
-                        else
-                        {
+                        } else {
                             // Raw sql
                             $value = trim($currentCriterion['value']).' ';
                         }
-                        
+
                         // Wrap the subquery
                         $tempValue = '';
-                        if (!empty($value))
-                        {
-                            if ($formatted)
-                            {
+                        if (!empty($value)) {
+                            if ($formatted) {
                                 $tempValue = "\n";
                                 $tempValue .= $this->indent($indent);
 
@@ -359,17 +327,14 @@ abstract class WhereQueryBuilder extends QueryBuilder
 
                                 $indent++;
                                 $tempValue .= $this->indent($indent);
-                            }
-                            else
-                            {
+                            } else {
                                 $tempValue = self::BRACKET_OPEN.' ';
                             }
                         }
-                        
+
                         $tempValue .= $value;
-                        
-                        if ($formatted && !empty($tempValue))
-                        {
+
+                        if ($formatted && !empty($tempValue)) {
                             $tempValue .= "\n";
                             $indent--;
                             $tempValue .= $this->indent($indent);
@@ -389,9 +354,8 @@ abstract class WhereQueryBuilder extends QueryBuilder
                     .$currentCriterion['operator']
                     .(!is_null($currentCriterion['operator']) && $currentCriterion['operator'] != '' ? ' ' : '')
                     .$value.(!is_null($value) && $value != '' ? ' ' : '');
-                
-                if ($formatted && !empty($criterionString))
-                {
+
+                if ($formatted && !empty($criterionString)) {
                     $criterionString .= "\n";
                 }
                 $string .= $criterionString;
@@ -404,7 +368,7 @@ abstract class WhereQueryBuilder extends QueryBuilder
     /**
      * Adds an open bracket for nesting WHERE conditions.
      *
-     * @param  string $connector optional logical connector, default AND
+     * @param  string            $connector optional logical connector, default AND
      * @return WhereQueryBuilder
      */
     public function _open($connector = self::LOGICAL_AND)
@@ -414,45 +378,45 @@ abstract class WhereQueryBuilder extends QueryBuilder
 
     /**
      * Adds an open bracket for nesting WHERE conditions with OR operator.
-     * 
+     *
      * shortcut for WhereQueryBuilder::_open(WhereQueryBuilder::LOGICAL_OR)
-     * 
-     * @return WhereQueryBuilder 
+     *
+     * @return WhereQueryBuilder
      */
     public function _or()
     {
         return $this->_open(self::LOGICAL_OR);
     }
-    
+
     /**
      * Adds an open bracket for nesting WHERE conditions with AND operator.
-     * 
+     *
      * shortcut for WhereQueryBuilder::_open(WhereQueryBuilder::LOGICAL_AND)
-     * 
-     * @return WhereQueryBuilder 
+     *
+     * @return WhereQueryBuilder
      */
     public function _and()
     {
         return $this->_open(self::LOGICAL_AND);
     }
-    
+
     /**
      * Adds a closing bracket for nesting WHERE conditions.
-     * 
+     *
      * @return WhereQueryBuilder
      */
     public function _close()
     {
         return $this->closeCriteria($this->sqlParts['where']);
     }
-    
+
     /**
      * Adds a WHERE condition.
      *
-     * @param  string $column column name
-     * @param  mixed $value value
-     * @param  string $operator optional comparison operator, default =
-     * @param  string $connector optional logical connector, default AND
+     * @param  string            $column    column name
+     * @param  mixed             $value     value
+     * @param  string            $operator  optional comparison operator, default =
+     * @param  string            $connector optional logical connector, default AND
      * @return WhereQueryBuilder
      */
     public function where($column, $value, $operator = self::EQUALS, $connector = self::LOGICAL_AND)
@@ -463,9 +427,9 @@ abstract class WhereQueryBuilder extends QueryBuilder
     /**
      * Adds an AND WHERE condition.
      *
-     * @param  string $column colum name
-     * @param  mixed $value value
-     * @param  string $operator optional comparison operator, default =
+     * @param  string            $column   colum name
+     * @param  mixed             $value    value
+     * @param  string            $operator optional comparison operator, default =
      * @return WhereQueryBuilder
      */
     public function andWhere($column, $value, $operator = self::EQUALS)
@@ -476,9 +440,9 @@ abstract class WhereQueryBuilder extends QueryBuilder
     /**
      * Adds an OR WHERE condition.
      *
-     * @param  string $column colum name
-     * @param  mixed $value value
-     * @param  string $operator optional comparison operator, default =
+     * @param  string            $column   colum name
+     * @param  mixed             $value    value
+     * @param  string            $operator optional comparison operator, default =
      * @return WhereQueryBuilder
      */
     public function orWhere($column, $value, $operator = self::EQUALS)
@@ -488,58 +452,50 @@ abstract class WhereQueryBuilder extends QueryBuilder
 
     /**
      * get Where SQL parts
-     * 
-     * @return array 
+     *
+     * @return array
      */
     public function getWhereParts()
     {
         return $this->getSQLPart('where');
     }
-   
+
     /**
      * Returns the WHERE portion of the query as a string.
      *
-     * @param  bool $formatted format SQL string on multiple lines, default false
-     * 
+     * @param bool $formatted format SQL string on multiple lines, default false
+     *
      * @return string
      */
     public function getWhereString($formatted = false)
     {
         $where = $this->getCriteriaString($this->sqlParts['where'], $this->boundParams['where'], $formatted);
 
-        if (!empty($where))
-        {
+        if (!empty($where)) {
             $where = 'WHERE '.$where;
         }
 
         return $where;
     }
-    
+
     /**
      * Merges the given QueryBuilder's WHEREs into this QueryBuilder.
      *
-     * @param  WhereQueryBuilder $QueryBuilder to merge 
-     * 
+     * @param WhereQueryBuilder $QueryBuilder to merge
+     *
      * @return WhereQueryBuilder the current QueryBuilder
      */
     public function mergeWhere(WhereQueryBuilder $QueryBuilder)
     {
-        foreach ($QueryBuilder->getWhereParts() as $currentWhere)
-        {
+        foreach ($QueryBuilder->getWhereParts() as $currentWhere) {
             // Handle open/close brackets differently than other criteria.
-            if (array_key_exists('bracket', $currentWhere))
-            {
-                if (strcmp($currentWhere['bracket'], self::BRACKET_OPEN) == 0)
-                {
+            if (array_key_exists('bracket', $currentWhere)) {
+                if (strcmp($currentWhere['bracket'], self::BRACKET_OPEN) == 0) {
                     $this->_open($currentWhere['connector']);
-                }
-                else
-                {
+                } else {
                     $this->_close();
                 }
-            }
-            else
-            {
+            } else {
                 $this->where($currentWhere['column'], $currentWhere['value'], $currentWhere['operator'], $currentWhere['connector']);
             }
         }

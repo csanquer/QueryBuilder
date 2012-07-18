@@ -35,16 +35,15 @@ class DeleteQueryBuilderTest extends PDOTestCase
             array('author'),
         );
     }
-    
+
     /**
      * @dataProvider GetFromStringProvider
      */
     public function testGetFromString($table, $options, $expected, $expectedFormatted)
     {
         $this->queryBuilder->from($table);
-        
-        foreach ($options as $option)
-        {
+
+        foreach ($options as $option) {
             $this->queryBuilder->addOption($option);
         }
 
@@ -69,7 +68,7 @@ class DeleteQueryBuilderTest extends PDOTestCase
             ),
         );
     }
-    
+
     public function testWhere()
     {
         $this->assertInstanceOf('DeleteQueryBuilder', $this->queryBuilder->Where('id', 1, DeleteQueryBuilder::EQUALS, SelectQueryBuilder::LOGICAL_AND));
@@ -84,7 +83,7 @@ class DeleteQueryBuilderTest extends PDOTestCase
     {
         $this->assertInstanceOf('DeleteQueryBuilder', $this->queryBuilder->orWhere('id', 1, DeleteQueryBuilder::EQUALS));
     }
-    
+
     public function testOr()
     {
         $expected = array(Array(
@@ -95,18 +94,18 @@ class DeleteQueryBuilderTest extends PDOTestCase
         $this->assertInstanceOf('DeleteQueryBuilder', $this->queryBuilder->_or());
         $this->assertEquals($expected, $this->queryBuilder->getWhereParts());
     }
-    
+
     public function testAnd()
     {
         $expected = array(Array(
             'bracket' => DeleteQueryBuilder::BRACKET_OPEN,
             'connector' => DeleteQueryBuilder::LOGICAL_AND,
         ));
-        
+
         $this->assertInstanceOf('DeleteQueryBuilder', $this->queryBuilder->_and());
         $this->assertEquals($expected, $this->queryBuilder->getWhereParts());
     }
-    
+
     public function testMergeWhere()
     {
         $this->queryBuilder->where('id', 5 , DeleteQueryBuilder::LESS_THAN);
@@ -144,40 +143,28 @@ class DeleteQueryBuilderTest extends PDOTestCase
 
         $this->assertEquals($expected, $this->queryBuilder->getWhereParts());
     }
-    
-        
+
     /**
      * @dataProvider getQueryStringProvider
      */
     public function testGetQueryString($from, $wheres, $expectedQuery, $expectedFormattedQuery, $expectedBoundParameters, $expectedQuotedBoundParameters, $expectedDebuggedQuery)
     {
-        if (!empty($from))
-        {
+        if (!empty($from)) {
             $this->queryBuilder->from($from);
         }
 
-        foreach ($wheres as $where)
-        {
+        foreach ($wheres as $where) {
             $nbWhere = count($where);
-            if ($nbWhere == 4)
-            {
+            if ($nbWhere == 4) {
                 $this->queryBuilder->where($where[0], $where[1], $where[2], $where[3]);
-            }
-            elseif ($nbWhere >= 1 && $nbWhere <= 2)
-            {
-                if ($where[0] == '(')
-                {
-                    if (isset($where[1]))
-                    {
+            } elseif ($nbWhere >= 1 && $nbWhere <= 2) {
+                if ($where[0] == '(') {
+                    if (isset($where[1])) {
                         $this->queryBuilder->_open($where[1]);
-                    }
-                    else
-                    {
+                    } else {
                         $this->queryBuilder->_open();
                     }
-                }
-                elseif ($where[0] == ')')
-                {
+                } elseif ($where[0] == ')') {
                     $this->queryBuilder->_close();
                 }
             }
