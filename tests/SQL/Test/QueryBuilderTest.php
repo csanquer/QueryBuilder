@@ -4,39 +4,13 @@ class QueryBuilderTest extends PDOTestCase
 {
     /**
      *
-     * @var QueryBuilder
+     * @var QueryBuilderMock
      */
     protected $queryBuilder;
 
     protected function setUp()
     {
-        $this->queryBuilder = $this->getMockForAbstractClass('QueryBuilder', array(self::$pdo));
-    }
-
-    /**
-     * set queryType public for unit tests and set its value
-     *
-     * @param array $value
-     */
-    private function setQueryType($value)
-    {
-        $reflection = new ReflectionClass($this->queryBuilder);
-        $type = $reflection->getProperty('queryType');
-        $type->setAccessible(true);
-        $type->setValue($this->queryBuilder, $value);
-    }
-
-    /**
-     * set boundsParameters public for unit tests and set its value
-     *
-     * @param array $value
-     */
-    private function setBoundParams($value)
-    {
-        $reflection = new ReflectionClass($this->queryBuilder);
-        $boundParams = $reflection->getProperty('boundParams');
-        $boundParams->setAccessible(true);
-        $boundParams->setValue($this->queryBuilder, $value);
+        $this->queryBuilder = new QueryBuilderMock(self::$pdo);
     }
 
     public function testSetPdoConnection()
@@ -150,11 +124,8 @@ class QueryBuilderTest extends PDOTestCase
 
     public function testQueryWithoutQueryStatement()
     {
-        $this->queryBuilder
-            ->expects($this->any())
-            ->method('getQueryString')
-            ->will($this->returnValue(null));
-
+        $this->queryBuilder->setTestQueryString(null);
+        
         $this->assertFalse($this->queryBuilder->query());
     }
 
@@ -162,16 +133,16 @@ class QueryBuilderTest extends PDOTestCase
     {
         $this->assertNull($this->queryBuilder->getQueryType());
 
-        $this->setQueryType(QueryBuilder::TYPE_SELECT);
+        $this->queryBuilder->setQueryType(QueryBuilder::TYPE_SELECT);
         $this->assertEquals(QueryBuilder::TYPE_SELECT, $this->queryBuilder->getQueryType());
 
-        $this->setQueryType(QueryBuilder::TYPE_UPDATE);
+        $this->queryBuilder->setQueryType(QueryBuilder::TYPE_UPDATE);
         $this->assertEquals(QueryBuilder::TYPE_UPDATE, $this->queryBuilder->getQueryType());
 
-        $this->setQueryType(QueryBuilder::TYPE_DELETE);
+        $this->queryBuilder->setQueryType(QueryBuilder::TYPE_DELETE);
         $this->assertEquals(QueryBuilder::TYPE_DELETE, $this->queryBuilder->getQueryType());
 
-        $this->setQueryType(QueryBuilder::TYPE_INSERT);
+        $this->queryBuilder->setQueryType(QueryBuilder::TYPE_INSERT);
         $this->assertEquals(QueryBuilder::TYPE_INSERT, $this->queryBuilder->getQueryType());
     }
 
@@ -180,13 +151,10 @@ class QueryBuilderTest extends PDOTestCase
         $this->clearFixtures();
         $this->loadFixtures();
 
-        $this->queryBuilder
-            ->expects($this->any())
-            ->method('getQueryString')
-            ->will($this->returnValue('SELECT * FROM book WHERE author_id = ? '));
+        $this->queryBuilder->setTestQueryString('SELECT * FROM book WHERE author_id = ? ');
 
-        $this->setBoundParams(array('where' => array(2)));
-        $this->setQueryType(QueryBuilder::TYPE_SELECT);
+        $this->queryBuilder->setBoundParams(array('where' => array(2)));
+        $this->queryBuilder->setQueryType(QueryBuilder::TYPE_SELECT);
 
         $this->assertInstanceOf('PDOStatement', $this->queryBuilder->query(null));
 
@@ -226,15 +194,12 @@ class QueryBuilderTest extends PDOTestCase
         $this->clearFixtures();
         $this->loadFixtures();
 
-        $this->queryBuilder
-            ->expects($this->any())
-            ->method('getQueryString')
-            ->will($this->returnValue("INSERT INTO author (id, first_name, last_name) VALUES (? , ?, ?);"));
+        $this->queryBuilder->setTestQueryString("INSERT INTO author (id, first_name, last_name) VALUES (? , ?, ?);");
 
-        $this->setBoundParams(array(
+        $this->queryBuilder->setBoundParams(array(
             'values' => array(4 ,'Stephen', 'King'),
         ));
-        $this->setQueryType(QueryBuilder::TYPE_INSERT);
+        $this->queryBuilder->setQueryType(QueryBuilder::TYPE_INSERT);
 
         $this->assertEquals(4, $this->queryBuilder->query(QueryBuilder::FETCH_LAST_INSERT_ID));
     }
@@ -244,15 +209,12 @@ class QueryBuilderTest extends PDOTestCase
         $this->clearFixtures();
         $this->loadFixtures();
 
-        $this->queryBuilder
-            ->expects($this->any())
-            ->method('getQueryString')
-            ->will($this->returnValue("INSERT INTO author (id, first_name, last_name) VALUES (? , ?, ?);"));
+        $this->queryBuilder->setTestQueryString("INSERT INTO author (id, first_name, last_name) VALUES (? , ?, ?);");
 
-        $this->setBoundParams(array(
+        $this->queryBuilder->setBoundParams(array(
             'values' => array(4 ,'Stephen', 'King'),
         ));
-        $this->setQueryType(QueryBuilder::TYPE_INSERT);
+        $this->queryBuilder->setQueryType(QueryBuilder::TYPE_INSERT);
         $this->assertEquals(1, $this->queryBuilder->query());
     }
 
@@ -261,12 +223,9 @@ class QueryBuilderTest extends PDOTestCase
         $this->clearFixtures();
         $this->loadFixtures();
 
-        $this->queryBuilder
-            ->expects($this->any())
-            ->method('getQueryString')
-            ->will($this->returnValue("UPDATE book SET price = 10 WHERE id = 1"));
+        $this->queryBuilder->setTestQueryString("UPDATE book SET price = 10 WHERE id = 1");
 
-        $this->setQueryType(QueryBuilder::TYPE_UPDATE);
+        $this->queryBuilder->setQueryType(QueryBuilder::TYPE_UPDATE);
         $this->assertEquals(1, $this->queryBuilder->query());
     }
 
@@ -275,12 +234,9 @@ class QueryBuilderTest extends PDOTestCase
         $this->clearFixtures();
         $this->loadFixtures();
 
-        $this->queryBuilder
-            ->expects($this->any())
-            ->method('getQueryString')
-            ->will($this->returnValue("DELETE FROM book WHERE id = 1"));
+        $this->queryBuilder->setTestQueryString("DELETE FROM book WHERE id = 1");
 
-        $this->setQueryType(QueryBuilder::TYPE_DELETE);
+        $this->queryBuilder->setQueryType(QueryBuilder::TYPE_DELETE);
         $this->assertEquals(1, $this->queryBuilder->query());
     }
 
@@ -335,5 +291,34 @@ class QueryBuilderTest extends PDOTestCase
     public function testEndIfAlone()
     {
         $this->queryBuilder->_endif(true);
+    }
+}
+
+class QueryBuilderMock extends QueryBuilder 
+{
+    private $testQueryString;
+    
+    public function setBoundParams($params)
+    {
+        $this->boundParams = $params;
+    }
+    
+    public function setQueryType($type)
+    {
+        $this->queryType = $type;
+    }
+    
+    public function setTestQueryString($query)
+    {
+        $this->testQueryString = $query;
+    }
+    
+    /**
+     * Test implementation of Abstract method in QueryBuilder
+     *
+     */
+    public function getQueryString($formatted = false)
+    {
+        return $this->testQueryString;
     }
 }

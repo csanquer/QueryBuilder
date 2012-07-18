@@ -3,7 +3,7 @@
 /**
  * PDO fixtures Test Case class
  */
-class PDOTestCase extends \PHPUnit_Framework_TestCase
+class PDOTestCase extends PHPUnit_Framework_TestCase
 {
     /**
      *
