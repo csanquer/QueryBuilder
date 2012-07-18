@@ -1,5 +1,8 @@
 SQLQueryBuilder
 ===============
+
+[![Build Status](https://secure.travis-ci.org/csanquer/QueryBuilder.png?branch=php5.2)](http://travis-ci.org/csanquer/QueryBuilder)
+
 Classes used to build programmatically standard SQL Queries (with some MySQL
 specific functions). These classes must be used with PDO and parameters are always
 bound .
