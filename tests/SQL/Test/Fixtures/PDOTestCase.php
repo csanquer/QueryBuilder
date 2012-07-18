@@ -8,19 +8,16 @@ class PDOTestCase extends \PHPUnit_Framework_TestCase
 {
     /**
      *
-     * @var \PDO 
+     * @var \PDO
      */
     protected static $pdo;
-    
+
     public static function setUpBeforeClass()
     {
-        try
-        {
+        try {
             self::$pdo = new \PDO('sqlite::memory:');
             self::loadSchema();
-        }
-        catch (\PDOException $e)
-        {
+        } catch (\PDOException $e) {
             echo $e->getMessage();
         }
     }
@@ -29,36 +26,32 @@ class PDOTestCase extends \PHPUnit_Framework_TestCase
     {
         self::$pdo = null;
     }
-    
+
     protected static function loadSchema()
     {
         $sql = <<<SQL
 CREATE TABLE author
 (
-	id INTEGER NOT NULL PRIMARY KEY,
-	first_name VARCHAR(128) NOT NULL,
-	last_name VARCHAR(128) NOT NULL
+    id INTEGER NOT NULL PRIMARY KEY,
+    first_name VARCHAR(128) NOT NULL,
+    last_name VARCHAR(128) NOT NULL
 );
 
-CREATE TABLE book 
+CREATE TABLE book
 (
-	id INTEGER NOT NULL PRIMARY KEY,
-	title VARCHAR(255) NOT NULL,
-	author_id INTEGER NOT NULL,
-	published_at DATETIME,
-	price DECIMAL,
-	score DECIMAL
+    id INTEGER NOT NULL PRIMARY KEY,
+    title VARCHAR(255) NOT NULL,
+    author_id INTEGER NOT NULL,
+    published_at DATETIME,
+    price DECIMAL,
+    score DECIMAL
 );
 SQL;
 
-        if (self::$pdo instanceof \PDO)
-        {
-            try
-            {
+        if (self::$pdo instanceof \PDO) {
+            try {
                 self::$pdo->exec($sql);
-            }
-            catch (\PDOException $e)
-            {
+            } catch (\PDOException $e) {
                 echo $e->getMessage();
             }
         }
@@ -70,19 +63,15 @@ SQL;
 DELETE FROM book;
 DELETE FROM author;
 TRU;
-        if (self::$pdo instanceof \PDO)
-        {
-            try
-            {
+        if (self::$pdo instanceof \PDO) {
+            try {
                 self::$pdo->exec($sql);
-            }
-            catch (\PDOException $e)
-            {
+            } catch (\PDOException $e) {
                 echo $e->getMessage();
             }
         }
     }
-    
+
     protected function loadFixtures()
     {
         $sql = <<<EOD
@@ -98,14 +87,10 @@ INSERT INTO book (id, title, author_id, published_at, price, score) VALUES (5,'T
 INSERT INTO book (id, title, author_id, published_at, price, score) VALUES (6,'The Lord of the Rings', 1, '1954-01-01 00:00:00', 12.6, 5);
 EOD;
 
-        if (self::$pdo instanceof \PDO)
-        {
-            try
-            {
+        if (self::$pdo instanceof \PDO) {
+            try {
                 self::$pdo->exec($sql);
-            }
-            catch (\PDOException $e)
-            {
+            } catch (\PDOException $e) {
                 echo $e->getMessage();
             }
         }

@@ -42,7 +42,7 @@ class SelectQueryBuilderTest extends PDOTestCase
         $q = new SelectQueryBuilder();
         $q->select(array('id', 'lastname'));
         $q->from('author', 'a');
-        
+
         return array(
             array('book', null),
             array('author', null),
@@ -57,8 +57,7 @@ class SelectQueryBuilderTest extends PDOTestCase
      */
     public function testJoin($joins, $expected)
     {
-        foreach ($joins as $join)
-        {
+        foreach ($joins as $join) {
             $this->assertInstanceOf('SQL\SelectQueryBuilder', $this->queryBuilder->join($join[0], $join[1], $join[2], $join[3]));
         }
 
@@ -207,8 +206,7 @@ class SelectQueryBuilderTest extends PDOTestCase
     {
         $this->queryBuilder->from($table, $alias);
 
-        foreach ($joins as $join)
-        {
+        foreach ($joins as $join) {
             $this->queryBuilder->join($join[0], $join[1], $join[2], $join[3]);
         }
 
@@ -221,7 +219,7 @@ class SelectQueryBuilderTest extends PDOTestCase
         $q = new SelectQueryBuilder();
         $q->select(array('id', 'lastname'));
         $q->from('author', 'a');
-        
+
         return array(
             array(
                 'book',
@@ -334,8 +332,7 @@ class SelectQueryBuilderTest extends PDOTestCase
      */
     public function testGetGroupByString($groupBys, $expected, $expectedFormatted)
     {
-        foreach ($groupBys as $groupBy)
-        {
+        foreach ($groupBys as $groupBy) {
             $this->queryBuilder->groupBy($groupBy[0], $groupBy[1]);
         }
 
@@ -436,8 +433,7 @@ class SelectQueryBuilderTest extends PDOTestCase
      */
     public function testGetOrderByString($orderBys, $expected, $expectedFormatted)
     {
-        foreach ($orderBys as $orderBy)
-        {
+        foreach ($orderBys as $orderBy) {
             $this->queryBuilder->orderBy($orderBy[0], $orderBy[1]);
         }
         $this->assertEquals($expected, $this->queryBuilder->getOrderByString());
@@ -515,7 +511,7 @@ class SelectQueryBuilderTest extends PDOTestCase
         $this->assertEquals($expected, $this->queryBuilder->getPage());
         $this->assertEquals(null, $this->queryBuilder->getOffset());
     }
-    
+
     public function pageProvider()
     {
         return array(
@@ -524,7 +520,7 @@ class SelectQueryBuilderTest extends PDOTestCase
             array(3, 3),
         );
     }
-    
+
     /**
      *
      * @dataProvider offsetProvider
@@ -554,7 +550,7 @@ class SelectQueryBuilderTest extends PDOTestCase
         $this->queryBuilder->limit($limit);
         $this->assertEquals($expected, $this->queryBuilder->getOffset());
     }
-    
+
     public function offsetWithPageAndLimitProvider()
     {
         return array(
@@ -564,7 +560,7 @@ class SelectQueryBuilderTest extends PDOTestCase
             array(5, 50, 200),
         );
     }
-    
+
     /**
      *
      * @dataProvider pageWithOffsetAndLimitProvider
@@ -575,7 +571,7 @@ class SelectQueryBuilderTest extends PDOTestCase
         $this->queryBuilder->limit($limit);
         $this->assertEquals($expected, $this->queryBuilder->getPage());
     }
-    
+
     public function pageWithOffsetAndLimitProvider()
     {
         return array(
@@ -584,7 +580,7 @@ class SelectQueryBuilderTest extends PDOTestCase
             array(100, 50, 3),
         );
     }
-    
+
     /**
      *
      * @dataProvider paginateProvider
@@ -595,7 +591,7 @@ class SelectQueryBuilderTest extends PDOTestCase
         $this->assertEquals($expectedOffset, $this->queryBuilder->getOffset());
         $this->assertEquals($expectedLimit, $this->queryBuilder->getLimit());
     }
-    
+
     public function paginateProvider()
     {
         return array(
@@ -605,18 +601,16 @@ class SelectQueryBuilderTest extends PDOTestCase
             array(3, 50, 100, 50),
         );
     }
-    
+
     /**
      *
      * @dataProvider getLimitStringProvider
      */
     public function testGetLimitString($limit, $expected, $expectedFormatted)
     {
-        if (!empty($limit))
-        {
+        if (!empty($limit)) {
             $this->queryBuilder->limit($limit[0]);
-            if (isset($limit[1]))
-            {
+            if (isset($limit[1])) {
                 $this->queryBuilder->offset($limit[1]);
             }
         }
@@ -712,13 +706,11 @@ class SelectQueryBuilderTest extends PDOTestCase
      */
     public function testGetSelectString($selects, $options, $expected, $expectedFormatted)
     {
-        foreach ($selects as $select)
-        {
+        foreach ($selects as $select) {
             $this->queryBuilder->select($select[0], $select[1]);
         }
 
-        foreach ($options as $option)
-        {
+        foreach ($options as $option) {
             $this->queryBuilder->addOption($option);
         }
 
@@ -957,28 +949,18 @@ class SelectQueryBuilderTest extends PDOTestCase
      */
     public function testGetHavingString($havings, $expected, $expectedFormatted, $expectedBoundParameters)
     {
-        foreach ($havings as $having)
-        {
+        foreach ($havings as $having) {
             $nbHaving = count($having);
-            if ($nbHaving == 4)
-            {
+            if ($nbHaving == 4) {
                 $this->queryBuilder->having($having[0], $having[1], $having[2], $having[3]);
-            }
-            elseif ($nbHaving >= 1 && $nbHaving <= 2)
-            {
-                if ($having[0] == '(')
-                {
-                    if (isset($having[1]))
-                    {
+            } elseif ($nbHaving >= 1 && $nbHaving <= 2) {
+                if ($having[0] == '(') {
+                    if (isset($having[1])) {
                         $this->queryBuilder->openHaving($having[1]);
-                    }
-                    else
-                    {
+                    } else {
                         $this->queryBuilder->openHaving();
                     }
-                }
-                elseif ($having[0] == ')')
-                {
+                } elseif ($having[0] == ')') {
                     $this->queryBuilder->closeHaving();
                 }
             }
@@ -1132,7 +1114,7 @@ class SelectQueryBuilderTest extends PDOTestCase
     {
         $this->assertInstanceOf('SQL\SelectQueryBuilder', $this->queryBuilder->orWhere('id', 1, SelectQueryBuilder::EQUALS));
     }
-    
+
     public function testOr()
     {
         $expected = array(Array(
@@ -1143,107 +1125,80 @@ class SelectQueryBuilderTest extends PDOTestCase
         $this->assertInstanceOf('SQL\SelectQueryBuilder', $this->queryBuilder->_or());
         $this->assertEquals($expected, $this->queryBuilder->getWhereParts());
     }
-    
+
     public function testAnd()
     {
         $expected = array(Array(
             'bracket' => SelectQueryBuilder::BRACKET_OPEN,
             'connector' => SelectQueryBuilder::LOGICAL_AND,
         ));
-        
+
         $this->assertInstanceOf('SQL\SelectQueryBuilder', $this->queryBuilder->_and());
         $this->assertEquals($expected, $this->queryBuilder->getWhereParts());
     }
-    
+
     /**
      * @dataProvider getQueryStringProvider
      */
     public function testGetQueryString($selects, $from, $joins, $wheres, $groupBys, $havings, $orderBys, $limit, $expectedQuery, $expectedFormattedQuery, $expectedBoundParameters, $expectedQuotedBoundParameters, $expectedDebuggedQuery)
     {
-        foreach ($selects as $select)
-        {
+        foreach ($selects as $select) {
             $this->queryBuilder->select($select[0], isset($select[1]) ? $select[1] : null);
         }
 
-        if (!empty($from))
-        {
+        if (!empty($from)) {
             $this->queryBuilder->from($from[0], isset($from[1]) ? $from[1] : null);
         }
 
-        foreach ($joins as $join)
-        {
+        foreach ($joins as $join) {
             $this->queryBuilder->join($join[0], isset($join[1]) ? $join[1] : null, isset($join[2]) ? $join[2] : null, isset($join[3]) ? $join[3] : null);
         }
 
-        foreach ($wheres as $where)
-        {
+        foreach ($wheres as $where) {
             $nbWhere = count($where);
-            if ($nbWhere == 4)
-            {
+            if ($nbWhere == 4) {
                 $this->queryBuilder->where($where[0], $where[1], $where[2], $where[3]);
-            }
-            elseif ($nbWhere >= 1 && $nbWhere <= 2)
-            {
-                if ($where[0] == '(')
-                {
-                    if (isset($where[1]))
-                    {
+            } elseif ($nbWhere >= 1 && $nbWhere <= 2) {
+                if ($where[0] == '(') {
+                    if (isset($where[1])) {
                         $this->queryBuilder->_open($where[1]);
-                    }
-                    else
-                    {
+                    } else {
                         $this->queryBuilder->_open();
                     }
-                }
-                elseif ($where[0] == ')')
-                {
+                } elseif ($where[0] == ')') {
                     $this->queryBuilder->_close();
                 }
             }
         }
 
-        foreach ($groupBys as $groupBy)
-        {
+        foreach ($groupBys as $groupBy) {
             $this->queryBuilder->groupBy($groupBy[0], $groupBy[1]);
         }
 
-        foreach ($havings as $having)
-        {
+        foreach ($havings as $having) {
             $nbHaving = count($having);
-            if ($nbHaving == 4)
-            {
+            if ($nbHaving == 4) {
                 $this->queryBuilder->having($having[0], $having[1], $having[2], $having[3]);
-            }
-            elseif ($nbHaving >= 1 && $nbHaving <= 2)
-            {
-                if ($having[0] == '(')
-                {
-                    if (isset($having[1]))
-                    {
+            } elseif ($nbHaving >= 1 && $nbHaving <= 2) {
+                if ($having[0] == '(') {
+                    if (isset($having[1])) {
                         $this->queryBuilder->openHaving($having[1]);
-                    }
-                    else
-                    {
+                    } else {
                         $this->queryBuilder->openHaving();
                     }
-                }
-                elseif ($having[0] == ')')
-                {
+                } elseif ($having[0] == ')') {
                     $this->queryBuilder->closeHaving();
                 }
             }
         }
 
-        foreach ($orderBys as $orderBy)
-        {
+        foreach ($orderBys as $orderBy) {
             $this->queryBuilder->orderBy($orderBy[0], $orderBy[1]);
         }
 
-        if (!empty($limit))
-        {
+        if (!empty($limit)) {
             $this->queryBuilder->limit($limit[0]);
-            if (isset($limit[1]))
-            {
+            if (isset($limit[1])) {
                 $this->queryBuilder->offset($limit[1]);
             }
         }
@@ -1413,7 +1368,7 @@ class SelectQueryBuilderTest extends PDOTestCase
 
         $this->queryBuilder->from('book');
         $this->queryBuilder->where('author_id', 2);
-        
+
         $this->assertEquals(3, $this->queryBuilder->count());
     }
 
@@ -1469,7 +1424,7 @@ class SelectQueryBuilderTest extends PDOTestCase
 
         $this->assertEquals($expected, $this->queryBuilder->getJoinParts());
     }
-    
+
     public function testMergeWhere()
     {
         $this->queryBuilder->where('id', 5 , SelectQueryBuilder::LESS_THAN);
@@ -1507,7 +1462,7 @@ class SelectQueryBuilderTest extends PDOTestCase
 
         $this->assertEquals($expected, $this->queryBuilder->getWhereParts());
     }
-    
+
     public function testMergeGroupBy()
     {
         $this->queryBuilder->groupBy('id');
@@ -1530,7 +1485,7 @@ class SelectQueryBuilderTest extends PDOTestCase
 
         $this->assertEquals($expected, $this->queryBuilder->getGroupByParts());
     }
-    
+
     public function testMergeHaving()
     {
         $this->queryBuilder->having('score', 5 , SelectQueryBuilder::LESS_THAN);
@@ -1568,7 +1523,7 @@ class SelectQueryBuilderTest extends PDOTestCase
 
         $this->assertEquals($expected, $this->queryBuilder->getHavingParts());
     }
-    
+
     public function testMergeOrderBy()
     {
         $this->queryBuilder->orderBy('price', SelectQueryBuilder::DESC);
@@ -1592,7 +1547,7 @@ class SelectQueryBuilderTest extends PDOTestCase
 //        echo var_export($this->queryBuilder->getOrderByParts());
         $this->assertEquals($expected, $this->queryBuilder->getOrderByParts());
     }
-    
+
     public function testMergeLimit()
     {
         $this->queryBuilder
@@ -1609,7 +1564,7 @@ class SelectQueryBuilderTest extends PDOTestCase
         $this->assertEquals(50, $this->queryBuilder->getLimit());
         $this->assertEquals(0, $this->queryBuilder->getOffset());
     }
-    
+
     /**
      *
      * @dataProvider mergeProvider
@@ -1644,12 +1599,12 @@ class SelectQueryBuilderTest extends PDOTestCase
             ->orderBy('score', SelectQueryBuilder::ASC)
             ->limit(50)
             ->offset(0);
-       
+
         $this->queryBuilder->merge($qb, $overwriteLimit, $mergeOrderBy);
         $this->assertEquals($expectedQuery, $this->queryBuilder->getQueryString());
         $this->assertEquals($expectedBoundParameters, $this->queryBuilder->getBoundParameters());
     }
-    
+
     public function mergeProvider()
     {
         return array(

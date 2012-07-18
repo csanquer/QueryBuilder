@@ -14,7 +14,7 @@ class QueryBuilderTest extends PDOTestCase
      * @var SQL\Base\QueryBuilder
      */
     protected $queryBuilder;
-    
+
     protected function setUp()
     {
         $this->queryBuilder = $this->getMockForAbstractClass('SQL\Base\QueryBuilder', array(self::$pdo));
@@ -22,8 +22,8 @@ class QueryBuilderTest extends PDOTestCase
 
     /**
      * set queryType public for unit tests and set its value
-     * 
-     * @param array $value 
+     *
+     * @param array $value
      */
     private function setQueryType($value)
     {
@@ -32,11 +32,11 @@ class QueryBuilderTest extends PDOTestCase
         $type->setAccessible(true);
         $type->setValue($this->queryBuilder, $value);
     }
-    
+
     /**
      * set boundsParameters public for unit tests and set its value
-     * 
-     * @param array $value 
+     *
+     * @param array $value
      */
     private function setBoundParams($value)
     {
@@ -45,7 +45,7 @@ class QueryBuilderTest extends PDOTestCase
         $boundParams->setAccessible(true);
         $boundParams->setValue($this->queryBuilder, $value);
     }
-    
+
     public function testSetPdoConnection()
     {
         $queryBuilder = $this->getMockForAbstractClass('SQL\Base\QueryBuilder');
@@ -57,7 +57,7 @@ class QueryBuilderTest extends PDOTestCase
     {
         $this->assertInstanceOf('\PDO', $this->queryBuilder->getConnection());
     }
-    
+
     public function testQuote()
     {
         $this->assertEquals("''' AND 1'", $this->queryBuilder->quote("' AND 1"));
@@ -82,9 +82,9 @@ class QueryBuilderTest extends PDOTestCase
 
         $this->assertEquals("'\' AND 1'", $queryBuilder->quote("' AND 1"));
     }
-    
+
     /**
-     * @dataProvider optionsProvider 
+     * @dataProvider optionsProvider
      */
     public function testOptions($option, $expected)
     {
@@ -107,7 +107,7 @@ class QueryBuilderTest extends PDOTestCase
             ),
         );
     }
-    
+
     /**
      * @dataProvider debugQueryProvider
      */
@@ -161,32 +161,32 @@ class QueryBuilderTest extends PDOTestCase
             ->expects($this->any())
             ->method('getQueryString')
             ->will($this->returnValue(null));
-        
+
         $this->assertFalse($this->queryBuilder->query());
     }
 
     public function testGetQueryType()
     {
         $this->assertNull($this->queryBuilder->getQueryType());
-        
+
         $this->setQueryType(QueryBuilder::TYPE_SELECT);
         $this->assertEquals(QueryBuilder::TYPE_SELECT, $this->queryBuilder->getQueryType());
-        
+
         $this->setQueryType(QueryBuilder::TYPE_UPDATE);
         $this->assertEquals(QueryBuilder::TYPE_UPDATE, $this->queryBuilder->getQueryType());
-        
+
         $this->setQueryType(QueryBuilder::TYPE_DELETE);
         $this->assertEquals(QueryBuilder::TYPE_DELETE, $this->queryBuilder->getQueryType());
-        
+
         $this->setQueryType(QueryBuilder::TYPE_INSERT);
         $this->assertEquals(QueryBuilder::TYPE_INSERT, $this->queryBuilder->getQueryType());
     }
-    
+
     public function testQuerySelect()
     {
         $this->clearFixtures();
         $this->loadFixtures();
-        
+
         $this->queryBuilder
             ->expects($this->any())
             ->method('getQueryString')
@@ -194,7 +194,7 @@ class QueryBuilderTest extends PDOTestCase
 
         $this->setBoundParams(array('where' => array(2)));
         $this->setQueryType(QueryBuilder::TYPE_SELECT);
-        
+
         $this->assertInstanceOf('\PDOStatement', $this->queryBuilder->query(null));
 
         $expected = array(
@@ -227,12 +227,12 @@ class QueryBuilderTest extends PDOTestCase
         $this->assertEquals($expected, $this->queryBuilder->query(\PDO::FETCH_ASSOC));
         $this->assertEquals($expected, $this->queryBuilder->query());
     }
-    
+
     public function testQueryInsertLastInsertId()
     {
         $this->clearFixtures();
         $this->loadFixtures();
-        
+
         $this->queryBuilder
             ->expects($this->any())
             ->method('getQueryString')
@@ -242,15 +242,15 @@ class QueryBuilderTest extends PDOTestCase
             'values' => array(4 ,'Stephen', 'King'),
         ));
         $this->setQueryType(QueryBuilder::TYPE_INSERT);
-        
+
         $this->assertEquals(4, $this->queryBuilder->query(QueryBuilder::FETCH_LAST_INSERT_ID));
     }
-    
+
     public function testQueryInsert()
     {
         $this->clearFixtures();
         $this->loadFixtures();
-        
+
         $this->queryBuilder
             ->expects($this->any())
             ->method('getQueryString')
@@ -262,12 +262,12 @@ class QueryBuilderTest extends PDOTestCase
         $this->setQueryType(QueryBuilder::TYPE_INSERT);
         $this->assertEquals(1, $this->queryBuilder->query());
     }
-    
+
     public function testQueryUpdate()
     {
         $this->clearFixtures();
         $this->loadFixtures();
-        
+
         $this->queryBuilder
             ->expects($this->any())
             ->method('getQueryString')
@@ -276,12 +276,12 @@ class QueryBuilderTest extends PDOTestCase
         $this->setQueryType(QueryBuilder::TYPE_UPDATE);
         $this->assertEquals(1, $this->queryBuilder->query());
     }
-    
+
     public function testQueryDelete()
     {
         $this->clearFixtures();
         $this->loadFixtures();
-        
+
         $this->queryBuilder
             ->expects($this->any())
             ->method('getQueryString')
@@ -295,31 +295,31 @@ class QueryBuilderTest extends PDOTestCase
     {
         $this->assertSame($this->queryBuilder, $this->queryBuilder->_if(true));
         $this->assertSame($this->queryBuilder, $this->queryBuilder->_endif());
-        
+
         $this->assertInstanceOf('\SQL\Proxy\QueryConditionalProxy', $this->queryBuilder->_if(false));
         $this->assertSame($this->queryBuilder, $this->queryBuilder->_endif());
-        
+
         $this->assertSame($this->queryBuilder, $this->queryBuilder->_if(true));
         $this->assertInstanceOf('\SQL\Proxy\QueryConditionalProxy', $this->queryBuilder->_elseif(false));
         $this->assertInstanceOf('\SQL\Proxy\QueryConditionalProxy', $this->queryBuilder->_else(false));
         $this->assertSame($this->queryBuilder, $this->queryBuilder->_endif());
-        
+
         $this->assertInstanceOf('\SQL\Proxy\QueryConditionalProxy', $this->queryBuilder->_if(false));
         $this->assertSame($this->queryBuilder, $this->queryBuilder->_elseif(true));
         $this->assertInstanceOf('\SQL\Proxy\QueryConditionalProxy', $this->queryBuilder->_else(false));
         $this->assertSame($this->queryBuilder, $this->queryBuilder->_endif());
-        
+
         $this->assertInstanceOf('\SQL\Proxy\QueryConditionalProxy', $this->queryBuilder->_if(false));
         $this->assertInstanceOf('\SQL\Proxy\QueryConditionalProxy', $this->queryBuilder->_elseif(false));
         $this->assertSame($this->queryBuilder, $this->queryBuilder->_else());
         $this->assertSame($this->queryBuilder, $this->queryBuilder->_endif());
-        
+
         $this->assertSame($this->queryBuilder, $this->queryBuilder->_if(true));
         $this->assertInstanceOf('\SQL\Proxy\QueryConditionalProxy', $this->queryBuilder->_if(false));
         $this->assertSame($this->queryBuilder, $this->queryBuilder->_endif());
         $this->assertSame($this->queryBuilder, $this->queryBuilder->_endif());
     }
-    
+
     /**
      * @expectedException SQL\Exception\QueryBuilderException
      */
@@ -327,7 +327,7 @@ class QueryBuilderTest extends PDOTestCase
     {
         $this->queryBuilder->_elseif(true);
     }
-    
+
     /**
      * @expectedException SQL\Exception\QueryBuilderException
      */
@@ -335,7 +335,7 @@ class QueryBuilderTest extends PDOTestCase
     {
         $this->queryBuilder->_else(true);
     }
-    
+
     /**
      * @expectedException SQL\Exception\QueryBuilderException
      */

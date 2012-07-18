@@ -5,10 +5,10 @@ namespace SQL;
 use SQL\Base\WhereQueryBuilder;
 
 /**
- * Class for building programmatically PDO Select queries 
- * 
+ * Class for building programmatically PDO Select queries
+ *
  * Based on original code Querybuilder from https://github.com/jstayton/QueryBuilder
- * 
+ *
  * @author   Justin Stayton <justin.stayton@gmail.com>
  * @author   Matt Labrum
  * @author   Charles SANQUER <charles.sanquer@spyrit.net>
@@ -21,25 +21,25 @@ class SelectQueryBuilder extends WhereQueryBuilder
     const INNER_JOIN = 'INNER JOIN';
     const LEFT_JOIN = 'LEFT JOIN';
     const RIGHT_JOIN = 'RIGHT JOIN';
-    
+
     /**
      * ORDER BY directions.
      */
     const ASC = 'ASC';
     const DESC = 'DESC';
-    
+
     /**
      * Constructor.
      *
-     * @param  PDO $PdoConnection optional PDO database connection
+     * @param  PDO                    $PdoConnection optional PDO database connection
      * @return SQL\SelectQueryBuilder
      */
     public function __construct(\PDO $PdoConnection = null)
     {
         parent::__construct($PdoConnection);
-        
+
         $this->queryType = self::TYPE_SELECT;
-        
+
         $this->sqlParts['select'] = array();
         $this->sqlParts['from'] = array('table' => null, 'alias' => null);
         $this->sqlParts['join'] = array();
@@ -47,7 +47,7 @@ class SelectQueryBuilder extends WhereQueryBuilder
         $this->sqlParts['having'] = array();
         $this->sqlParts['orderBy'] = array();
         $this->sqlParts['limit'] = array('limit' => 0, 'offset' => 0, 'page' => 0);
-        
+
         $this->boundParams['from'] = array();
         $this->boundParams['having'] = array();
     }
@@ -75,34 +75,30 @@ class SelectQueryBuilder extends WhereQueryBuilder
     /**
      * Adds a SELECT column, table, or expression with optional alias.
      *
-     * @param  string $column column name, table name, or expression, or array of column (index = alias and value = column)
-     * @param  string $alias optional alias
-     * 
+     * @param string $column column name, table name, or expression, or array of column (index = alias and value = column)
+     * @param string $alias  optional alias
+     *
      * @return SQL\SelectQueryBuilder
      */
     public function select($column, $alias = null)
     {
-        if (!empty($column) || $column == '0')
-        {
-            if (is_array($column))
-            {
-                foreach ($column as $alias => $column)
-                {
+        if (!empty($column) || $column == '0') {
+            if (is_array($column)) {
+                foreach ($column as $alias => $column) {
                     $this->sqlParts['select'][$column] = is_string($alias) ? $alias : null;
                 }
-            }
-            else
-            {
+            } else {
                 $this->sqlParts['select'][$column] = is_string($alias) ? $alias : null;
             }
         }
+
         return $this;
     }
 
     /**
      * get Select parts
-     * 
-     * @return array 
+     *
+     * @return array
      */
     public function getSelectParts()
     {
@@ -112,8 +108,8 @@ class SelectQueryBuilder extends WhereQueryBuilder
     /**
      * Returns the SELECT portion of the query as a string.
      *
-     * @param  bool $formatted format SQL string on multiple lines, default false
-     * 
+     * @param bool $formatted format SQL string on multiple lines, default false
+     *
      * @return string
      */
     public function getSelectString($formatted = false)
@@ -121,40 +117,32 @@ class SelectQueryBuilder extends WhereQueryBuilder
         $select = '';
 
         $first = true;
-        foreach ($this->sqlParts['select'] as $currentColumn => $currentAlias)
-        {
-            if (!$first)
-            {
+        foreach ($this->sqlParts['select'] as $currentColumn => $currentAlias) {
+            if (!$first) {
                 $select .= ', ';
-            }
-            else
-            {
+            } else {
                 $first = false;
             }
 
             $select .= $currentColumn;
 
-            if (isset($currentAlias))
-            {
+            if (isset($currentAlias)) {
                 $select .= ' AS '.$currentAlias;
             }
         }
 
-        if (empty($select))
-        {
+        if (empty($select)) {
             $select = '*';
         }
 
         // Add any execution options.
-        if (!empty($this->options) && $select != '*')
-        {
+        if (!empty($this->options) && $select != '*') {
             $select = implode(' ', $this->options).' '.$select;
         }
 
         $select = 'SELECT '.$select.' ';
 
-        if ($formatted)
-        {
+        if ($formatted) {
             $select .= "\n";
         }
 
@@ -165,7 +153,7 @@ class SelectQueryBuilder extends WhereQueryBuilder
      * Sets the FROM table with optional alias.
      *
      * @param  \SQL\SelectQueryBuilder|string $table table name or SELECT Query
-     * @param  string $alias optional alias
+     * @param  string                         $alias optional alias
      * @return SQL\SelectQueryBuilder
      */
     public function from($table, $alias = null)
@@ -184,6 +172,7 @@ class SelectQueryBuilder extends WhereQueryBuilder
     public function getFromTable()
     {
         $from = $this->getSQLPart('from');
+
         return isset($from['table']) ? $from['table'] : null;
     }
 
@@ -195,6 +184,7 @@ class SelectQueryBuilder extends WhereQueryBuilder
     public function getFromAlias()
     {
         $from = $this->getSQLPart('from');
+
         return isset($from['alias']) ? $from['alias'] : null;
     }
 
@@ -211,27 +201,24 @@ class SelectQueryBuilder extends WhereQueryBuilder
     /**
      * Adds a JOIN table with optional ON criteria.
      *
-     * @param  string $table table name
-     * @param  string $alias optional alias
-     * @param  string|array $criteria optional ON criteria
-     * @param  string $type optional type of join, default INNER JOIN
+     * @param string       $table    table name
+     * @param string       $alias    optional alias
+     * @param string|array $criteria optional ON criteria
+     * @param string       $type     optional type of join, default INNER JOIN
 
      * @return SQL\SelectQueryBuilder
      */
     public function join($table, $alias = null, $criteria = null, $type = self::INNER_JOIN)
     {
-        if (!in_array($type, array(self::INNER_JOIN, self::LEFT_JOIN, self::RIGHT_JOIN)))
-        {
+        if (!in_array($type, array(self::INNER_JOIN, self::LEFT_JOIN, self::RIGHT_JOIN))) {
             $type = self::INNER_JOIN;
         }
 
-        if (is_string($criteria))
-        {
+        if (is_string($criteria)) {
             $criteria = array($criteria);
         }
 
-        if (!empty($table))
-        {
+        if (!empty($table)) {
             $this->sqlParts['join'][] = array(
                 'table' => $table,
                 'criteria' => $criteria,
@@ -246,9 +233,9 @@ class SelectQueryBuilder extends WhereQueryBuilder
     /**
      * Adds an INNER JOIN table with optional ON criteria.
      *
-     * @param  string $table table name
-     * @param  string|array $criteria optional ON criteria
-     * @param  string $alias optional alias
+     * @param  string                 $table    table name
+     * @param  string|array           $criteria optional ON criteria
+     * @param  string                 $alias    optional alias
      * @return SQL\SelectQueryBuilder
      */
     public function innerJoin($table, $alias = null, $criteria = null)
@@ -259,10 +246,10 @@ class SelectQueryBuilder extends WhereQueryBuilder
     /**
      * Adds a LEFT JOIN table with optional ON criteria.
      *
-     * @param  string $table table name
-     * @param  string $alias optional alias
-     * @param  string|array $criteria optional ON criteria
-     * 
+     * @param string       $table    table name
+     * @param string       $alias    optional alias
+     * @param string|array $criteria optional ON criteria
+     *
      * @return SQL\SelectQueryBuilder
      */
     public function leftJoin($table, $alias = null, $criteria = null)
@@ -273,10 +260,10 @@ class SelectQueryBuilder extends WhereQueryBuilder
     /**
      * Adds a RIGHT JOIN table with optional ON criteria.
      *
-     * @param  string $table table name
-     * @param  string $alias optional alias
-     * @param  string|array $criteria optional ON criteria
-     * 
+     * @param string       $table    table name
+     * @param string       $alias    optional alias
+     * @param string|array $criteria optional ON criteria
+     *
      * @return SQL\SelectQueryBuilder
      */
     public function rightJoin($table, $alias = null, $criteria = null)
@@ -286,8 +273,8 @@ class SelectQueryBuilder extends WhereQueryBuilder
 
     /**
      * get Join SQL parts
-     * 
-     * @return array 
+     *
+     * @return array
      */
     public function getJoinParts()
     {
@@ -298,10 +285,10 @@ class SelectQueryBuilder extends WhereQueryBuilder
      * Returns an ON criteria string joining the specified table and column to
      * the same column of the previous JOIN or FROM table.
      *
-     * @param  int $joinIndex index of current join
-     * @param  string $table current table name
-     * @param  string $alias current table alias name
-     * @param  string $column current column name
+     * @param  int    $joinIndex index of current join
+     * @param  string $table     current table name
+     * @param  string $alias     current table alias name
+     * @param  string $column    current column name
      * @return string
      */
     protected function getJoinCriteriaUsingPreviousTable($joinIndex, $table, $alias, $column)
@@ -310,13 +297,10 @@ class SelectQueryBuilder extends WhereQueryBuilder
 
         // If the previous table is from a JOIN, use that. Otherwise, use the
         // FROM table.
-        if (array_key_exists($previousJoinIndex, $this->sqlParts['join']))
-        {
+        if (array_key_exists($previousJoinIndex, $this->sqlParts['join'])) {
             $previousTable = $this->sqlParts['join'][$previousJoinIndex]['table'];
             $previousAlias = $this->sqlParts['join'][$previousJoinIndex]['alias'];
-        }
-        else
-        {
+        } else {
             $previousTable = $this->getFromTable();
             $previousAlias = $this->getFromAlias();
         }
@@ -327,57 +311,47 @@ class SelectQueryBuilder extends WhereQueryBuilder
     /**
      * Returns the JOIN portion of the query as a string.
      *
-     * @param  bool $formatted format SQL string on multiple lines, default false
-     * 
+     * @param bool $formatted format SQL string on multiple lines, default false
+     *
      * @return string
      */
     public function getJoinString($formatted = false)
     {
         $join = '';
 
-        foreach ($this->sqlParts['join'] as $i => $currentJoin)
-        {
+        foreach ($this->sqlParts['join'] as $i => $currentJoin) {
             $join .= $currentJoin['type'].' '.$currentJoin['table'];
 
-            if (isset($currentJoin['alias']))
-            {
+            if (isset($currentJoin['alias'])) {
                 $join .= ' AS '.$currentJoin['alias'];
             }
             $join = trim($join).' ';
 
-            if ($formatted)
-            {
+            if ($formatted) {
                 $join .= "\n";
             }
 
             // Add ON criteria if specified.
-            if (isset($currentJoin['criteria']))
-            {
+            if (isset($currentJoin['criteria'])) {
                 $join .= 'ON ';
 
-                foreach ($currentJoin['criteria'] as $x => $criterion)
-                {
+                foreach ($currentJoin['criteria'] as $x => $criterion) {
                     // Logically join each criterion with AND.
-                    if ($x != 0)
-                    {
+                    if ($x != 0) {
                         $join .= self::LOGICAL_AND.' ';
                     }
 
                     // If the criterion does not include an equals sign, assume a
                     // column name and join against the same column from the previous
                     // table.
-                    if (strpos($criterion, '=') === false)
-                    {
+                    if (strpos($criterion, '=') === false) {
                         $join .= $this->getJoinCriteriaUsingPreviousTable($i, $currentJoin['table'], $currentJoin['alias'], $criterion);
-                    }
-                    else
-                    {
+                    } else {
                         $join .= $criterion;
                     }
                     $join = trim($join).' ';
 
-                    if ($formatted)
-                    {
+                    if ($formatted) {
                         $join .= "\n";
                     }
                 }
@@ -390,43 +364,36 @@ class SelectQueryBuilder extends WhereQueryBuilder
     /**
      * Returns the FROM portion of the query, including all JOINs, as a string.
      *
-     * @param  bool $formatted format SQL string on multiple lines, default false
-     * 
+     * @param bool $formatted format SQL string on multiple lines, default false
+     *
      * @return string
      */
     public function getFromString($formatted = false)
     {
         $from = '';
 
-        if (!empty($this->sqlParts['from']))
-        {
+        if (!empty($this->sqlParts['from'])) {
 
             // Allow the user to pass a QueryBuilder into from
-            if ($this->sqlParts['from']['table'] instanceof self)
-            {
+            if ($this->sqlParts['from']['table'] instanceof self) {
                 $from .= self::BRACKET_OPEN.($formatted ? " \n" : '').$this->sqlParts['from']['table']->getQueryString($formatted).self::BRACKET_CLOSE;
                 $this->boundParams['from'] = array_merge($this->boundParams['from'], $this->sqlParts['from']['table']->getBoundParameters(false, null));
-            }
-            else
-            {
+            } else {
                 $from .= $this->sqlParts['from']['table'];
             }
 
-            if (!empty($this->sqlParts['from']['alias']))
-            {
+            if (!empty($this->sqlParts['from']['alias'])) {
                 $from .= ' AS '.$this->sqlParts['from']['alias'];
             }
             $from = trim($from).' ';
-            if ($formatted)
-            {
+            if ($formatted) {
                 $from .= "\n";
             }
             // Add any JOINs.
             $from .= $this->getJoinString($formatted);
         }
 
-        if (!empty($from))
-        {
+        if (!empty($from)) {
             $from = 'FROM '.$from;
         }
 
@@ -436,20 +403,18 @@ class SelectQueryBuilder extends WhereQueryBuilder
     /**
      * Adds a GROUP BY column.
      *
-     * @param  string $column column name
-     * @param  string $order optional order direction, default empty (specific to MySQL)
-     * 
+     * @param string $column column name
+     * @param string $order  optional order direction, default empty (specific to MySQL)
+     *
      * @return SQL\SelectQueryBuilder
      */
     public function groupBy($column, $order = null)
     {
-        if (!in_array($order, array(self::ASC, self::DESC)))
-        {
+        if (!in_array($order, array(self::ASC, self::DESC))) {
             $order = null;
         }
 
-        if (!is_null($column) && $column != '')
-        {
+        if (!is_null($column) && $column != '') {
             $this->sqlParts['groupBy'][] = array(
                 'column' => $column,
                 'order' => $order
@@ -461,7 +426,7 @@ class SelectQueryBuilder extends WhereQueryBuilder
 
     /**
      * get Group By parts
-     * 
+     *
      * @return array
      */
     public function getGroupByParts()
@@ -472,8 +437,8 @@ class SelectQueryBuilder extends WhereQueryBuilder
     /**
      * Returns the GROUP BY portion of the query as a string.
      *
-     * @param  bool $formatted format SQL string on multiple lines, default false
-     * 
+     * @param bool $formatted format SQL string on multiple lines, default false
+     *
      * @return string
      */
     public function getGroupByString($formatted = false)
@@ -481,27 +446,21 @@ class SelectQueryBuilder extends WhereQueryBuilder
         $groupBy = '';
 
         $first = true;
-        foreach ($this->sqlParts['groupBy'] as $currentGroupBy)
-        {
-            if (!$first)
-            {
+        foreach ($this->sqlParts['groupBy'] as $currentGroupBy) {
+            if (!$first) {
                 $groupBy .= ', ';
-            }
-            else
-            {
+            } else {
                 $first = false;
             }
 
             $groupBy .= $currentGroupBy['column'].(!empty($currentGroupBy['order']) ? ' '.$currentGroupBy['order'] : '');
         }
 
-        if (!empty($groupBy))
-        {
+        if (!empty($groupBy)) {
             $groupBy = 'GROUP BY '.$groupBy.' ';
         }
 
-        if ($formatted && !empty($groupBy))
-        {
+        if ($formatted && !empty($groupBy)) {
             $groupBy .= "\n";
         }
 
@@ -511,7 +470,7 @@ class SelectQueryBuilder extends WhereQueryBuilder
     /**
      * Adds an open bracket for nesting WHERE conditions.
      *
-     * @param  string $connector optional logical connector, default AND
+     * @param  string                 $connector optional logical connector, default AND
      * @return SQL\SelectQueryBuilder
      */
     public function _open($connector = self::LOGICAL_AND)
@@ -519,34 +478,33 @@ class SelectQueryBuilder extends WhereQueryBuilder
         return parent::_open($connector);
     }
 
-    
     /**
      * Adds an open bracket for nesting WHERE conditions with OR operator.
-     * 
+     *
      * shortcut for SelectQueryBuilder::_open(SelectQueryBuilder::LOGICAL_OR)
-     * 
-     * @return SQL\SelectQueryBuilder 
+     *
+     * @return SQL\SelectQueryBuilder
      */
     public function _or()
     {
         return $this->_open(self::LOGICAL_OR);
     }
-    
+
     /**
      * Adds an open bracket for nesting WHERE conditions with AND operator.
-     * 
+     *
      * shortcut for SelectQueryBuilder::_open(SelectQueryBuilder::LOGICAL_AND)
-     * 
-     * @return SQL\SelectQueryBuilder 
+     *
+     * @return SQL\SelectQueryBuilder
      */
     public function _and()
     {
         return $this->_open(self::LOGICAL_AND);
     }
-    
+
     /**
      * Adds a closing bracket for nesting WHERE conditions.
-     * 
+     *
      * @return SQL\SelectQueryBuilder
      */
     public function _close()
@@ -557,11 +515,11 @@ class SelectQueryBuilder extends WhereQueryBuilder
     /**
      * Adds a WHERE condition.
      *
-     * @param  string $column column name
-     * @param  mixed $value value
-     * @param  string $operator optional comparison operator, default = '='
-     * @param  string $connector optional logical connector, default AND
-     * 
+     * @param string $column    column name
+     * @param mixed  $value     value
+     * @param string $operator  optional comparison operator, default = '='
+     * @param string $connector optional logical connector, default AND
+     *
      * @return SQL\SelectQueryBuilder
      */
     public function where($column, $value, $operator = self::EQUALS, $connector = self::LOGICAL_AND)
@@ -572,10 +530,10 @@ class SelectQueryBuilder extends WhereQueryBuilder
     /**
      * Adds an AND WHERE condition.
      *
-     * @param  string $column colum name
-     * @param  mixed $value value
-     * @param  string $operator optional comparison operator, default = '='
-     * 
+     * @param string $column   colum name
+     * @param mixed  $value    value
+     * @param string $operator optional comparison operator, default = '='
+     *
      * @return SQL\SelectQueryBuilder
      */
     public function andWhere($column, $value, $operator = self::EQUALS)
@@ -586,21 +544,21 @@ class SelectQueryBuilder extends WhereQueryBuilder
     /**
      * Adds an OR WHERE condition.
      *
-     * @param  string $column colum name
-     * @param  mixed $value value
-     * @param  string $operator optional comparison operator, default = '='
-     * 
+     * @param string $column   colum name
+     * @param mixed  $value    value
+     * @param string $operator optional comparison operator, default = '='
+     *
      * @return SQL\SelectQueryBuilder
      */
     public function orWhere($column, $value, $operator = self::EQUALS)
     {
         return parent::where($column, $value, $operator, self::LOGICAL_OR);
     }
-    
+
     /**
      * Adds an open bracket for nesting HAVING conditions.
      *
-     * @param  string $connector optional logical connector, default AND
+     * @param  string                 $connector optional logical connector, default AND
      * @return SQL\SelectQueryBuilder
      */
     public function openHaving($connector = self::LOGICAL_AND)
@@ -621,10 +579,10 @@ class SelectQueryBuilder extends WhereQueryBuilder
     /**
      * Adds a HAVING condition.
      *
-     * @param  string $column colum name
-     * @param  mixed $value value
-     * @param  string $operator optional comparison operator, default =
-     * @param  string $connector optional logical connector, default AND
+     * @param  string                 $column    colum name
+     * @param  mixed                  $value     value
+     * @param  string                 $operator  optional comparison operator, default =
+     * @param  string                 $connector optional logical connector, default AND
      * @return SQL\SelectQueryBuilder
      */
     public function having($column, $value, $operator = self::EQUALS, $connector = self::LOGICAL_AND)
@@ -635,9 +593,9 @@ class SelectQueryBuilder extends WhereQueryBuilder
     /**
      * Adds an AND HAVING condition.
      *
-     * @param  string $column colum name
-     * @param  mixed $value value
-     * @param  string $operator optional comparison operator, default =
+     * @param  string                 $column   colum name
+     * @param  mixed                  $value    value
+     * @param  string                 $operator optional comparison operator, default =
      * @return SQL\SelectQueryBuilder
      */
     public function andHaving($column, $value, $operator = self::EQUALS)
@@ -648,9 +606,9 @@ class SelectQueryBuilder extends WhereQueryBuilder
     /**
      * Adds an OR HAVING condition.
      *
-     * @param  string $column colum name
-     * @param  mixed $value value
-     * @param  string $operator optional comparison operator, default =
+     * @param  string                 $column   colum name
+     * @param  mixed                  $value    value
+     * @param  string                 $operator optional comparison operator, default =
      * @return SQL\SelectQueryBuilder
      */
     public function orHaving($column, $value, $operator = self::EQUALS)
@@ -660,8 +618,8 @@ class SelectQueryBuilder extends WhereQueryBuilder
 
     /**
      * get Having SQL parts
-     * 
-     * @return array 
+     *
+     * @return array
      */
     public function getHavingParts()
     {
@@ -671,16 +629,15 @@ class SelectQueryBuilder extends WhereQueryBuilder
     /**
      * Returns the HAVING portion of the query as a string.
      *
-     * @param  bool $formatted format SQL string on multiple lines, default false
-     * 
+     * @param bool $formatted format SQL string on multiple lines, default false
+     *
      * @return string
      */
     public function getHavingString($formatted = false)
     {
         $having = $this->getCriteriaString($this->sqlParts['having'], $this->boundParams['having'], $formatted);
 
-        if (!empty($having))
-        {
+        if (!empty($having)) {
             $having = 'HAVING '.$having;
         }
 
@@ -690,19 +647,17 @@ class SelectQueryBuilder extends WhereQueryBuilder
     /**
      * Adds a column to ORDER BY.
      *
-     * @param  string $column column name
-     * @param  string $order optional order direction, default ASC
+     * @param  string                 $column column name
+     * @param  string                 $order  optional order direction, default ASC
      * @return SQL\SelectQueryBuilder
      */
     public function orderBy($column, $order = self::ASC)
     {
-        if (!in_array($order, array(self::ASC, self::DESC)))
-        {
+        if (!in_array($order, array(self::ASC, self::DESC))) {
             $order = self::ASC;
         }
 
-        if (!is_null($column) && $column != '')
-        {
+        if (!is_null($column) && $column != '') {
             $this->sqlParts['orderBy'][] = array('column' => $column, 'order' => $order);
         }
 
@@ -711,8 +666,8 @@ class SelectQueryBuilder extends WhereQueryBuilder
 
     /**
      * get Order By parts
-     * 
-     * @return array 
+     *
+     * @return array
      */
     public function getOrderByParts()
     {
@@ -722,8 +677,8 @@ class SelectQueryBuilder extends WhereQueryBuilder
     /**
      * Returns the ORDER BY portion of the query as a string.
      *
-     * @param  bool $formatted format SQL string on multiple lines, default false
-     * 
+     * @param bool $formatted format SQL string on multiple lines, default false
+     *
      * @return string
      */
     public function getOrderByString($formatted = false)
@@ -731,27 +686,21 @@ class SelectQueryBuilder extends WhereQueryBuilder
         $orderBy = '';
 
         $first = true;
-        foreach ($this->sqlParts['orderBy'] as $currentOrderBy)
-        {
-            if (!$first)
-            {
+        foreach ($this->sqlParts['orderBy'] as $currentOrderBy) {
+            if (!$first) {
                 $orderBy .= ', ';
-            }
-            else
-            {
+            } else {
                 $first = false;
             }
 
             $orderBy .= $currentOrderBy['column'].' '.$currentOrderBy['order'];
         }
 
-        if (!empty($orderBy))
-        {
+        if (!empty($orderBy)) {
             $orderBy = 'ORDER BY '.$orderBy.' ';
         }
 
-        if ($formatted && !empty($orderBy))
-        {
+        if ($formatted && !empty($orderBy)) {
             $orderBy .= "\n";
         }
 
@@ -761,8 +710,8 @@ class SelectQueryBuilder extends WhereQueryBuilder
     /**
      * Set the LIMIT on number of rows to return
      *
-     * @param  int $limit number of rows to return
-     * 
+     * @param int $limit number of rows to return
+     *
      * @return SQL\SelectQueryBuilder
      */
     public function limit($limit)
@@ -774,25 +723,25 @@ class SelectQueryBuilder extends WhereQueryBuilder
 
     /**
      * Set the OFFSET
-     * 
-     * @param  int $offset start row number 
-     * 
+     *
+     * @param int $offset start row number
+     *
      * @return SQL\SelectQueryBuilder
      */
     public function offset($offset)
     {
         $this->sqlParts['limit']['offset'] = (int) $offset;
         $this->sqlParts['limit']['page'] = null;
-        
+
         return $this;
     }
-    
+
     /**
      * set limit and offset by pagination
-     * 
+     *
      * @param int $page
-     * @param int $maxPerPage 
-     * 
+     * @param int $maxPerPage
+     *
      * @return SQL\SelectQueryBuilder
      */
     public function paginate($page, $maxPerPage)
@@ -801,24 +750,25 @@ class SelectQueryBuilder extends WhereQueryBuilder
             ->limit($maxPerPage)
             ->page($page);
     }
-    
+
     /**
-     * set the page number (offset related to limit), 
-     * 
+     * set the page number (offset related to limit),
+     *
      * @param type $page
-     * 
+     *
      * @return SQL\SelectQueryBuilder
-     * 
-     * @throws Exception 
-     * 
+     *
+     * @throws Exception
+     *
      */
     public function page($page)
     {
         $this->sqlParts['limit']['page'] = empty($page) ? 1 : (int) $page;
         $this->sqlParts['limit']['offset'] = null;
+
         return $this;
     }
-    
+
     /**
      * Returns the LIMIT on number of rows to return.
      *
@@ -827,37 +777,36 @@ class SelectQueryBuilder extends WhereQueryBuilder
     public function getLimit()
     {
         $limit = $this->getSQLPart('limit');
+
         return isset($limit['limit']) ? $limit['limit'] : null;
     }
-    
+
     protected function calculatePageAndOffset()
     {
         $limit = $this->getSQLPart('limit');
-        
-        if (!empty($limit['limit']))
-        {
-            if (is_null($limit['offset']) && !empty($limit['page']))
-            {
+
+        if (!empty($limit['limit'])) {
+            if (is_null($limit['offset']) && !empty($limit['page'])) {
                 $limit['offset'] = ($limit['page'] - 1) * $limit['limit'];
             }
 
-            if (empty($limit['page']) && !is_null($limit['offset']))
-            {
+            if (empty($limit['page']) && !is_null($limit['offset'])) {
                 $limit['page'] = ($limit['offset']/$limit['limit'])+1;
             }
             $this->sqlParts['limit'] = $limit;
         }
     }
-    
+
     /**
      * get Page.
-     * 
-     * @return int 
+     *
+     * @return int
      */
     public function getPage()
     {
         $this->calculatePageAndOffset();
         $limit = $this->getSQLPart('limit');
+
         return isset($limit['page']) ? $limit['page'] : null;
     }
 
@@ -871,14 +820,15 @@ class SelectQueryBuilder extends WhereQueryBuilder
     {
         $this->calculatePageAndOffset();
         $limit = $this->getSQLPart('limit');
+
         return isset($limit['offset']) ? $limit['offset'] : null;
     }
 
     /**
      * Returns the LIMIT portion of the query as a string.
      *
-     * @param  bool $formatted format SQL string on multiple lines, default false
-     * 
+     * @param bool $formatted format SQL string on multiple lines, default false
+     *
      * @return string
      */
     public function getLimitString($formatted = false)
@@ -886,17 +836,14 @@ class SelectQueryBuilder extends WhereQueryBuilder
         $this->calculatePageAndOffset();
         $limitString = '';
 
-        if (!empty($this->sqlParts['limit']['limit']))
-        {
+        if (!empty($this->sqlParts['limit']['limit'])) {
             $limitString .= 'LIMIT '.((int) $this->sqlParts['limit']['limit']).' ';
-            if ($formatted)
-            {
+            if ($formatted) {
                 $limitString .= "\n";
             }
 
             $limitString .= 'OFFSET '.((int) $this->sqlParts['limit']['offset']).' ';
-            if ($formatted)
-            {
+            if ($formatted) {
                 $limitString .= "\n";
             }
         }
@@ -907,36 +854,33 @@ class SelectQueryBuilder extends WhereQueryBuilder
     /**
      * Merges the given QueryBuilder's SELECT into this QueryBuilder.
      *
-     * @param  \SQL\SelectQueryBuilder $QueryBuilder to merge 
-     * 
+     * @param \SQL\SelectQueryBuilder $QueryBuilder to merge
+     *
      * @return \SQL\SelectQueryBuilder the current QueryBuilder
      */
     public function mergeSelect(SelectQueryBuilder $QueryBuilder)
     {
-        foreach ($QueryBuilder->getOptions() as $currentOption)
-        {
+        foreach ($QueryBuilder->getOptions() as $currentOption) {
             $this->addOption($currentOption);
         }
 
-        foreach ($QueryBuilder->getSelectParts() as $currentColumn => $currentAlias)
-        {
+        foreach ($QueryBuilder->getSelectParts() as $currentColumn => $currentAlias) {
             $this->select($currentColumn, $currentAlias);
         }
 
         return $this;
     }
-    
+
     /**
      * Merges the given QueryBuilder's JOINs into this QueryBuilder.
      *
-     * @param  \SQL\SelectQueryBuilder $QueryBuilder to merge 
-     * 
+     * @param \SQL\SelectQueryBuilder $QueryBuilder to merge
+     *
      * @return \SQL\SelectQueryBuilder the current QueryBuilder
      */
     public function mergeJoin(SelectQueryBuilder $QueryBuilder)
     {
-        foreach ($QueryBuilder->getJoinParts() as $currentJoin)
-        {
+        foreach ($QueryBuilder->getJoinParts() as $currentJoin) {
             $this->join($currentJoin['table'], $currentJoin['alias'], $currentJoin['criteria'], $currentJoin['type']);
         }
 
@@ -946,26 +890,25 @@ class SelectQueryBuilder extends WhereQueryBuilder
     /**
      * Merges the given QueryBuilder's WHEREs into this QueryBuilder.
      *
-     * @param  \SQL\Base\WhereQueryBuilder $QueryBuilder to merge 
-     * 
+     * @param \SQL\Base\WhereQueryBuilder $QueryBuilder to merge
+     *
      * @return \SQL\SelectQueryBuilder the current QueryBuilder
      */
     public function mergeWhere(WhereQueryBuilder $QueryBuilder)
     {
         return parent::mergeWhere($QueryBuilder);
     }
-    
+
     /**
      * Merges the given QueryBuilder's GROUP BYs into this QueryBuilder.
      *
-     * @param  \SQL\SelectQueryBuilder $QueryBuilder to merge 
-     * 
+     * @param \SQL\SelectQueryBuilder $QueryBuilder to merge
+     *
      * @return \SQL\SelectQueryBuilder the current QueryBuilder
      */
     public function mergeGroupBy(SelectQueryBuilder $QueryBuilder)
     {
-        foreach ($QueryBuilder->getGroupByParts() as $currentGroupBy)
-        {
+        foreach ($QueryBuilder->getGroupByParts() as $currentGroupBy) {
             $this->groupBy($currentGroupBy['column'], $currentGroupBy['order']);
         }
 
@@ -975,74 +918,66 @@ class SelectQueryBuilder extends WhereQueryBuilder
     /**
      * Merges the given QueryBuilder's HAVINGs into this QueryBuilder.
      *
-     * @param  \SQL\SelectQueryBuilder $QueryBuilder to merge 
-     * 
+     * @param \SQL\SelectQueryBuilder $QueryBuilder to merge
+     *
      * @return \SQL\SelectQueryBuilder the current QueryBuilder
      */
     public function mergeHaving(SelectQueryBuilder $QueryBuilder)
     {
-        foreach ($QueryBuilder->getHavingParts() as $currentHaving)
-        {
+        foreach ($QueryBuilder->getHavingParts() as $currentHaving) {
             // Handle open/close brackets differently than other criteria.
-            if (array_key_exists('bracket', $currentHaving))
-            {
-                if (strcmp($currentHaving['bracket'], self::BRACKET_OPEN) == 0)
-                {
+            if (array_key_exists('bracket', $currentHaving)) {
+                if (strcmp($currentHaving['bracket'], self::BRACKET_OPEN) == 0) {
                     $this->openHaving($currentHaving['connector']);
-                }
-                else
-                {
+                } else {
                     $this->closeHaving();
                 }
-            }
-            else
-            {
+            } else {
                 $this->having($currentHaving['column'], $currentHaving['value'], $currentHaving['operator'], $currentHaving['connector']);
             }
         }
 
         return $this;
     }
-    
+
     /**
      * Merges the given QueryBuilder's ORDER BYs into this QueryBuilder.
      *
-     * @param  \SQL\SelectQueryBuilder $QueryBuilder to merge 
-     * 
+     * @param \SQL\SelectQueryBuilder $QueryBuilder to merge
+     *
      * @return \SQL\SelectQueryBuilder the current QueryBuilder
      */
     public function mergeOrderBy(SelectQueryBuilder $QueryBuilder)
     {
-        foreach ($QueryBuilder->getOrderByParts() as $currentOrderBy)
-        {
+        foreach ($QueryBuilder->getOrderByParts() as $currentOrderBy) {
             $this->orderBy($currentOrderBy['column'], $currentOrderBy['order']);
         }
 
         return $this;
     }
-    
+
     /**
      * Merges the given QueryBuilder's LIMITs into this QueryBuilder.
      *
-     * @param  \SQL\SelectQueryBuilder $QueryBuilder to merge 
-     * 
+     * @param \SQL\SelectQueryBuilder $QueryBuilder to merge
+     *
      * @return \SQL\SelectQueryBuilder the current QueryBuilder
      */
     public function mergeLimit(SelectQueryBuilder $QueryBuilder)
     {
         $this->limit($QueryBuilder->getLimit());
         $this->offset($QueryBuilder->getOffset());
-        
+
         return $this;
     }
 
     /**
      * Merges the given QueryBuilder's HAVINGs into this QueryBuilder.
      *
-     * @param  \SQL\SelectQueryBuilder $QueryBuilder to merge 
-     * @param  bool $overwriteLimit optional overwrite limit, default = true
-     * @param  bool $mergeOrderBy optional merge order by clause, default = true
-     * 
+     * @param \SQL\SelectQueryBuilder $QueryBuilder   to merge
+     * @param bool                    $overwriteLimit optional overwrite limit, default = true
+     * @param bool                    $mergeOrderBy   optional merge order by clause, default = true
+     *
      * @return \SQL\SelectQueryBuilder the current QueryBuilder
      */
     public function merge(SelectQueryBuilder $QueryBuilder, $overwriteLimit = true, $mergeOrderBy = true)
@@ -1053,40 +988,38 @@ class SelectQueryBuilder extends WhereQueryBuilder
             ->mergeWhere($QueryBuilder)
             ->mergeGroupBy($QueryBuilder)
             ->mergeHaving($QueryBuilder);
-        
-        if ($mergeOrderBy)
-        {
+
+        if ($mergeOrderBy) {
             $this->mergeOrderBy($QueryBuilder);
         }
 
-        if ($overwriteLimit)
-        {
+        if ($overwriteLimit) {
             $this->mergeLimit($QueryBuilder);
         }
-        
+
         return $this;
     }
 
     /**
      * Merge all BoundParameters section
-     * 
-     * @return array 
+     *
+     * @return array
      */
     protected function mergeBoundParameters()
     {
         $boundParams = array();
-        if (isset($this->boundParams['where']) && isset($this->boundParams['having']))
-        {
+        if (isset($this->boundParams['where']) && isset($this->boundParams['having'])) {
              $boundParams = array_merge($boundParams, $this->boundParams['where'], $this->boundParams['having']);
         }
+
         return $boundParams;
     }
-    
+
     /**
      * Returns the full query string.
      *
-     * @param  bool $formatted format SQL string on multiple lines, default false
-     * 
+     * @param bool $formatted format SQL string on multiple lines, default false
+     *
      * @return string
      */
     public function getQueryString($formatted = false)
@@ -1094,11 +1027,10 @@ class SelectQueryBuilder extends WhereQueryBuilder
         //return empty string if from parts or selects parts are not set
         $tableFrom = $this->getFromTable();
         $selects = $this->getSelectParts();
-        if (empty($tableFrom) && empty($selects))
-        {
+        if (empty($tableFrom) && empty($selects)) {
             return '';
         }
-        
+
         return $this->getSelectString($formatted)
                 .$this->getFromString($formatted)
                 .$this->getWhereString($formatted)
@@ -1110,7 +1042,7 @@ class SelectQueryBuilder extends WhereQueryBuilder
 
     /**
      * Executes the query, but only returns the row count
-     * 
+     *
      * @return int|false
      */
     public function count()
@@ -1137,11 +1069,11 @@ class SelectQueryBuilder extends WhereQueryBuilder
 
         // Fetch the count from the query result
         $result = false;
-        if ($stmt instanceof \PDOStatement)
-        {
+        if ($stmt instanceof \PDOStatement) {
             $result = $stmt->fetchColumn();
             $stmt->closeCursor();
         }
+
         return $result;
     }
 }

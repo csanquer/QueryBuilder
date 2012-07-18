@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<phpunit 
+<phpunit
     bootstrap="tests/bootstrap.php"
     colors="true"
     convertErrorsToExceptions="true"
@@ -20,7 +20,7 @@
             <directory suffix=".php">lib/SQL/</directory>
         </whitelist>
     </filter>
-    
+
 <!--    <logging>
       <log type="coverage-html" target="build/coverage" charset="UTF-8"
            yui="true" highlight="true"

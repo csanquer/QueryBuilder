@@ -7,9 +7,9 @@ use SQL\Exception\QueryBuilderException;
 
 /**
  * Abstract Base class for Queries
- * 
+ *
  * Based on original code Querybuilder from https://github.com/jstayton/QueryBuilder
- * 
+ *
  * @author   Charles SANQUER <charles.sanquer@spyrit.net>
  */
 abstract class QueryBuilder
@@ -18,9 +18,9 @@ abstract class QueryBuilder
     const TYPE_INSERT = 'create';
     const TYPE_UPDATE = 'update';
     const TYPE_DELETE = 'delete';
- 
+
     const FETCH_LAST_INSERT_ID = 'last_insert_id';
-    
+
     /**
      * Brackets for grouping criteria.
      */
@@ -58,34 +58,34 @@ abstract class QueryBuilder
 
     /**
      *
-     * @var string 
+     * @var string
      */
     protected $indentChar;
 
     /**
      *
-     * @var int 
+     * @var int
      */
     protected $indentCharMultiplier;
 
     /**
      * flags for boolean functions
-     * 
-     * @var \SQL\Proxy\QueryConditionalProxy 
+     *
+     * @var \SQL\Proxy\QueryConditionalProxy
      */
-	protected $conditionalProxy = null;
-    
+    protected $conditionalProxy = null;
+
     /**
      * type of SQL Query (select,insert,update,delete)
-     * 
-     * @var string 
+     *
+     * @var string
      */
     protected $queryType;
-    
+
     /**
      * Constructor.
      *
-     * @param  PDO $PdoConnection optional PDO database connection
+     * @param  PDO                   $PdoConnection optional PDO database connection
      * @return SQL\Base\QueryBuilder
      */
     public function __construct(\PDO $PdoConnection = null)
@@ -112,19 +112,19 @@ abstract class QueryBuilder
     }
 
     /**
-     * get SQL Query Type 
-     * 
-     * @return type 
+     * get SQL Query Type
+     *
+     * @return type
      */
     public function getQueryType()
     {
         return $this->queryType;
     }
-    
+
     /**
      * Sets the PDO database connection to use in executing this query.
      *
-     * @param  PDO $PdoConnection optional PDO database connection
+     * @param  PDO                   $PdoConnection optional PDO database connection
      * @return SQL\Base\QueryBuilder
      */
     public function setConnection(\PDO $connection = null)
@@ -147,9 +147,9 @@ abstract class QueryBuilder
     /**
      * Returns the full query string.
      *
-     * @param  bool $formatted format SQL string on multiple lines, default false
+     * @param bool $formatted format SQL string on multiple lines, default false
      * @abstract
-     * 
+     *
      * @return string
      */
     abstract public function getQueryString($formatted = false);
@@ -157,7 +157,7 @@ abstract class QueryBuilder
     /**
      * Safely escapes a value for use in a query.
      *
-     * @param  string $value value to escape
+     * @param  string       $value value to escape
      * @return string|false
      */
     public function quote($value)
@@ -168,27 +168,21 @@ abstract class QueryBuilder
     /**
      * Safely escapes a value for use in a query.
      *
-     * @param  string $value value to escape
-     * @param  PDO|null $connection PDO connection
-     * 
+     * @param string   $value      value to escape
+     * @param PDO|null $connection PDO connection
+     *
      * @return string|false
      */
     public static function quoteValue($value, \PDO $connection = null)
     {
-        if (is_int($value) || is_float($value))
-        {
+        if (is_int($value) || is_float($value)) {
             return $value;
-        }
-        else
-        {
+        } else {
             // If a PDO database connection is set, use it to quote the value using
             // the underlying database. Otherwise, quote it manually.
-            if ($connection instanceof \PDO)
-            {
+            if ($connection instanceof \PDO) {
                 return $connection->quote($value);
-            }
-            else
-            {
+            } else {
                 return '\'' . addslashes($value) . '\'';
             }
         }
@@ -197,13 +191,12 @@ abstract class QueryBuilder
     /**
      * Adds an execution option like DISTINCT or SQL_CALC_FOUND_ROWS.
      *
-     * @param  string $option execution option to add
+     * @param  string                $option execution option to add
      * @return SQL\Base\QueryBuilder
      */
     public function addOption($option)
     {
-        if (!is_null($option) && $option != '')
-        {
+        if (!is_null($option) && $option != '') {
             $this->options[] = $option;
         }
 
@@ -212,7 +205,7 @@ abstract class QueryBuilder
 
     /**
      * get Options
-     * 
+     *
      * @return array
      */
     public function getOptions()
@@ -222,9 +215,9 @@ abstract class QueryBuilder
 
     /**
      * get SQL part
-     * 
-     * @param string $section
-     * @return mixed 
+     *
+     * @param  string $section
+     * @return mixed
      */
     protected function getSQLPart($section)
     {
@@ -234,25 +227,21 @@ abstract class QueryBuilder
     /**
      * Returns all bound parameters
      *
-     * @param bool $quoted default = false, if true the bound parameters are escaped
+     * @param bool        $quoted  default = false, if true the bound parameters are escaped
      * @param string|null $section default = null, which bound parameters section to retrieve
-     * 
+     *
      * @return array
      */
     public function getBoundParameters($quoted = false, $section = null)
     {
         $boundParams = array();
-        if (isset($this->boundParams[$section]))
-        {
+        if (isset($this->boundParams[$section])) {
             $boundParams = $this->boundParams[$section];
-        }
-        elseif (is_null($section) || $section === false)
-        {
+        } elseif (is_null($section) || $section === false) {
             $boundParams = $this->mergeBoundParameters();
         }
 
-        if ($quoted && !empty($boundParams))
-        {
+        if ($quoted && !empty($boundParams)) {
             return $this->quoteBoundParameters($boundParams);
         }
 
@@ -261,10 +250,10 @@ abstract class QueryBuilder
 
     /**
      * quote each item in a bound parameters array
-     * 
+     *
      * @param array $boundParameters
-     * 
-     * @return array 
+     *
+     * @return array
      */
     protected function quoteBoundParameters($boundParameters)
     {
@@ -273,96 +262,85 @@ abstract class QueryBuilder
 
     /**
      * Merge all BoundParameters section
-     * 
-     * @return array 
+     *
+     * @return array
      */
     protected function mergeBoundParameters()
     {
         $boundParams = array();
-        if (!empty($this->boundParams))
-        {
-            foreach ($this->boundParams as $sectionParams)
-            {
+        if (!empty($this->boundParams)) {
+            foreach ($this->boundParams as $sectionParams) {
                 $boundParams = array_merge($boundParams, $sectionParams);
             }
         }
+
         return $boundParams;
     }
 
     /**
      * return a indentation string repeat n times
-     * 
+     *
      * @param int $multiplier indent string multiplier
-     * 
-     * @return String 
+     *
+     * @return String
      */
     protected function indent($multiplier = 0)
     {
         $multiplier = (int) $multiplier;
-        if ($this->indentCharMultiplier > 0 && $multiplier > 0)
-        {
+        if ($this->indentCharMultiplier > 0 && $multiplier > 0) {
             return str_repeat($this->indentChar, $this->indentCharMultiplier * $multiplier);
         }
+
         return '';
     }
 
     /**
      * Replaces any parameter placeholders in a query with the value of that
-     * parameter. Useful for debugging. Assumes anonymous parameters from 
+     * parameter. Useful for debugging. Assumes anonymous parameters from
      * $params are are in the same order as specified in $query
      *
-     * @param string $query The sql query with parameter placeholders
-     * @param array $params default = empty array , The array of substitution parameters
-     * @param bool $quote default = true, if true quote each parameter
-     * @param PDO $connection default = null , PDO connection (used to quote values)
-     * 
+     * @param string $query      The sql query with parameter placeholders
+     * @param array  $params     default = empty array , The array of substitution parameters
+     * @param bool   $quote      default = true, if true quote each parameter
+     * @param PDO    $connection default = null , PDO connection (used to quote values)
+     *
      * @return string The debugged query
      */
     public static function debugQuery($query, $params = array(), $quoted = true, \PDO $connection = null)
     {
-        if (!empty($params) && is_array($params))
-        {
+        if (!empty($params) && is_array($params)) {
             $keys = array();
             // build a regular expression for each parameter
-            foreach ($params as $key => $value)
-            {
-                if (is_string($key))
-                {
-                    if (strpos($key, ':') === 0)
-                    {
+            foreach ($params as $key => $value) {
+                if (is_string($key)) {
+                    if (strpos($key, ':') === 0) {
                         $keys[] = '/' . $key . '/';
-                    }
-                    else
-                    {
+                    } else {
                         $keys[] = '/:' . $key . '/';
                     }
-                }
-                else
-                {
+                } else {
                     $keys[] = '/[?]/';
                 }
 
-                if ($quoted)
-                {
+                if ($quoted) {
                     $params[$key] = self::quoteValue($value, $connection);
-                }
-                elseif (is_string($value) && !is_numeric($value))
-                {
+                } elseif (is_string($value) && !is_numeric($value)) {
                     $params[$key] = '\'' . $value . '\'';
                 }
             }
             $query = preg_replace($keys, $params, $query, 1);
         }
+
         return $query;
     }
 
     /**
      * Replaces any parameter placeholders in a query with the value of that
-     * parameter. Useful for debugging. Assumes anonymous parameters from 
+     * parameter. Useful for debugging. Assumes anonymous parameters from
      * $params are are in the same order as specified in $query
      *
      * @param bool $quoted default = true, if true quote each parameter
-     * 
+     *
      * @return string The debugged query
      */
     public function debug($quoted = true, $formatted = true)
@@ -374,11 +352,11 @@ abstract class QueryBuilder
      * Executes the query using the PDO database connection and return result as PDOStatement or array of scalar values or objects
      *
      * @see PDOStatement::fetch() and PDOStatement::fetchAll()
-     * 
+     *
      * @param int $fetchStyle default = \PDO::FETCH_ASSOC , a PDO_FETCH constant to return a result as array or null to return a PDOStatement or \SQL\Base\QueryBuilder::FETCH_LAST_INSERT_ID
-     * 
+     *
      * @return array|PDOStatement|string|false , return PDOStatement if $fetch_style is null , or an array , or a SQL string if there is no PDO , or false if something goes wrong
-     * 
+     *
      * @throws PDOException if a error occured with PDO
      */
     public function query($fetchStyle = \PDO::FETCH_ASSOC)
@@ -388,32 +366,26 @@ abstract class QueryBuilder
         $queryString = $this->getQueryString();
 
         $res = false;
-        
+
         // Only execute if a query is set.
-        if (!empty($queryString))
-        {
+        if (!empty($queryString)) {
             // If no PDO database connection is set, the query cannot be executed so we return the SQL string.
-            if (!$PdoConnection instanceof \PDO)
-            {
+            if (!$PdoConnection instanceof \PDO) {
                 return $this->debug(true, true);
             }
 
             $PdoStatement = $PdoConnection->prepare($queryString);
             $PdoStatement->execute($this->getBoundParameters());
-            
-             
-            if (!is_null($fetchStyle))
-            {
-                switch ($this->queryType)
-                {
+
+            if (!is_null($fetchStyle)) {
+                switch ($this->queryType) {
                     case self::TYPE_INSERT;
                         $res = $PdoStatement->rowCount();
-                        if ($fetchStyle == self::FETCH_LAST_INSERT_ID && $res)
-                        {
+                        if ($fetchStyle == self::FETCH_LAST_INSERT_ID && $res) {
                             $res = $PdoConnection->lastInsertId();
                         }
                         break;
-                        
+
                     case self::TYPE_SELECT;
                         $res = $PdoStatement->fetchAll($fetchStyle);
                         break;
@@ -424,9 +396,7 @@ abstract class QueryBuilder
                         $res = $PdoStatement->rowCount();
                         break;
                 }
-            }
-            else
-            {
+            } else {
                 $res = $PdoStatement;
             }
         }
@@ -441,13 +411,14 @@ abstract class QueryBuilder
      * or a QueryConditionalProxy instance otherwise.
      * Allows for conditional statements in a fluid interface.
      *
-     * @param      bool $cond
+     * @param bool $cond
      *
-     * @return     \SQL\Proxy\QueryConditionalProxy|\SQL\Base\QueryBuilder
+     * @return \SQL\Proxy\QueryConditionalProxy|\SQL\Base\QueryBuilder
      */
     public function _if($cond)
     {
         $this->conditionalProxy = new QueryConditionalProxy($this, $cond, $this->conditionalProxy);
+
         return $this->conditionalProxy->getQueryOrProxy();
     }
 
@@ -455,16 +426,15 @@ abstract class QueryBuilder
      * Returns a QueryConditionalProxy instance.
      * Allows for conditional statements in a fluid interface.
      *
-     * @param      bool $cond ignored
+     * @param bool $cond ignored
      *
-     * @throws     SQL\Exception\QueryBuilderException
-     * 
-     * @return     \SQL\Proxy\QueryConditionalProxy|\SQL\Base\QueryBuilder
+     * @throws SQL\Exception\QueryBuilderException
+     *
+     * @return \SQL\Proxy\QueryConditionalProxy|\SQL\Base\QueryBuilder
      */
     public function _elseif($cond)
     {
-        if (!$this->conditionalProxy)
-        {
+        if (!$this->conditionalProxy) {
             throw new QueryBuilderException('_elseif() must be called after _if()');
         }
 
@@ -475,14 +445,13 @@ abstract class QueryBuilder
      * Returns a QueryConditionalProxy instance.
      * Allows for conditional statements in a fluid interface.
      *
-     * @throws     SQL\Exception\QueryBuilderException
-     * 
-     * @return     \SQL\Proxy\QueryConditionalProxy|\SQL\Base\QueryBuilder
+     * @throws SQL\Exception\QueryBuilderException
+     *
+     * @return \SQL\Proxy\QueryConditionalProxy|\SQL\Base\QueryBuilder
      */
     public function _else()
     {
-        if (!$this->conditionalProxy)
-        {
+        if (!$this->conditionalProxy) {
             throw new QueryBuilderException('_else() must be called after _if()');
         }
 
@@ -493,21 +462,19 @@ abstract class QueryBuilder
      * Returns the current object
      * Allows for conditional statements in a fluid interface.
      *
-     * @throws     SQL\Exception\QueryBuilderException
-     * 
-     * @return     \SQL\Base\QueryBuilder
+     * @throws SQL\Exception\QueryBuilderException
+     *
+     * @return \SQL\Base\QueryBuilder
      */
     public function _endif()
     {
-        if (!$this->conditionalProxy)
-        {
+        if (!$this->conditionalProxy) {
             throw new QueryBuilderException('_endif() must be called after _if()');
         }
 
         $this->conditionalProxy = $this->conditionalProxy->getParentProxy();
 
-        if ($this->conditionalProxy)
-        {
+        if ($this->conditionalProxy) {
             return $this->conditionalProxy->getQueryOrProxy();
         }
 

@@ -22,7 +22,7 @@ class InsertQueryBuilderTest extends PDOTestCase
     {
         $this->queryBuilder = new InsertQueryBuilder(self::$pdo);
     }
-    
+
     /**
      * @dataProvider intoProvider
      */
@@ -42,16 +42,15 @@ class InsertQueryBuilderTest extends PDOTestCase
             array('book', array('id', 'title'), array('table' => 'book', 'columns' => array('id', 'title'))),
         );
     }
-    
+
     /**
      * @dataProvider GetIntoStringProvider
      */
     public function testGetIntoString($table, $columns, $options, $expected, $expectedFormatted)
     {
         $this->queryBuilder->into($table, $columns);
-        
-        foreach ($options as $option)
-        {
+
+        foreach ($options as $option) {
             $this->queryBuilder->addOption($option);
         }
 
@@ -85,7 +84,7 @@ class InsertQueryBuilderTest extends PDOTestCase
             ),
         );
     }
-    
+
     /**
      * @dataProvider valuesProvider
      */
@@ -95,7 +94,7 @@ class InsertQueryBuilderTest extends PDOTestCase
         $this->assertEquals($expectedValues, $this->queryBuilder->getValuesPart());
         $this->assertEquals($expectedValues, $this->queryBuilder->getValues());
     }
-    
+
     public function valuesProvider()
     {
         return array(
@@ -117,22 +116,21 @@ class InsertQueryBuilderTest extends PDOTestCase
             ),
         );
     }
-    
+
     /**
      * @dataProvider getValuesStringProvider
      */
     public function testGetValuesString($values, $expectedBoundParameters, $expected, $expectedFormatted)
     {
-        foreach ($values as $value)
-        {
+        foreach ($values as $value) {
             $this->queryBuilder->values($value);
         }
-        
+
         $this->assertEquals($expected, $this->queryBuilder->getValuesString());
         $this->assertEquals($expectedFormatted, $this->queryBuilder->getValuesString(true));
         $this->assertEquals($expectedBoundParameters, $this->queryBuilder->getBoundParameters());
     }
-    
+
     public function getValuesStringProvider()
     {
         return array(
@@ -166,28 +164,28 @@ class InsertQueryBuilderTest extends PDOTestCase
             ),
         );
     }
-    
+
     public function testSelect()
     {
         $select = new SelectQueryBuilder();
-        
+
         $this->assertInstanceOf('SQL\InsertQueryBuilder', $this->queryBuilder->select($select));
         $this->assertEquals($select, $this->queryBuilder->getSelectPart($select));
         $this->assertEquals($select, $this->queryBuilder->getSelect($select));
     }
-    
+
     /**
      * @dataProvider getSelectStringProvider
      */
     public function testGetSelectString($selectQueryBuilder, $expectedBoundParameters, $expected, $expectedFormatted)
     {
         $this->queryBuilder->select($selectQueryBuilder);
-        
+
         $this->assertEquals($expected, $this->queryBuilder->getSelectString());
         $this->assertEquals($expectedFormatted, $this->queryBuilder->getSelectString(true));
         $this->assertEquals($expectedBoundParameters, $this->queryBuilder->getBoundParameters());
     }
-    
+
     public function getSelectStringProvider()
     {
         $select1 = new SelectQueryBuilder();
@@ -195,7 +193,7 @@ class InsertQueryBuilderTest extends PDOTestCase
         $select1->select('title');
         $select1->from('OldBook', 'o');
         $select1->where('price', 8, SelectQueryBuilder::GREATER_THAN_OR_EQUAL);
-        
+
         return array(
             array(
                 $select1,
@@ -205,28 +203,26 @@ class InsertQueryBuilderTest extends PDOTestCase
             ),
         );
     }
-    
+
     /**
      * @dataProvider getQueryStringProvider
      */
     public function testGetQueryString($table, $columns, $values, $select, $expectedBoundParameters, $expected, $expectedFormatted)
     {
         $this->queryBuilder->into($table, $columns);
-        
-        foreach ($values as $value)
-        {
+
+        foreach ($values as $value) {
             $this->queryBuilder->values($value);
         }
-        
-        if (!empty($select))
-        {
+
+        if (!empty($select)) {
             $this->queryBuilder->select($select);
         }
-        
+
         $this->assertEquals($expected, $this->queryBuilder->getQueryString());
         $this->assertEquals($expectedFormatted, $this->queryBuilder->getQueryString(true));
     }
-    
+
     public function getQueryStringProvider()
     {
         $select1 = new SelectQueryBuilder();
@@ -234,7 +230,7 @@ class InsertQueryBuilderTest extends PDOTestCase
         $select1->select('title');
         $select1->from('OldBook', 'o');
         $select1->where('price', 8, SelectQueryBuilder::GREATER_THAN_OR_EQUAL);
-        
+
         return array(
             array(
                 '',
