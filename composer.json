@@ -1,0 +1,18 @@
+{
+    "autoload": {
+        "classmap": [ "src/SQL" ]
+    },
+    "name": "csanquer/querybuilder",
+    "description": "SQL Query Builder library",
+    "keywords": [ "query", "sql"],
+    "license": "LGPL-3.0",
+    "authors": [
+        {
+            "name": "Charles SANQUER",
+            "email": "charles.sanquer@gmail.com"
+        }
+    ],
+    "require": {
+        "php" : ">=5.2"
+    }
+}
