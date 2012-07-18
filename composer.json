@@ -1,14 +1,18 @@
 {
     "autoload": {
-        "psr-0": {"SQL": "lib/"}
+        "psr-0": {"SQL": "src/"}
     },
     "name": "csanquer/querybuilder",
     "description": "SQL Query Builder library",
+    "keywords": [ "query", "sql"],
+    "license": "LGPL-3.0",
     "authors": [
         {
             "name": "Charles SANQUER",
-            "email": "charles.sanquer@spyrit.net"
+            "email": "charles.sanquer@gmail.com"
         }
     ],
-    "require": {}
+    "require": {
+        "php" : ">=5.3"
+    }
 }

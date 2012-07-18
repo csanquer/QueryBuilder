@@ -21,9 +21,10 @@
         </whitelist>
     </filter>
     
-    <logging>
+<!--    <logging>
       <log type="coverage-html" target="build/coverage" charset="UTF-8"
            yui="true" highlight="true"
            lowUpperBound="40" highLowerBound="80"/>
     </logging>
+-->
 </phpunit>
