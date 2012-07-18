@@ -42,13 +42,13 @@ class QueryBuilderTest extends PDOTestCase
     public function testSetPdoConnection()
     {
         $queryBuilder = $this->getMockForAbstractClass('QueryBuilder');
-        $queryBuilder->setConnection(new \PDO('sqlite::memory:'));
-        $this->assertInstanceOf('\PDO', $queryBuilder->getConnection());
+        $queryBuilder->setConnection(new PDO('sqlite::memory:'));
+        $this->assertInstanceOf('PDO', $queryBuilder->getConnection());
     }
 
     public function testGetPdoConnection()
     {
-        $this->assertInstanceOf('\PDO', $this->queryBuilder->getConnection());
+        $this->assertInstanceOf('PDO', $this->queryBuilder->getConnection());
     }
 
     public function testQuote()
@@ -188,7 +188,7 @@ class QueryBuilderTest extends PDOTestCase
         $this->setBoundParams(array('where' => array(2)));
         $this->setQueryType(QueryBuilder::TYPE_SELECT);
 
-        $this->assertInstanceOf('\PDOStatement', $this->queryBuilder->query(null));
+        $this->assertInstanceOf('PDOStatement', $this->queryBuilder->query(null));
 
         $expected = array(
             array(
@@ -217,7 +217,7 @@ class QueryBuilderTest extends PDOTestCase
             ),
         );
 
-        $this->assertEquals($expected, $this->queryBuilder->query(\PDO::FETCH_ASSOC));
+        $this->assertEquals($expected, $this->queryBuilder->query(PDO::FETCH_ASSOC));
         $this->assertEquals($expected, $this->queryBuilder->query());
     }
 

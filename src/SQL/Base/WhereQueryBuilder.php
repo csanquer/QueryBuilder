@@ -149,7 +149,7 @@ abstract class WhereQueryBuilder extends QueryBuilder
             case self::BETWEEN:
             case self::NOT_BETWEEN:
                 if (!is_array($value) || count($value) != 2) {
-                    throw new \InvalidArgumentException('the operator BETWEEN need a array value with 2 elements : minimum and maximum');
+                    throw new InvalidArgumentException('the operator BETWEEN need a array value with 2 elements : minimum and maximum');
                 }
 
                 sort($value);

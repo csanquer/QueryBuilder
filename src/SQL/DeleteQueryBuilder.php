@@ -141,7 +141,7 @@ class DeleteQueryBuilder extends WhereQueryBuilder
      * @param string $operator  optional comparison operator, default = '='
      * @param string $connector optional logical connector, default AND
      *
-     * @return \DeleteQueryBuilder
+     * @return DeleteQueryBuilder
      */
     public function where($column, $value, $operator = self::EQUALS, $connector = self::LOGICAL_AND)
     {

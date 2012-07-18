@@ -24,7 +24,7 @@ class WhereQueryBuilderTest extends PDOTestCase
     }
 
     /**
-     * @expectedException \InvalidArgumentException
+     * @expectedException InvalidArgumentException
      */
     public function testWhereBetweenException()
     {
