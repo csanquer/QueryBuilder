@@ -17,7 +17,7 @@
 
     <filter>
         <whitelist>
-            <directory suffix=".php">lib/SQL/</directory>
+            <directory suffix=".php">src/SQL/</directory>
         </whitelist>
     </filter>
 
