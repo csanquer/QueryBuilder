@@ -15,7 +15,7 @@ Licensing
 
 * Copyright (C) 2009-2010 Justin Stayton <justin.stayton@gmail.com>
 * Copyright (C) 2011 Matt Labrum
-* Copyright (C) 2011-2012 Charles SANQUER <charles.sanquer@spyrit.net>
+* Copyright (C) 2011-2012 Charles SANQUER <charles.sanquer@gmail.com>
 
 This file is part of SQLQueryBuilder.
 

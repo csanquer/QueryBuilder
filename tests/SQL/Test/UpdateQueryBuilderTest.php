@@ -17,9 +17,9 @@ class UpdateQueryBuilderTest extends PDOTestCase
         $this->queryBuilder = new UpdateQueryBuilder(self::$pdo);
     }
 
-    public function testTable()
+    public function testUpdate()
     {
-        $this->assertInstanceOf('UpdateQueryBuilder', $this->queryBuilder->table('book'));
+        $this->assertInstanceOf('UpdateQueryBuilder', $this->queryBuilder->update('book'));
         $this->assertEquals('book', $this->queryBuilder->getTablePart());
         $this->assertEquals('book', $this->queryBuilder->getTable());
     }
@@ -29,7 +29,7 @@ class UpdateQueryBuilderTest extends PDOTestCase
      */
     public function testGetTableString($table, $options, $expected, $expectedFormatted)
     {
-        $this->queryBuilder->table($table);
+        $this->queryBuilder->update($table);
 
         foreach ($options as $option) {
             $this->queryBuilder->addOption($option);
@@ -258,7 +258,7 @@ class UpdateQueryBuilderTest extends PDOTestCase
      */
     public function testGetQueryString($table, $sets, $wheres, $expectedBoundParameters, $expected, $expectedFormatted)
     {
-        $this->queryBuilder->table($table);
+        $this->queryBuilder->update($table);
 
         foreach ($sets as $set) {
             $this->queryBuilder->set($set[0], $set[1], $set[2]);

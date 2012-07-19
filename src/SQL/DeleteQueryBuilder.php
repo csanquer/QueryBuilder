@@ -3,7 +3,7 @@
 /**
  * Class for building programmatically PDO Delete queries
  *
- * @author   Charles SANQUER <charles.sanquer@spyrit.net>
+ * @author   Charles SANQUER <charles.sanquer@gmail.com>
  */
 class DeleteQueryBuilder extends WhereQueryBuilder
 {
@@ -30,7 +30,7 @@ class DeleteQueryBuilder extends WhereQueryBuilder
      *
      * @return DeleteQueryBuilder
      */
-    public function from($table)
+    public function deleteFrom($table)
     {
         $this->sqlParts['from'] = (string) $table;
 

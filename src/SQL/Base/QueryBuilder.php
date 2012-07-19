@@ -5,7 +5,7 @@
  *
  * Based on original code Querybuilder from https://github.com/jstayton/QueryBuilder
  *
- * @author   Charles SANQUER <charles.sanquer@spyrit.net>
+ * @author   Charles SANQUER <charles.sanquer@gmail.com>
  */
 abstract class QueryBuilder
 {

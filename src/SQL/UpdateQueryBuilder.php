@@ -3,7 +3,7 @@
 /**
  * Class for building programmatically PDO Update queries
  *
- * @author   Charles SANQUER <charles.sanquer@spyrit.net>
+ * @author   Charles SANQUER <charles.sanquer@gmail.com>
  */
 class UpdateQueryBuilder extends WhereQueryBuilder
 {
@@ -48,7 +48,7 @@ class UpdateQueryBuilder extends WhereQueryBuilder
      *
      * @return UpdateQueryBuilder
      */
-    public function table($table)
+    public function update($table)
     {
         $this->sqlParts['table'] = (string) $table;
 

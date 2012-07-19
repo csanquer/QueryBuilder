@@ -18,16 +18,16 @@ class DeleteQueryBuilderTest extends PDOTestCase
     }
 
     /**
-     * @dataProvider fromProvider
+     * @dataProvider deleteFromProvider
      */
-    public function testFrom($table)
+    public function testDeleteFrom($table)
     {
-        $this->assertInstanceOf('DeleteQueryBuilder', $this->queryBuilder->from($table));
+        $this->assertInstanceOf('DeleteQueryBuilder', $this->queryBuilder->deleteFrom($table));
         $this->assertEquals($table, $this->queryBuilder->getFromTable());
         $this->assertEquals($table, $this->queryBuilder->getFromPart());
     }
 
-    public function fromProvider()
+    public function deleteFromProvider()
     {
         return array(
             array(null),
@@ -41,7 +41,7 @@ class DeleteQueryBuilderTest extends PDOTestCase
      */
     public function testGetFromString($table, $options, $expected, $expectedFormatted)
     {
-        $this->queryBuilder->from($table);
+        $this->queryBuilder->deleteFrom($table);
 
         foreach ($options as $option) {
             $this->queryBuilder->addOption($option);
@@ -150,7 +150,7 @@ class DeleteQueryBuilderTest extends PDOTestCase
     public function testGetQueryString($from, $wheres, $expectedQuery, $expectedFormattedQuery, $expectedBoundParameters, $expectedQuotedBoundParameters, $expectedDebuggedQuery)
     {
         if (!empty($from)) {
-            $this->queryBuilder->from($from);
+            $this->queryBuilder->deleteFrom($from);
         }
 
         foreach ($wheres as $where) {
