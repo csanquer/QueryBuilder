@@ -46,6 +46,60 @@ class QueryBuilderTest extends PDOTestCase
         $boundParams->setValue($this->queryBuilder, $value);
     }
 
+    public function testCreateSelect()
+    {
+        $this->assertInstanceOf('\SQL\SelectQueryBuilder', QueryBuilder::createSelect());
+    }
+    
+    public function testCreateInsert()
+    {
+        $this->assertInstanceOf('\SQL\InsertQueryBuilder', QueryBuilder::createInsert());
+    }
+
+    public function testCreateUpdate()
+    {
+        $this->assertInstanceOf('\SQL\UpdateQueryBuilder', QueryBuilder::createUpdate());
+    }
+    
+    public function testCreateDelete()
+    {
+        $this->assertInstanceOf('\SQL\DeleteQueryBuilder', QueryBuilder::createDelete());
+    }
+    
+    /**
+     * @dataProvider createProvider
+     */
+    public function testCreate($type, $class)
+    {
+        $this->assertInstanceOf($class, QueryBuilder::create($type));
+    }
+    
+    public function createProvider()
+    {
+        return array(
+            array(
+                null,
+               '\SQL\SelectQueryBuilder',
+            ),
+            array(
+                QueryBuilder::TYPE_SELECT,
+               '\SQL\SelectQueryBuilder',
+            ),
+            array(
+                QueryBuilder::TYPE_INSERT,
+               '\SQL\InsertQueryBuilder',
+            ),
+            array(
+                QueryBuilder::TYPE_UPDATE,
+               '\SQL\UpdateQueryBuilder',
+            ),
+            array(
+                QueryBuilder::TYPE_DELETE,
+               '\SQL\DeleteQueryBuilder',
+            ),
+        );
+    }
+    
     public function testSetPdoConnection()
     {
         $queryBuilder = $this->getMockForAbstractClass('SQL\Base\QueryBuilder');

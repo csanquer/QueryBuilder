@@ -4,6 +4,10 @@ namespace SQL\Base;
 
 use SQL\Proxy\QueryConditionalProxy;
 use SQL\Exception\QueryBuilderException;
+use SQL\SelectQueryBuilder;
+use SQL\InsertQueryBuilder;
+use SQL\UpdateQueryBuilder;
+use SQL\DeleteQueryBuilder;
 
 /**
  * Abstract Base class for Queries
@@ -15,7 +19,7 @@ use SQL\Exception\QueryBuilderException;
 abstract class QueryBuilder
 {
     const TYPE_SELECT = 'select';
-    const TYPE_INSERT = 'create';
+    const TYPE_INSERT = 'insert';
     const TYPE_UPDATE = 'update';
     const TYPE_DELETE = 'delete';
 
@@ -111,6 +115,76 @@ abstract class QueryBuilder
         return $this->getQueryString(false);
     }
 
+    /**
+     * create a specific QueryBuilder
+     *
+     * @param string $type among these values SQL\Base\QueryBuilder::TYPE_SELECT, SQL\Base\QueryBuilder::TYPE_INSERT, SQL\Base\QueryBuilder::TYPE_UPDATE, SQL\Base\QueryBuilder::TYPE_DELETE or null (select)
+     * @param \PDO $PdoConnection
+     * 
+     * @return \SQL\UpdateQueryBuilder|\SQL\InsertQueryBuilder|\SQL\DeleteQueryBuilder|\SQL\SelectQueryBuilder 
+     */
+    public static function create($type = null, \PDO $PdoConnection = null)
+    {
+        switch ($type) {
+            case static::TYPE_UPDATE:
+                return new UpdateQueryBuilder($PdoConnection);
+                break;
+
+            case static::TYPE_INSERT:
+                return new InsertQueryBuilder($PdoConnection);
+                break;
+            
+            case static::TYPE_DELETE:
+                return new DeleteQueryBuilder($PdoConnection);
+                break;
+            
+            case static::TYPE_SELECT:
+            default:
+                return new SelectQueryBuilder($PdoConnection);
+                break;
+        }
+    }
+    
+    /**
+     *
+     * @param \PDO $PdoConnection
+     * @return \SQL\SelectQueryBuilder  
+     */
+    public static function createSelect(\PDO $PdoConnection = null)
+    {
+        return static::create(static::TYPE_SELECT);
+    }
+    
+    /**
+     *
+     * @param \PDO $PdoConnection
+     * @return \SQL\InsertQueryBuilder  
+     */
+    public static function createInsert(\PDO $PdoConnection = null)
+    {
+        return static::create(static::TYPE_INSERT);
+    }
+    
+    /**
+     *
+     * @param \PDO $PdoConnection
+     * @return \SQL\UpdateQueryBuilder  
+     */
+    public static function createUpdate(\PDO $PdoConnection = null)
+    {
+        return static::create(static::TYPE_UPDATE);
+    }
+    
+    /**
+     *
+     * @param \PDO $PdoConnection
+     * @return \SQL\DeleteQueryBuilder  
+     */
+    public static function createDelete(\PDO $PdoConnection = null)
+    {
+        return static::create(static::TYPE_DELETE);
+    }
+    
     /**
      * get SQL Query Type
      *
