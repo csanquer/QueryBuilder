@@ -11,7 +11,7 @@ use SQL\Base\WhereQueryBuilder;
  *
  * @author   Justin Stayton <justin.stayton@gmail.com>
  * @author   Matt Labrum
- * @author   Charles SANQUER <charles.sanquer@spyrit.net>
+ * @author   Charles SANQUER <charles.sanquer@gmail.com>
  */
 class SelectQueryBuilder extends WhereQueryBuilder
 {

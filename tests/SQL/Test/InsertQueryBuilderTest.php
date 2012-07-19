@@ -43,11 +43,28 @@ class InsertQueryBuilderTest extends PDOTestCase
         );
     }
 
+    public function testIsReplace()
+    {
+        $this->assertFalse($this->queryBuilder->isReplace());
+        
+        $this->queryBuilder->replace();
+        $this->assertTrue($this->queryBuilder->isReplace());
+        
+        $this->queryBuilder->insert();
+        $this->assertFalse($this->queryBuilder->isReplace());
+    }
+    
     /**
      * @dataProvider GetIntoStringProvider
      */
-    public function testGetIntoString($table, $columns, $options, $expected, $expectedFormatted)
+    public function testGetIntoString($replace, $table, $columns, $options, $expected, $expectedFormatted)
     {
+        if ($replace === true) {
+            $this->queryBuilder->replace();
+        } elseif ($replace === false) {
+            $this->queryBuilder->insert();
+        }
+        
         $this->queryBuilder->into($table, $columns);
 
         foreach ($options as $option) {
@@ -62,6 +79,7 @@ class InsertQueryBuilderTest extends PDOTestCase
     {
         return array(
             array(
+                false,
                 'book',
                 null,
                 array(),
@@ -69,6 +87,23 @@ class InsertQueryBuilderTest extends PDOTestCase
                 'INSERT INTO book '."\n",
             ),
             array(
+                true,
+                'book',
+                null,
+                array(),
+                'REPLACE INTO book ',
+                'REPLACE INTO book '."\n",
+            ),
+            array(
+                null,
+                'book',
+                null,
+                array(),
+                'INSERT INTO book ',
+                'INSERT INTO book '."\n",
+            ),
+            array(
+                null,
                 'book',
                 array('id', 'title'),
                 array(),
@@ -76,6 +111,7 @@ class InsertQueryBuilderTest extends PDOTestCase
                 'INSERT INTO book (id, title) '."\n",
             ),
             array(
+                null,
                 'book',
                 array(),
                 array('LOW PRIORITY'),

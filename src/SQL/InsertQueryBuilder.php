@@ -7,10 +7,16 @@ use SQL\Base\QueryBuilder;
 /**
  * Class for building programmatically PDO Insert queries
  *
- * @author   Charles SANQUER <charles.sanquer@spyrit.net>
+ * @author   Charles SANQUER <charles.sanquer@gmail.com>
  */
 class InsertQueryBuilder extends QueryBuilder
 {
+    /**
+     *
+     * @var bool
+     */
+    protected $replaceMode = false;
+    
     /**
      * Constructor.
      *
@@ -32,6 +38,38 @@ class InsertQueryBuilder extends QueryBuilder
         $this->boundParams['select'] = array();
     }
 
+    /**
+     * use INSERT clause.
+     *
+     * @return SQL\InsertQueryBuilder
+     */
+    public function insert()
+    {
+        $this->replaceMode = false;
+        return $this;
+    }
+    
+    /**
+     * use REPLACE clause.
+     *
+     * @return SQL\InsertQueryBuilder
+     */
+    public function replace()
+    {
+        $this->replaceMode = true;
+        return $this;
+    }
+    
+    /**
+     * check if the query is an REPLACE query
+     * 
+     * @return bool
+     */
+    public function isReplace()
+    {
+        return $this->replaceMode;
+    }
+    
     /**
      * Sets the INTO table with optional columns.
      *
@@ -110,7 +148,7 @@ class InsertQueryBuilder extends QueryBuilder
                 $options = implode(' ', $this->options).' ';
             }
 
-            $into = 'INSERT '.$options.'INTO '.$into;
+            $into = ($this->replaceMode ? 'REPLACE' : 'INSERT' ).' '.$options.'INTO '.$into;
 
             $columns = $this->getIntoColumns();
             if (!empty($columns)) {

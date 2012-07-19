@@ -11,7 +11,7 @@ namespace SQL\Proxy;
  * under MIT license
  *
  * @author   Francois Zaninotto
- * @author   Charles SANQUER <charles.sanquer@spyrit.net>
+ * @author   Charles SANQUER <charles.sanquer@gmail.com>
  */
 class QueryConditionalProxy
 {
