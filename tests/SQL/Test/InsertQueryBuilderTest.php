@@ -40,14 +40,14 @@ class InsertQueryBuilderTest extends PDOTestCase
     public function testIsReplace()
     {
         $this->assertFalse($this->queryBuilder->isReplace());
-        
+
         $this->queryBuilder->replace();
         $this->assertTrue($this->queryBuilder->isReplace());
-        
+
         $this->queryBuilder->insert();
         $this->assertFalse($this->queryBuilder->isReplace());
     }
-    
+
     /**
      * @dataProvider GetIntoStringProvider
      */
@@ -58,7 +58,7 @@ class InsertQueryBuilderTest extends PDOTestCase
         } elseif ($replace === false) {
             $this->queryBuilder->insert();
         }
-        
+
         $this->queryBuilder->into($table, $columns);
 
         foreach ($options as $option) {

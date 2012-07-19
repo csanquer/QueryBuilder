@@ -13,6 +13,60 @@ class QueryBuilderTest extends PDOTestCase
         $this->queryBuilder = new QueryBuilderMock(self::$pdo);
     }
 
+    public function testCreateSelect()
+    {
+        $this->assertInstanceOf('SelectQueryBuilder', QueryBuilder::createSelect());
+    }
+
+    public function testCreateInsert()
+    {
+        $this->assertInstanceOf('InsertQueryBuilder', QueryBuilder::createInsert());
+    }
+
+    public function testCreateUpdate()
+    {
+        $this->assertInstanceOf('UpdateQueryBuilder', QueryBuilder::createUpdate());
+    }
+
+    public function testCreateDelete()
+    {
+        $this->assertInstanceOf('DeleteQueryBuilder', QueryBuilder::createDelete());
+    }
+
+    /**
+     * @dataProvider createProvider
+     */
+    public function testCreate($type, $class)
+    {
+        $this->assertInstanceOf($class, QueryBuilder::create($type));
+    }
+
+    public function createProvider()
+    {
+        return array(
+            array(
+                null,
+               'SelectQueryBuilder',
+            ),
+            array(
+                QueryBuilder::TYPE_SELECT,
+               'SelectQueryBuilder',
+            ),
+            array(
+                QueryBuilder::TYPE_INSERT,
+               'InsertQueryBuilder',
+            ),
+            array(
+                QueryBuilder::TYPE_UPDATE,
+               'UpdateQueryBuilder',
+            ),
+            array(
+                QueryBuilder::TYPE_DELETE,
+               'DeleteQueryBuilder',
+            ),
+        );
+    }
+
     public function testSetPdoConnection()
     {
         $queryBuilder = $this->getMockForAbstractClass('QueryBuilder');
@@ -125,7 +179,7 @@ class QueryBuilderTest extends PDOTestCase
     public function testQueryWithoutQueryStatement()
     {
         $this->queryBuilder->setTestQueryString(null);
-        
+
         $this->assertFalse($this->queryBuilder->query());
     }
 
@@ -294,25 +348,25 @@ class QueryBuilderTest extends PDOTestCase
     }
 }
 
-class QueryBuilderMock extends QueryBuilder 
+class QueryBuilderMock extends QueryBuilder
 {
     private $testQueryString;
-    
+
     public function setBoundParams($params)
     {
         $this->boundParams = $params;
     }
-    
+
     public function setQueryType($type)
     {
         $this->queryType = $type;
     }
-    
+
     public function setTestQueryString($query)
     {
         $this->testQueryString = $query;
     }
-    
+
     /**
      * Test implementation of Abstract method in QueryBuilder
      *

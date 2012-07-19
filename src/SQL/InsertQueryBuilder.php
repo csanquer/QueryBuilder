@@ -12,7 +12,7 @@ class InsertQueryBuilder extends QueryBuilder
      * @var bool
      */
     protected $replaceMode = false;
-    
+
     /**
      * Constructor.
      *
@@ -42,9 +42,10 @@ class InsertQueryBuilder extends QueryBuilder
     public function insert()
     {
         $this->replaceMode = false;
+
         return $this;
     }
-    
+
     /**
      * use REPLACE clause.
      *
@@ -53,19 +54,20 @@ class InsertQueryBuilder extends QueryBuilder
     public function replace()
     {
         $this->replaceMode = true;
+
         return $this;
     }
-    
+
     /**
      * check if the query is an REPLACE query
-     * 
+     *
      * @return bool
      */
     public function isReplace()
     {
         return $this->replaceMode;
     }
-    
+
     /**
      * Sets the INTO table with optional columns.
      *

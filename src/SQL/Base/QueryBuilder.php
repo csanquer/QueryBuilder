@@ -10,7 +10,7 @@
 abstract class QueryBuilder
 {
     const TYPE_SELECT = 'select';
-    const TYPE_INSERT = 'create';
+    const TYPE_INSERT = 'insert';
     const TYPE_UPDATE = 'update';
     const TYPE_DELETE = 'delete';
 
@@ -104,6 +104,76 @@ abstract class QueryBuilder
     public function __toString()
     {
         return $this->getQueryString(false);
+    }
+
+    /**
+     * create a specific QueryBuilder
+     *
+     * @param string $type          among these values QueryBuilder::TYPE_SELECT, QueryBuilder::TYPE_INSERT, QueryBuilder::TYPE_UPDATE, QueryBuilder::TYPE_DELETE or null (select)
+     * @param PDO    $PdoConnection
+     *
+     * @return UpdateQueryBuilder|InsertQueryBuilder|DeleteQueryBuilder|SelectQueryBuilder
+     */
+    public static function create($type = null, PDO $PdoConnection = null)
+    {
+        switch ($type) {
+            case static::TYPE_UPDATE:
+                return new UpdateQueryBuilder($PdoConnection);
+                break;
+
+            case static::TYPE_INSERT:
+                return new InsertQueryBuilder($PdoConnection);
+                break;
+
+            case static::TYPE_DELETE:
+                return new DeleteQueryBuilder($PdoConnection);
+                break;
+
+            case static::TYPE_SELECT:
+            default:
+                return new SelectQueryBuilder($PdoConnection);
+                break;
+        }
+    }
+
+    /**
+     *
+     * @param  PDO                $PdoConnection
+     * @return SelectQueryBuilder
+     */
+    public static function createSelect(PDO $PdoConnection = null)
+    {
+        return static::create(static::TYPE_SELECT);
+    }
+
+    /**
+     *
+     * @param  PDO                $PdoConnection
+     * @return InsertQueryBuilder
+     */
+    public static function createInsert(PDO $PdoConnection = null)
+    {
+        return static::create(static::TYPE_INSERT);
+    }
+
+    /**
+     *
+     * @param  PDO                $PdoConnection
+     * @return UpdateQueryBuilder
+     */
+    public static function createUpdate(PDO $PdoConnection = null)
+    {
+        return static::create(static::TYPE_UPDATE);
+    }
+
+    /**
+     *
+     * @param  PDO                $PdoConnection
+     * @return DeleteQueryBuilder
+     */
+    public static function createDelete(PDO $PdoConnection = null)
+    {
+        return static::create(static::TYPE_DELETE);
     }
 
     /**
