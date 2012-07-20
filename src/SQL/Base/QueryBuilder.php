@@ -117,19 +117,19 @@ abstract class QueryBuilder
     public static function create($type = null, PDO $PdoConnection = null)
     {
         switch ($type) {
-            case static::TYPE_UPDATE:
+            case self::TYPE_UPDATE:
                 return new UpdateQueryBuilder($PdoConnection);
                 break;
 
-            case static::TYPE_INSERT:
+            case self::TYPE_INSERT:
                 return new InsertQueryBuilder($PdoConnection);
                 break;
 
-            case static::TYPE_DELETE:
+            case self::TYPE_DELETE:
                 return new DeleteQueryBuilder($PdoConnection);
                 break;
 
-            case static::TYPE_SELECT:
+            case self::TYPE_SELECT:
             default:
                 return new SelectQueryBuilder($PdoConnection);
                 break;
@@ -143,7 +143,7 @@ abstract class QueryBuilder
      */
     public static function createSelect(PDO $PdoConnection = null)
     {
-        return static::create(static::TYPE_SELECT);
+        return self::create(self::TYPE_SELECT);
     }
 
     /**
@@ -153,7 +153,7 @@ abstract class QueryBuilder
      */
     public static function createInsert(PDO $PdoConnection = null)
     {
-        return static::create(static::TYPE_INSERT);
+        return self::create(self::TYPE_INSERT);
     }
 
     /**
@@ -163,7 +163,7 @@ abstract class QueryBuilder
      */
     public static function createUpdate(PDO $PdoConnection = null)
     {
-        return static::create(static::TYPE_UPDATE);
+        return self::create(self::TYPE_UPDATE);
     }
 
     /**
@@ -173,7 +173,7 @@ abstract class QueryBuilder
      */
     public static function createDelete(PDO $PdoConnection = null)
     {
-        return static::create(static::TYPE_DELETE);
+        return self::create(self::TYPE_DELETE);
     }
 
     /**
