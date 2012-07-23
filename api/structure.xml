@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<project version="2.0.0a8" title="">
+<project version="2.0.0a8" title="&lt;b&gt;SQL QueryBuilder&lt;/b&gt;">
   <file path="Exception/QueryBuilderException.php" hash="0251cc64548e988391e111a930a945af" package="Default">
     <class final="false" abstract="false" namespace="SQL\Exception" line="9" package="Default">
       <extends>\Exception</extends>
