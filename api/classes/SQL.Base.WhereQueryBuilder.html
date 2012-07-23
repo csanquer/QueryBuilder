@@ -1,0 +1,1309 @@
+<!DOCTYPE html><html xmlns:date="http://exslt.org/dates-and-times" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<meta name="viewport" content="width=device-width; initial-scale=1.0; maximum-scale=1.0; user-scalable=0;">
+<meta charset="utf-8">
+<title>phpDocumentor » \SQL\Base\WhereQueryBuilder</title>
+<meta name="author" content="Mike van Riel">
+<meta name="description" content="">
+<link href="../css/template.css" rel="stylesheet" media="all">
+<script src="../js/jquery-1.7.1.min.js" type="text/javascript"></script><script src="../js/jquery-ui-1.8.2.custom.min.js" type="text/javascript"></script><script src="../js/jquery.mousewheel.min.js" type="text/javascript"></script><script src="../js/bootstrap.js" type="text/javascript"></script><script src="../js/template.js" type="text/javascript"></script><script src="../js/prettify/prettify.min.js" type="text/javascript"></script><link rel="shortcut icon" href="../img/favicon.ico">
+<link rel="apple-touch-icon" href="../img/apple-touch-icon.png">
+<link rel="apple-touch-icon" sizes="72x72" href="../img/apple-touch-icon-72x72.png">
+<link rel="apple-touch-icon" sizes="114x114" href="../img/apple-touch-icon-114x114.png">
+</head>
+<body>
+<div class="navbar navbar-fixed-top">
+<div class="navbar-inner"><div class="container">
+<a class="btn btn-navbar" data-toggle="collapse" data-target=".nav-collapse"><span class="icon-bar"></span><span class="icon-bar"></span><span class="icon-bar"></span></a><a class="brand" href="../index.html">phpDocumentor</a><div class="nav-collapse"><ul class="nav">
+<li class="dropdown">
+<a href="#api" class="dropdown-toggle" data-toggle="dropdown">
+                                    API Documentation <b class="caret"></b></a><ul class="dropdown-menu">
+<li><a>Namespaces</a></li>
+<li><a href="../namespaces/SQL.html"><i class="icon-th"></i> SQL</a></li>
+</ul>
+</li>
+<li class="dropdown" id="charts-menu">
+<a href="#charts" class="dropdown-toggle" data-toggle="dropdown">
+                                    Charts <b class="caret"></b></a><ul class="dropdown-menu"><li><a href="../graph_class.html"><i class="icon-list-alt"></i> Class hierarchy diagram</a></li></ul>
+</li>
+<li class="dropdown" id="reports-menu">
+<a href="#reports" class="dropdown-toggle" data-toggle="dropdown">
+                                    Reports <b class="caret"></b></a><ul class="dropdown-menu">
+<li><a href="../errors.html"><i class="icon-remove-sign"></i> Errors 
+                <span class="label label-info">43</span></a></li>
+<li><a href="../markers.html"><i class="icon-map-marker"></i> Markers 
+                <ul></ul></a></li>
+<li><a href="../deprecated.html"><i class="icon-stop"></i> Deprecated elements 
+                <span class="label label-info">0</span></a></li>
+</ul>
+</li>
+</ul></div>
+</div></div>
+<div class="go_to_top"><a href="#___" style="color: inherit">Back to top  <i class="icon-upload icon-white"></i></a></div>
+</div>
+<div id="___" class="container">
+<noscript><div class="alert alert-warning">
+                            Javascript is disabled; several features are only available
+                            if Javascript is enabled.
+                        </div></noscript>
+<div class="row">
+<div class="span4">
+<span class="btn-group visibility" data-toggle="buttons-checkbox"><button class="btn public active" title="Show public elements">Public</button><button class="btn protected" title="Show protected elements">Protected</button><button class="btn private" title="Show private elements">Private</button><button class="btn inherited active" title="Show inherited elements">Inherited</button></span><div class="btn-group view pull-right" data-toggle="buttons-radio">
+<button class="btn details" title="Show descriptions and method names"><i class="icon-list"></i></button><button class="btn simple" title="Show only method names"><i class="icon-align-justify"></i></button>
+</div>
+<ul class="side-nav nav nav-list">
+<li class="nav-header">
+<i class="icon-custom icon-method"></i> Methods</li>
+<li class="method public "><a href="#__construct" title="__construct :: Constructor."><span class="description">Constructor.</span><pre>__construct()</pre></a></li>
+<li class="method public inherited"><a href="#__toString" title="__toString :: Returns the full query string without value placeholders."><span class="description">Returns the full query string without value placeholders.</span><pre>__toString()</pre></a></li>
+<li class="method public "><a href="#_and" title="_and :: Adds an open bracket for nesting WHERE conditions with AND operator."><span class="description">Adds an open bracket for nesting WHERE conditions with AND operator.</span><pre>_and()</pre></a></li>
+<li class="method public "><a href="#_close" title="_close :: Adds a closing bracket for nesting WHERE conditions."><span class="description">Adds a closing bracket for nesting WHERE conditions.</span><pre>_close()</pre></a></li>
+<li class="method public inherited"><a href="#_else" title="_else :: Returns a QueryConditionalProxy instance."><span class="description">Returns a QueryConditionalProxy instance.</span><pre>_else()</pre></a></li>
+<li class="method public inherited"><a href="#_elseif" title="_elseif :: Returns a QueryConditionalProxy instance."><span class="description">Returns a QueryConditionalProxy instance.</span><pre>_elseif()</pre></a></li>
+<li class="method public inherited"><a href="#_endif" title="_endif :: Returns the current object
+Allows for conditional statements in a fluid interface."><span class="description">Returns the current object
+Allows for conditional statements in a fluid interface.</span><pre>_endif()</pre></a></li>
+<li class="method public inherited"><a href="#_if" title="_if :: Returns the current object if the condition is true,
+or a QueryConditionalProxy instance otherwise."><span class="description">Returns the current object if the condition is true,
+or a QueryConditionalProxy instance otherwise.</span><pre>_if()</pre></a></li>
+<li class="method public "><a href="#_open" title="_open :: Adds an open bracket for nesting WHERE conditions."><span class="description">Adds an open bracket for nesting WHERE conditions.</span><pre>_open()</pre></a></li>
+<li class="method public "><a href="#_or" title="_or :: Adds an open bracket for nesting WHERE conditions with OR operator."><span class="description">Adds an open bracket for nesting WHERE conditions with OR operator.</span><pre>_or()</pre></a></li>
+<li class="method public inherited"><a href="#addOption" title="addOption :: Adds an execution option like DISTINCT or SQL_CALC_FOUND_ROWS."><span class="description">Adds an execution option like DISTINCT or SQL_CALC_FOUND_ROWS.</span><pre>addOption()</pre></a></li>
+<li class="method public "><a href="#andWhere" title="andWhere :: Adds an AND WHERE condition."><span class="description">Adds an AND WHERE condition.</span><pre>andWhere()</pre></a></li>
+<li class="method public inherited"><a href="#create" title="create :: create a specific QueryBuilder"><span class="description">create a specific QueryBuilder</span><pre>create()</pre></a></li>
+<li class="method public inherited"><a href="#createDelete" title="createDelete :: "><span class="description">createDelete()
+        </span><pre>createDelete()</pre></a></li>
+<li class="method public inherited"><a href="#createInsert" title="createInsert :: "><span class="description">createInsert()
+        </span><pre>createInsert()</pre></a></li>
+<li class="method public inherited"><a href="#createSelect" title="createSelect :: "><span class="description">createSelect()
+        </span><pre>createSelect()</pre></a></li>
+<li class="method public inherited"><a href="#createUpdate" title="createUpdate :: "><span class="description">createUpdate()
+        </span><pre>createUpdate()</pre></a></li>
+<li class="method public inherited"><a href="#debug" title="debug :: Replaces any parameter placeholders in a query with the value of that
+parameter."><span class="description">Replaces any parameter placeholders in a query with the value of that
+parameter.</span><pre>debug()</pre></a></li>
+<li class="method public inherited"><a href="#debugQuery" title="debugQuery :: Replaces any parameter placeholders in a query with the value of that
+parameter."><span class="description">Replaces any parameter placeholders in a query with the value of that
+parameter.</span><pre>debugQuery()</pre></a></li>
+<li class="method public inherited"><a href="#getBoundParameters" title="getBoundParameters :: Returns all bound parameters"><span class="description">Returns all bound parameters</span><pre>getBoundParameters()</pre></a></li>
+<li class="method public inherited"><a href="#getConnection" title="getConnection :: Returns the PDO database connection to use in executing this query."><span class="description">Returns the PDO database connection to use in executing this query.</span><pre>getConnection()</pre></a></li>
+<li class="method public inherited"><a href="#getOptions" title="getOptions :: get Options"><span class="description">get Options</span><pre>getOptions()</pre></a></li>
+<li class="method public inherited"><a href="#getQueryString" title="getQueryString :: Returns the full query string."><span class="description">Returns the full query string.</span><pre>getQueryString()</pre></a></li>
+<li class="method public inherited"><a href="#getQueryType" title="getQueryType :: get SQL Query Type"><span class="description">get SQL Query Type</span><pre>getQueryType()</pre></a></li>
+<li class="method public "><a href="#getWhereParts" title="getWhereParts :: get Where SQL parts"><span class="description">get Where SQL parts</span><pre>getWhereParts()</pre></a></li>
+<li class="method public "><a href="#getWhereString" title="getWhereString :: Returns the WHERE portion of the query as a string."><span class="description">Returns the WHERE portion of the query as a string.</span><pre>getWhereString()</pre></a></li>
+<li class="method public "><a href="#mergeWhere" title="mergeWhere :: Merges the given QueryBuilder's WHEREs into this QueryBuilder."><span class="description">Merges the given QueryBuilder's WHEREs into this QueryBuilder.</span><pre>mergeWhere()</pre></a></li>
+<li class="method public "><a href="#orWhere" title="orWhere :: Adds an OR WHERE condition."><span class="description">Adds an OR WHERE condition.</span><pre>orWhere()</pre></a></li>
+<li class="method public inherited"><a href="#query" title="query :: Executes the query using the PDO database connection and return result as PDOStatement or array of scalar values or objects"><span class="description">Executes the query using the PDO database connection and return result as PDOStatement or array of scalar values or objects</span><pre>query()</pre></a></li>
+<li class="method public inherited"><a href="#quote" title="quote :: Safely escapes a value for use in a query."><span class="description">Safely escapes a value for use in a query.</span><pre>quote()</pre></a></li>
+<li class="method public inherited"><a href="#quoteValue" title="quoteValue :: Safely escapes a value for use in a query."><span class="description">Safely escapes a value for use in a query.</span><pre>quoteValue()</pre></a></li>
+<li class="method public inherited"><a href="#setConnection" title="setConnection :: Sets the PDO database connection to use in executing this query."><span class="description">Sets the PDO database connection to use in executing this query.</span><pre>setConnection()</pre></a></li>
+<li class="method public "><a href="#where" title="where :: Adds a WHERE condition."><span class="description">Adds a WHERE condition.</span><pre>where()</pre></a></li>
+<li class="nav-header protected">» Protected</li>
+<li class="method protected "><a href="#closeCriteria" title="closeCriteria :: Adds a closing bracket for nesting conditions to the specified WHERE or
+HAVING criteria."><span class="description">Adds a closing bracket for nesting conditions to the specified WHERE or
+HAVING criteria.</span><pre>closeCriteria()</pre></a></li>
+<li class="method protected "><a href="#criteria" title="criteria :: Adds a condition to the specified WHERE or HAVING criteria."><span class="description">Adds a condition to the specified WHERE or HAVING criteria.</span><pre>criteria()</pre></a></li>
+<li class="method protected "><a href="#getCriteriaString" title="getCriteriaString :: Returns the WHERE or HAVING portion of the query as a string."><span class="description">Returns the WHERE or HAVING portion of the query as a string.</span><pre>getCriteriaString()</pre></a></li>
+<li class="method protected inherited"><a href="#getSQLPart" title="getSQLPart :: get SQL part"><span class="description">get SQL part</span><pre>getSQLPart()</pre></a></li>
+<li class="method protected inherited"><a href="#indent" title="indent :: return a indentation string repeat n times"><span class="description">return a indentation string repeat n times</span><pre>indent()</pre></a></li>
+<li class="method protected inherited"><a href="#mergeBoundParameters" title="mergeBoundParameters :: Merge all BoundParameters section"><span class="description">Merge all BoundParameters section</span><pre>mergeBoundParameters()</pre></a></li>
+<li class="method protected "><a href="#openCriteria" title="openCriteria :: Adds an open bracket for nesting conditions to the specified WHERE or
+HAVING criteria."><span class="description">Adds an open bracket for nesting conditions to the specified WHERE or
+HAVING criteria.</span><pre>openCriteria()</pre></a></li>
+<li class="method protected inherited"><a href="#quoteBoundParameters" title="quoteBoundParameters :: quote each item in a bound parameters array"><span class="description">quote each item in a bound parameters array</span><pre>quoteBoundParameters()</pre></a></li>
+<li class="nav-header">
+<i class="icon-custom icon-property"></i> Properties</li>
+<li class="nav-header protected">» Protected</li>
+<li class="property protected inherited"><a href="#%24boundParams" title="$boundParams :: Where and Having bound parameters"><span class="description">Where and Having bound parameters</span><pre>$boundParams</pre></a></li>
+<li class="property protected inherited"><a href="#%24conditionalProxy" title="$conditionalProxy :: flags for boolean functions"><span class="description">flags for boolean functions</span><pre>$conditionalProxy</pre></a></li>
+<li class="property protected inherited"><a href="#%24connection" title="$connection :: PDO database connection to use in executing the query."><span class="description">PDO database connection to use in executing the query.</span><pre>$connection</pre></a></li>
+<li class="property protected inherited"><a href="#%24indentChar" title="$indentChar :: "><span class="description">$indentChar</span><pre>$indentChar</pre></a></li>
+<li class="property protected inherited"><a href="#%24indentCharMultiplier" title="$indentCharMultiplier :: "><span class="description">$indentCharMultiplier</span><pre>$indentCharMultiplier</pre></a></li>
+<li class="property protected inherited"><a href="#%24options" title="$options :: Execution options like DISTINCT and SQL_CALC_FOUND_ROWS."><span class="description">Execution options like DISTINCT and SQL_CALC_FOUND_ROWS.</span><pre>$options</pre></a></li>
+<li class="property protected inherited"><a href="#%24queryType" title="$queryType :: type of SQL Query (select,insert,update,delete)"><span class="description">type of SQL Query (select,insert,update,delete)</span><pre>$queryType</pre></a></li>
+<li class="property protected inherited"><a href="#%24sqlParts" title="$sqlParts :: SQL query clauses"><span class="description">SQL query clauses</span><pre>$sqlParts</pre></a></li>
+<li class="nav-header">
+<i class="icon-custom icon-constant"></i> Constants</li>
+<li class="constant  "><a href="#BETWEEN" title="BETWEEN :: "><span class="description">BETWEEN</span><pre>BETWEEN</pre></a></li>
+<li class="constant  inherited"><a href="#BRACKET_CLOSE" title="BRACKET_CLOSE :: "><span class="description">BRACKET_CLOSE</span><pre>BRACKET_CLOSE</pre></a></li>
+<li class="constant  inherited"><a href="#BRACKET_OPEN" title="BRACKET_OPEN :: Brackets for grouping criteria."><span class="description">Brackets for grouping criteria.</span><pre>BRACKET_OPEN</pre></a></li>
+<li class="constant  "><a href="#EQUALS" title="EQUALS :: Comparison operators."><span class="description">Comparison operators.</span><pre>EQUALS</pre></a></li>
+<li class="constant  "><a href="#EXISTS" title="EXISTS :: "><span class="description">EXISTS</span><pre>EXISTS</pre></a></li>
+<li class="constant  inherited"><a href="#FETCH_LAST_INSERT_ID" title="FETCH_LAST_INSERT_ID :: "><span class="description">FETCH_LAST_INSERT_ID</span><pre>FETCH_LAST_INSERT_ID</pre></a></li>
+<li class="constant  "><a href="#GREATER_THAN" title="GREATER_THAN :: "><span class="description">GREATER_THAN</span><pre>GREATER_THAN</pre></a></li>
+<li class="constant  "><a href="#GREATER_THAN_OR_EQUAL" title="GREATER_THAN_OR_EQUAL :: "><span class="description">GREATER_THAN_OR_EQUAL</span><pre>GREATER_THAN_OR_EQUAL</pre></a></li>
+<li class="constant  "><a href="#IN" title="IN :: "><span class="description">IN</span><pre>IN</pre></a></li>
+<li class="constant  "><a href="#IS_NOT_NULL" title="IS_NOT_NULL :: "><span class="description">IS_NOT_NULL</span><pre>IS_NOT_NULL</pre></a></li>
+<li class="constant  "><a href="#IS_NULL" title="IS_NULL :: "><span class="description">IS_NULL</span><pre>IS_NULL</pre></a></li>
+<li class="constant  "><a href="#LESS_THAN" title="LESS_THAN :: "><span class="description">LESS_THAN</span><pre>LESS_THAN</pre></a></li>
+<li class="constant  "><a href="#LESS_THAN_OR_EQUAL" title="LESS_THAN_OR_EQUAL :: "><span class="description">LESS_THAN_OR_EQUAL</span><pre>LESS_THAN_OR_EQUAL</pre></a></li>
+<li class="constant  "><a href="#LIKE" title="LIKE :: "><span class="description">LIKE</span><pre>LIKE</pre></a></li>
+<li class="constant  "><a href="#LOGICAL_AND" title="LOGICAL_AND :: Logical operators."><span class="description">Logical operators.</span><pre>LOGICAL_AND</pre></a></li>
+<li class="constant  "><a href="#LOGICAL_OR" title="LOGICAL_OR :: "><span class="description">LOGICAL_OR</span><pre>LOGICAL_OR</pre></a></li>
+<li class="constant  "><a href="#NOT_BETWEEN" title="NOT_BETWEEN :: "><span class="description">NOT_BETWEEN</span><pre>NOT_BETWEEN</pre></a></li>
+<li class="constant  "><a href="#NOT_EQUALS" title="NOT_EQUALS :: "><span class="description">NOT_EQUALS</span><pre>NOT_EQUALS</pre></a></li>
+<li class="constant  "><a href="#NOT_EXISTS" title="NOT_EXISTS :: "><span class="description">NOT_EXISTS</span><pre>NOT_EXISTS</pre></a></li>
+<li class="constant  "><a href="#NOT_IN" title="NOT_IN :: "><span class="description">NOT_IN</span><pre>NOT_IN</pre></a></li>
+<li class="constant  "><a href="#NOT_LIKE" title="NOT_LIKE :: "><span class="description">NOT_LIKE</span><pre>NOT_LIKE</pre></a></li>
+<li class="constant  "><a href="#NOT_REGEXP" title="NOT_REGEXP :: "><span class="description">NOT_REGEXP</span><pre>NOT_REGEXP</pre></a></li>
+<li class="constant  "><a href="#RAW_CRITERIA" title="RAW_CRITERIA :: Specifies that the where() column name is the full where field, eg where('users.password = password(?)', 'test', QueryBuilder::RAW_WHERE)"><span class="description">Specifies that the where() column name is the full where field, eg where('users.password = password(?)', 'test', QueryBuilder::RAW_WHERE)</span><pre>RAW_CRITERIA</pre></a></li>
+<li class="constant  "><a href="#REGEXP" title="REGEXP :: "><span class="description">REGEXP</span><pre>REGEXP</pre></a></li>
+<li class="constant  "><a href="#SUB_QUERY_EXISTS" title="SUB_QUERY_EXISTS :: "><span class="description">SUB_QUERY_EXISTS</span><pre>SUB_QUERY_EXISTS</pre></a></li>
+<li class="constant  "><a href="#SUB_QUERY_IN" title="SUB_QUERY_IN :: Specifies that the where() column contains a subquery"><span class="description">Specifies that the where() column contains a subquery</span><pre>SUB_QUERY_IN</pre></a></li>
+<li class="constant  "><a href="#SUB_QUERY_NOT_EXISTS" title="SUB_QUERY_NOT_EXISTS :: "><span class="description">SUB_QUERY_NOT_EXISTS</span><pre>SUB_QUERY_NOT_EXISTS</pre></a></li>
+<li class="constant  "><a href="#SUB_QUERY_NOT_IN" title="SUB_QUERY_NOT_IN :: "><span class="description">SUB_QUERY_NOT_IN</span><pre>SUB_QUERY_NOT_IN</pre></a></li>
+<li class="constant  inherited"><a href="#TYPE_DELETE" title="TYPE_DELETE :: "><span class="description">TYPE_DELETE</span><pre>TYPE_DELETE</pre></a></li>
+<li class="constant  inherited"><a href="#TYPE_INSERT" title="TYPE_INSERT :: "><span class="description">TYPE_INSERT</span><pre>TYPE_INSERT</pre></a></li>
+<li class="constant  inherited"><a href="#TYPE_SELECT" title="TYPE_SELECT :: "><span class="description">TYPE_SELECT</span><pre>TYPE_SELECT</pre></a></li>
+<li class="constant  inherited"><a href="#TYPE_UPDATE" title="TYPE_UPDATE :: "><span class="description">TYPE_UPDATE</span><pre>TYPE_UPDATE</pre></a></li>
+</ul>
+</div>
+<div class="span8">
+<a name="%5CSQL%5CBase%5CWhereQueryBuilder" id="\SQL\Base\WhereQueryBuilder"></a><ul class="breadcrumb">
+<li>
+<a href="../index.html"><i class="icon-custom icon-class"></i></a><span class="divider">\</span>
+</li>
+<li><a href="../namespaces/SQL.html">SQL</a></li>
+<span class="divider">\</span><li><a href="../namespaces/SQL.Base.html">Base</a></li>
+<li class="active">
+<span class="divider">\</span><a href="../classes/SQL.Base.WhereQueryBuilder.html">WhereQueryBuilder</a>
+</li>
+</ul>
+<div href="../classes/SQL.Base.WhereQueryBuilder.html" class="element class">
+<p class="short_description">Abstract Base class for Queries with Where Clauses</p>
+<div class="details">
+<p class="long_description"><p>Based on original code Querybuilder from https://github.com/jstayton/QueryBuilder</p></p>
+<table class="table table-bordered"><tr>
+<th>author</th>
+<td><a href="mailto:charles.sanquer@gmail.com">Charles SANQUER</a></td>
+</tr></table>
+<h3>
+<i class="icon-custom icon-method"></i> Methods</h3>
+<a name="__construct" id="__construct"></a><div class="element clickable method public __construct" data-toggle="collapse" data-target=".__construct .collapse">
+<h2>Constructor.</h2>
+<pre>__construct(\PDO $PdoConnection) : \SQL\Base\SQL\Base\WhereQueryBuilder</pre>
+<div class="labels"></div>
+<div class="row collapse"><div class="detail-description">
+<p class="long_description"></p>
+<h3>Parameters</h3>
+<div class="subelement argument">
+<h4>$PdoConnection</h4>
+<code>\SQL\Base\PDO</code><p>optional PDO database connection</p></div>
+<h3>Returns</h3>
+<div class="subelement response"><code>\SQL\Base\SQL\Base\WhereQueryBuilder</code></div>
+</div></div>
+</div>
+<a name="__toString" id="__toString"></a><div class="element clickable method public __toString" data-toggle="collapse" data-target=".__toString .collapse">
+<h2>Returns the full query string without value placeholders.</h2>
+<pre>__toString() : string</pre>
+<div class="labels"><span class="label">Inherited</span></div>
+<div class="row collapse"><div class="detail-description">
+<p class="long_description"></p>
+<table class="table table-bordered"><tr>
+<th>inherited_from</th>
+<td>\SQL\Base\QueryBuilder::__toString()</td>
+</tr></table>
+<h3>Returns</h3>
+<div class="subelement response"><code>string</code></div>
+</div></div>
+</div>
+<a name="_and" id="_and"></a><div class="element clickable method public _and" data-toggle="collapse" data-target="._and .collapse">
+<h2>Adds an open bracket for nesting WHERE conditions with AND operator.</h2>
+<pre>_and() : \SQL\Base\SQL\Base\WhereQueryBuilder</pre>
+<div class="labels"></div>
+<div class="row collapse"><div class="detail-description">
+<p class="long_description"><p>shortcut for WhereQueryBuilder::_open(WhereQueryBuilder::LOGICAL_AND)</p></p>
+<h3>Returns</h3>
+<div class="subelement response"><code>\SQL\Base\SQL\Base\WhereQueryBuilder</code></div>
+</div></div>
+</div>
+<a name="_close" id="_close"></a><div class="element clickable method public _close" data-toggle="collapse" data-target="._close .collapse">
+<h2>Adds a closing bracket for nesting WHERE conditions.</h2>
+<pre>_close() : \SQL\Base\SQL\Base\WhereQueryBuilder</pre>
+<div class="labels"></div>
+<div class="row collapse"><div class="detail-description">
+<p class="long_description"></p>
+<h3>Returns</h3>
+<div class="subelement response"><code>\SQL\Base\SQL\Base\WhereQueryBuilder</code></div>
+</div></div>
+</div>
+<a name="_else" id="_else"></a><div class="element clickable method public _else" data-toggle="collapse" data-target="._else .collapse">
+<h2>Returns a QueryConditionalProxy instance.</h2>
+<pre>_else() : <a href="../classes/SQL.Proxy.QueryConditionalProxy.html">\SQL\Proxy\QueryConditionalProxy</a> | <a href="../classes/SQL.Base.QueryBuilder.html">\SQL\Base\QueryBuilder</a></pre>
+<div class="labels"><span class="label">Inherited</span></div>
+<div class="row collapse"><div class="detail-description">
+<p class="long_description"><p>Allows for conditional statements in a fluid interface.</p></p>
+<table class="table table-bordered"><tr>
+<th>inherited_from</th>
+<td>\SQL\Base\QueryBuilder::_else()</td>
+</tr></table>
+<h3>Exceptions</h3>
+<table class="table table-bordered"><tr>
+<th><code>\SQL\Base\SQL\Exception\QueryBuilderException</code></th>
+<td></td>
+</tr></table>
+<h3>Returns</h3>
+<div class="subelement response">
+<code><a href="../classes/SQL.Proxy.QueryConditionalProxy.html">\SQL\Proxy\QueryConditionalProxy</a></code><code><a href="../classes/SQL.Base.QueryBuilder.html">\SQL\Base\QueryBuilder</a></code>
+</div>
+</div></div>
+</div>
+<a name="_elseif" id="_elseif"></a><div class="element clickable method public _elseif" data-toggle="collapse" data-target="._elseif .collapse">
+<h2>Returns a QueryConditionalProxy instance.</h2>
+<pre>_elseif(bool $cond) : <a href="../classes/SQL.Proxy.QueryConditionalProxy.html">\SQL\Proxy\QueryConditionalProxy</a> | <a href="../classes/SQL.Base.QueryBuilder.html">\SQL\Base\QueryBuilder</a></pre>
+<div class="labels"><span class="label">Inherited</span></div>
+<div class="row collapse"><div class="detail-description">
+<p class="long_description"><p>Allows for conditional statements in a fluid interface.</p></p>
+<table class="table table-bordered"><tr>
+<th>inherited_from</th>
+<td>\SQL\Base\QueryBuilder::_elseif()</td>
+</tr></table>
+<h3>Parameters</h3>
+<div class="subelement argument">
+<h4>$cond</h4>
+<code>bool</code><p>ignored</p></div>
+<h3>Exceptions</h3>
+<table class="table table-bordered"><tr>
+<th><code>\SQL\Base\SQL\Exception\QueryBuilderException</code></th>
+<td></td>
+</tr></table>
+<h3>Returns</h3>
+<div class="subelement response">
+<code><a href="../classes/SQL.Proxy.QueryConditionalProxy.html">\SQL\Proxy\QueryConditionalProxy</a></code><code><a href="../classes/SQL.Base.QueryBuilder.html">\SQL\Base\QueryBuilder</a></code>
+</div>
+</div></div>
+</div>
+<a name="_endif" id="_endif"></a><div class="element clickable method public _endif" data-toggle="collapse" data-target="._endif .collapse">
+<h2>Returns the current object
+Allows for conditional statements in a fluid interface.</h2>
+<pre>_endif() : <a href="../classes/SQL.Base.QueryBuilder.html">\SQL\Base\QueryBuilder</a></pre>
+<div class="labels"><span class="label">Inherited</span></div>
+<div class="row collapse"><div class="detail-description">
+<p class="long_description"></p>
+<table class="table table-bordered"><tr>
+<th>inherited_from</th>
+<td>\SQL\Base\QueryBuilder::_endif()</td>
+</tr></table>
+<h3>Exceptions</h3>
+<table class="table table-bordered"><tr>
+<th><code>\SQL\Base\SQL\Exception\QueryBuilderException</code></th>
+<td></td>
+</tr></table>
+<h3>Returns</h3>
+<div class="subelement response"><code><a href="../classes/SQL.Base.QueryBuilder.html">\SQL\Base\QueryBuilder</a></code></div>
+</div></div>
+</div>
+<a name="_if" id="_if"></a><div class="element clickable method public _if" data-toggle="collapse" data-target="._if .collapse">
+<h2>Returns the current object if the condition is true,
+or a QueryConditionalProxy instance otherwise.</h2>
+<pre>_if(bool $cond) : <a href="../classes/SQL.Proxy.QueryConditionalProxy.html">\SQL\Proxy\QueryConditionalProxy</a> | <a href="../classes/SQL.Base.QueryBuilder.html">\SQL\Base\QueryBuilder</a></pre>
+<div class="labels"><span class="label">Inherited</span></div>
+<div class="row collapse"><div class="detail-description">
+<p class="long_description"><p>Allows for conditional statements in a fluid interface.</p></p>
+<table class="table table-bordered"><tr>
+<th>inherited_from</th>
+<td>\SQL\Base\QueryBuilder::_if()</td>
+</tr></table>
+<h3>Parameters</h3>
+<div class="subelement argument">
+<h4>$cond</h4>
+<code>bool</code>
+</div>
+<h3>Returns</h3>
+<div class="subelement response">
+<code><a href="../classes/SQL.Proxy.QueryConditionalProxy.html">\SQL\Proxy\QueryConditionalProxy</a></code><code><a href="../classes/SQL.Base.QueryBuilder.html">\SQL\Base\QueryBuilder</a></code>
+</div>
+</div></div>
+</div>
+<a name="_open" id="_open"></a><div class="element clickable method public _open" data-toggle="collapse" data-target="._open .collapse">
+<h2>Adds an open bracket for nesting WHERE conditions.</h2>
+<pre>_open(string $connector) : \SQL\Base\SQL\Base\WhereQueryBuilder</pre>
+<div class="labels"></div>
+<div class="row collapse"><div class="detail-description">
+<p class="long_description"></p>
+<h3>Parameters</h3>
+<div class="subelement argument">
+<h4>$connector</h4>
+<code>string</code><p>optional logical connector, default AND</p></div>
+<h3>Returns</h3>
+<div class="subelement response"><code>\SQL\Base\SQL\Base\WhereQueryBuilder</code></div>
+</div></div>
+</div>
+<a name="_or" id="_or"></a><div class="element clickable method public _or" data-toggle="collapse" data-target="._or .collapse">
+<h2>Adds an open bracket for nesting WHERE conditions with OR operator.</h2>
+<pre>_or() : \SQL\Base\SQL\Base\WhereQueryBuilder</pre>
+<div class="labels"></div>
+<div class="row collapse"><div class="detail-description">
+<p class="long_description"><p>shortcut for WhereQueryBuilder::_open(WhereQueryBuilder::LOGICAL_OR)</p></p>
+<h3>Returns</h3>
+<div class="subelement response"><code>\SQL\Base\SQL\Base\WhereQueryBuilder</code></div>
+</div></div>
+</div>
+<a name="addOption" id="addOption"></a><div class="element clickable method public addOption" data-toggle="collapse" data-target=".addOption .collapse">
+<h2>Adds an execution option like DISTINCT or SQL_CALC_FOUND_ROWS.</h2>
+<pre>addOption(string $option) : \SQL\Base\SQL\Base\QueryBuilder</pre>
+<div class="labels"><span class="label">Inherited</span></div>
+<div class="row collapse"><div class="detail-description">
+<p class="long_description"></p>
+<table class="table table-bordered"><tr>
+<th>inherited_from</th>
+<td>\SQL\Base\QueryBuilder::addOption()</td>
+</tr></table>
+<h3>Parameters</h3>
+<div class="subelement argument">
+<h4>$option</h4>
+<code>string</code><p>execution option to add</p></div>
+<h3>Returns</h3>
+<div class="subelement response"><code>\SQL\Base\SQL\Base\QueryBuilder</code></div>
+</div></div>
+</div>
+<a name="andWhere" id="andWhere"></a><div class="element clickable method public andWhere" data-toggle="collapse" data-target=".andWhere .collapse">
+<h2>Adds an AND WHERE condition.</h2>
+<pre>andWhere(string $column, mixed $value, string $operator) : \SQL\Base\SQL\Base\WhereQueryBuilder</pre>
+<div class="labels"></div>
+<div class="row collapse"><div class="detail-description">
+<p class="long_description"></p>
+<h3>Parameters</h3>
+<div class="subelement argument">
+<h4>$column</h4>
+<code>string</code><p>colum name</p></div>
+<div class="subelement argument">
+<h4>$value</h4>
+<code>mixed</code><p>value</p></div>
+<div class="subelement argument">
+<h4>$operator</h4>
+<code>string</code><p>optional comparison operator, default =</p>
+</div>
+<h3>Returns</h3>
+<div class="subelement response"><code>\SQL\Base\SQL\Base\WhereQueryBuilder</code></div>
+</div></div>
+</div>
+<a name="create" id="create"></a><div class="element clickable method public create" data-toggle="collapse" data-target=".create .collapse">
+<h2>create a specific QueryBuilder</h2>
+<pre>create(string $type, \PDO $PdoConnection) : <a href="../classes/SQL.UpdateQueryBuilder.html">\SQL\UpdateQueryBuilder</a> | <a href="../classes/SQL.InsertQueryBuilder.html">\SQL\InsertQueryBuilder</a> | <a href="../classes/SQL.DeleteQueryBuilder.html">\SQL\DeleteQueryBuilder</a> | <a href="../classes/SQL.SelectQueryBuilder.html">\SQL\SelectQueryBuilder</a></pre>
+<div class="labels"><span class="label">Inherited</span></div>
+<div class="row collapse"><div class="detail-description">
+<p class="long_description"></p>
+<table class="table table-bordered"><tr>
+<th>inherited_from</th>
+<td>\SQL\Base\QueryBuilder::create()</td>
+</tr></table>
+<h3>Parameters</h3>
+<div class="subelement argument">
+<h4>$type</h4>
+<code>string</code><p>among these values SQL\Base\QueryBuilder::TYPE_SELECT, SQL\Base\QueryBuilder::TYPE_INSERT, SQL\Base\QueryBuilder::TYPE_UPDATE, SQL\Base\QueryBuilder::TYPE_DELETE or null (select)</p>
+</div>
+<div class="subelement argument">
+<h4>$PdoConnection</h4>
+<code><a href="http://php.net/manual/en/class.pdo.php">\PDO</a></code>
+</div>
+<h3>Returns</h3>
+<div class="subelement response">
+<code><a href="../classes/SQL.UpdateQueryBuilder.html">\SQL\UpdateQueryBuilder</a></code><code><a href="../classes/SQL.InsertQueryBuilder.html">\SQL\InsertQueryBuilder</a></code><code><a href="../classes/SQL.DeleteQueryBuilder.html">\SQL\DeleteQueryBuilder</a></code><code><a href="../classes/SQL.SelectQueryBuilder.html">\SQL\SelectQueryBuilder</a></code>
+</div>
+</div></div>
+</div>
+<a name="createDelete" id="createDelete"></a><div class="element clickable method public createDelete" data-toggle="collapse" data-target=".createDelete .collapse">
+<h2>createDelete()
+        </h2>
+<pre>createDelete(\PDO $PdoConnection) : <a href="../classes/SQL.DeleteQueryBuilder.html">\SQL\DeleteQueryBuilder</a></pre>
+<div class="labels"><span class="label">Inherited</span></div>
+<div class="row collapse"><div class="detail-description">
+<p class="long_description"></p>
+<table class="table table-bordered"><tr>
+<th>inherited_from</th>
+<td>\SQL\Base\QueryBuilder::createDelete()</td>
+</tr></table>
+<h3>Parameters</h3>
+<div class="subelement argument">
+<h4>$PdoConnection</h4>
+<code><a href="http://php.net/manual/en/class.pdo.php">\PDO</a></code>
+</div>
+<h3>Returns</h3>
+<div class="subelement response"><code><a href="../classes/SQL.DeleteQueryBuilder.html">\SQL\DeleteQueryBuilder</a></code></div>
+</div></div>
+</div>
+<a name="createInsert" id="createInsert"></a><div class="element clickable method public createInsert" data-toggle="collapse" data-target=".createInsert .collapse">
+<h2>createInsert()
+        </h2>
+<pre>createInsert(\PDO $PdoConnection) : <a href="../classes/SQL.InsertQueryBuilder.html">\SQL\InsertQueryBuilder</a></pre>
+<div class="labels"><span class="label">Inherited</span></div>
+<div class="row collapse"><div class="detail-description">
+<p class="long_description"></p>
+<table class="table table-bordered"><tr>
+<th>inherited_from</th>
+<td>\SQL\Base\QueryBuilder::createInsert()</td>
+</tr></table>
+<h3>Parameters</h3>
+<div class="subelement argument">
+<h4>$PdoConnection</h4>
+<code><a href="http://php.net/manual/en/class.pdo.php">\PDO</a></code>
+</div>
+<h3>Returns</h3>
+<div class="subelement response"><code><a href="../classes/SQL.InsertQueryBuilder.html">\SQL\InsertQueryBuilder</a></code></div>
+</div></div>
+</div>
+<a name="createSelect" id="createSelect"></a><div class="element clickable method public createSelect" data-toggle="collapse" data-target=".createSelect .collapse">
+<h2>createSelect()
+        </h2>
+<pre>createSelect(\PDO $PdoConnection) : <a href="../classes/SQL.SelectQueryBuilder.html">\SQL\SelectQueryBuilder</a></pre>
+<div class="labels"><span class="label">Inherited</span></div>
+<div class="row collapse"><div class="detail-description">
+<p class="long_description"></p>
+<table class="table table-bordered"><tr>
+<th>inherited_from</th>
+<td>\SQL\Base\QueryBuilder::createSelect()</td>
+</tr></table>
+<h3>Parameters</h3>
+<div class="subelement argument">
+<h4>$PdoConnection</h4>
+<code><a href="http://php.net/manual/en/class.pdo.php">\PDO</a></code>
+</div>
+<h3>Returns</h3>
+<div class="subelement response"><code><a href="../classes/SQL.SelectQueryBuilder.html">\SQL\SelectQueryBuilder</a></code></div>
+</div></div>
+</div>
+<a name="createUpdate" id="createUpdate"></a><div class="element clickable method public createUpdate" data-toggle="collapse" data-target=".createUpdate .collapse">
+<h2>createUpdate()
+        </h2>
+<pre>createUpdate(\PDO $PdoConnection) : <a href="../classes/SQL.UpdateQueryBuilder.html">\SQL\UpdateQueryBuilder</a></pre>
+<div class="labels"><span class="label">Inherited</span></div>
+<div class="row collapse"><div class="detail-description">
+<p class="long_description"></p>
+<table class="table table-bordered"><tr>
+<th>inherited_from</th>
+<td>\SQL\Base\QueryBuilder::createUpdate()</td>
+</tr></table>
+<h3>Parameters</h3>
+<div class="subelement argument">
+<h4>$PdoConnection</h4>
+<code><a href="http://php.net/manual/en/class.pdo.php">\PDO</a></code>
+</div>
+<h3>Returns</h3>
+<div class="subelement response"><code><a href="../classes/SQL.UpdateQueryBuilder.html">\SQL\UpdateQueryBuilder</a></code></div>
+</div></div>
+</div>
+<a name="debug" id="debug"></a><div class="element clickable method public debug" data-toggle="collapse" data-target=".debug .collapse">
+<h2>Replaces any parameter placeholders in a query with the value of that
+parameter.</h2>
+<pre>debug(bool $quoted, $formatted) : string</pre>
+<div class="labels"><span class="label">Inherited</span></div>
+<div class="row collapse"><div class="detail-description">
+<p class="long_description"><p>Useful for debugging. Assumes anonymous parameters from
+$params are are in the same order as specified in $query</p></p>
+<table class="table table-bordered"><tr>
+<th>inherited_from</th>
+<td>\SQL\Base\QueryBuilder::debug()</td>
+</tr></table>
+<h3>Parameters</h3>
+<div class="subelement argument">
+<h4>$quoted</h4>
+<code>bool</code><p>default = true, if true quote each parameter</p>
+</div>
+<div class="subelement argument">
+<h4>$formatted</h4>
+<code></code>
+</div>
+<h3>Returns</h3>
+<div class="subelement response">
+<code>string</code>The debugged query</div>
+</div></div>
+</div>
+<a name="debugQuery" id="debugQuery"></a><div class="element clickable method public debugQuery" data-toggle="collapse" data-target=".debugQuery .collapse">
+<h2>Replaces any parameter placeholders in a query with the value of that
+parameter.</h2>
+<pre>debugQuery(string $query, array $params, $quoted, \PDO $connection) : string</pre>
+<div class="labels"><span class="label">Inherited</span></div>
+<div class="row collapse"><div class="detail-description">
+<p class="long_description"><p>Useful for debugging. Assumes anonymous parameters from
+$params are are in the same order as specified in $query</p></p>
+<table class="table table-bordered"><tr>
+<th>inherited_from</th>
+<td>\SQL\Base\QueryBuilder::debugQuery()</td>
+</tr></table>
+<h3>Parameters</h3>
+<div class="subelement argument">
+<h4>$query</h4>
+<code>string</code><p>The sql query with parameter placeholders</p></div>
+<div class="subelement argument">
+<h4>$params</h4>
+<code>array</code><p>default = empty array , The array of substitution parameters</p>
+</div>
+<div class="subelement argument">
+<h4>$quoted</h4>
+<code></code>
+</div>
+<div class="subelement argument">
+<h4>$connection</h4>
+<code>\SQL\Base\PDO</code><p>default = null , PDO connection (used to quote values)</p>
+</div>
+<h3>Returns</h3>
+<div class="subelement response">
+<code>string</code>The debugged query</div>
+</div></div>
+</div>
+<a name="getBoundParameters" id="getBoundParameters"></a><div class="element clickable method public getBoundParameters" data-toggle="collapse" data-target=".getBoundParameters .collapse">
+<h2>Returns all bound parameters</h2>
+<pre>getBoundParameters(bool $quoted, string | null $section) : array</pre>
+<div class="labels"><span class="label">Inherited</span></div>
+<div class="row collapse"><div class="detail-description">
+<p class="long_description"></p>
+<table class="table table-bordered"><tr>
+<th>inherited_from</th>
+<td>\SQL\Base\QueryBuilder::getBoundParameters()</td>
+</tr></table>
+<h3>Parameters</h3>
+<div class="subelement argument">
+<h4>$quoted</h4>
+<code>bool</code><p>default = false, if true the bound parameters are escaped</p>
+</div>
+<div class="subelement argument">
+<h4>$section</h4>
+<code>stringnull</code><p>default = null, which bound parameters section to retrieve</p>
+</div>
+<h3>Returns</h3>
+<div class="subelement response"><code>array</code></div>
+</div></div>
+</div>
+<a name="getConnection" id="getConnection"></a><div class="element clickable method public getConnection" data-toggle="collapse" data-target=".getConnection .collapse">
+<h2>Returns the PDO database connection to use in executing this query.</h2>
+<pre>getConnection() : \SQL\Base\PDO | null</pre>
+<div class="labels"><span class="label">Inherited</span></div>
+<div class="row collapse"><div class="detail-description">
+<p class="long_description"></p>
+<table class="table table-bordered"><tr>
+<th>inherited_from</th>
+<td>\SQL\Base\QueryBuilder::getConnection()</td>
+</tr></table>
+<h3>Returns</h3>
+<div class="subelement response">
+<code>\SQL\Base\PDO</code><code>null</code>
+</div>
+</div></div>
+</div>
+<a name="getOptions" id="getOptions"></a><div class="element clickable method public getOptions" data-toggle="collapse" data-target=".getOptions .collapse">
+<h2>get Options</h2>
+<pre>getOptions() : array</pre>
+<div class="labels"><span class="label">Inherited</span></div>
+<div class="row collapse"><div class="detail-description">
+<p class="long_description"></p>
+<table class="table table-bordered"><tr>
+<th>inherited_from</th>
+<td>\SQL\Base\QueryBuilder::getOptions()</td>
+</tr></table>
+<h3>Returns</h3>
+<div class="subelement response"><code>array</code></div>
+</div></div>
+</div>
+<a name="getQueryString" id="getQueryString"></a><div class="element clickable method public getQueryString" data-toggle="collapse" data-target=".getQueryString .collapse">
+<h2>Returns the full query string.</h2>
+<pre>getQueryString(bool $formatted) : string</pre>
+<div class="labels"><span class="label">Inherited</span></div>
+<div class="row collapse"><div class="detail-description">
+<p class="long_description"></p>
+<table class="table table-bordered">
+<tr>
+<th>abstract</th>
+<td></td>
+</tr>
+<tr>
+<th>inherited_from</th>
+<td>\SQL\Base\QueryBuilder::getQueryString()</td>
+</tr>
+</table>
+<h3>Parameters</h3>
+<div class="subelement argument">
+<h4>$formatted</h4>
+<code>bool</code><p>format SQL string on multiple lines, default false</p></div>
+<h3>Returns</h3>
+<div class="subelement response"><code>string</code></div>
+</div></div>
+</div>
+<a name="getQueryType" id="getQueryType"></a><div class="element clickable method public getQueryType" data-toggle="collapse" data-target=".getQueryType .collapse">
+<h2>get SQL Query Type</h2>
+<pre>getQueryType() : \SQL\Base\type</pre>
+<div class="labels"><span class="label">Inherited</span></div>
+<div class="row collapse"><div class="detail-description">
+<p class="long_description"></p>
+<table class="table table-bordered"><tr>
+<th>inherited_from</th>
+<td>\SQL\Base\QueryBuilder::getQueryType()</td>
+</tr></table>
+<h3>Returns</h3>
+<div class="subelement response"><code>\SQL\Base\type</code></div>
+</div></div>
+</div>
+<a name="getWhereParts" id="getWhereParts"></a><div class="element clickable method public getWhereParts" data-toggle="collapse" data-target=".getWhereParts .collapse">
+<h2>get Where SQL parts</h2>
+<pre>getWhereParts() : array</pre>
+<div class="labels"></div>
+<div class="row collapse"><div class="detail-description">
+<p class="long_description"></p>
+<h3>Returns</h3>
+<div class="subelement response"><code>array</code></div>
+</div></div>
+</div>
+<a name="getWhereString" id="getWhereString"></a><div class="element clickable method public getWhereString" data-toggle="collapse" data-target=".getWhereString .collapse">
+<h2>Returns the WHERE portion of the query as a string.</h2>
+<pre>getWhereString(bool $formatted) : string</pre>
+<div class="labels"></div>
+<div class="row collapse"><div class="detail-description">
+<p class="long_description"></p>
+<h3>Parameters</h3>
+<div class="subelement argument">
+<h4>$formatted</h4>
+<code>bool</code><p>format SQL string on multiple lines, default false</p></div>
+<h3>Returns</h3>
+<div class="subelement response"><code>string</code></div>
+</div></div>
+</div>
+<a name="mergeWhere" id="mergeWhere"></a><div class="element clickable method public mergeWhere" data-toggle="collapse" data-target=".mergeWhere .collapse">
+<h2>Merges the given QueryBuilder's WHEREs into this QueryBuilder.</h2>
+<pre>mergeWhere(\SQL\Base\WhereQueryBuilder $QueryBuilder) : <a href="../classes/SQL.Base.WhereQueryBuilder.html">\SQL\Base\WhereQueryBuilder</a></pre>
+<div class="labels"></div>
+<div class="row collapse"><div class="detail-description">
+<p class="long_description"></p>
+<h3>Parameters</h3>
+<div class="subelement argument">
+<h4>$QueryBuilder</h4>
+<code><a href="../classes/SQL.Base.WhereQueryBuilder.html">\SQL\Base\WhereQueryBuilder</a></code><p>to merge</p></div>
+<h3>Returns</h3>
+<div class="subelement response">
+<code><a href="../classes/SQL.Base.WhereQueryBuilder.html">\SQL\Base\WhereQueryBuilder</a></code>the current QueryBuilder</div>
+</div></div>
+</div>
+<a name="orWhere" id="orWhere"></a><div class="element clickable method public orWhere" data-toggle="collapse" data-target=".orWhere .collapse">
+<h2>Adds an OR WHERE condition.</h2>
+<pre>orWhere(string $column, mixed $value, string $operator) : \SQL\Base\SQL\Base\WhereQueryBuilder</pre>
+<div class="labels"></div>
+<div class="row collapse"><div class="detail-description">
+<p class="long_description"></p>
+<h3>Parameters</h3>
+<div class="subelement argument">
+<h4>$column</h4>
+<code>string</code><p>colum name</p></div>
+<div class="subelement argument">
+<h4>$value</h4>
+<code>mixed</code><p>value</p></div>
+<div class="subelement argument">
+<h4>$operator</h4>
+<code>string</code><p>optional comparison operator, default =</p>
+</div>
+<h3>Returns</h3>
+<div class="subelement response"><code>\SQL\Base\SQL\Base\WhereQueryBuilder</code></div>
+</div></div>
+</div>
+<a name="query" id="query"></a><div class="element clickable method public query" data-toggle="collapse" data-target=".query .collapse">
+<h2>Executes the query using the PDO database connection and return result as PDOStatement or array of scalar values or objects</h2>
+<pre>query(int $fetchStyle) : array | \SQL\Base\PDOStatement | string | false</pre>
+<div class="labels"><span class="label">Inherited</span></div>
+<div class="row collapse"><div class="detail-description">
+<p class="long_description"></p>
+<table class="table table-bordered">
+<tr>
+<th>see</th>
+<td>\SQL\Base\PDOStatement::fetch()</td>
+</tr>
+<tr>
+<th>inherited_from</th>
+<td>\SQL\Base\QueryBuilder::query()</td>
+</tr>
+</table>
+<h3>Parameters</h3>
+<div class="subelement argument">
+<h4>$fetchStyle</h4>
+<code>int</code><p>default = \PDO::FETCH_ASSOC , a PDO_FETCH constant to return a result as array or null to return a PDOStatement or \SQL\Base\QueryBuilder::FETCH_LAST_INSERT_ID</p>
+</div>
+<h3>Exceptions</h3>
+<table class="table table-bordered"><tr>
+<th><code>\SQL\Base\PDOException</code></th>
+<td>if a error occured with PDO</td>
+</tr></table>
+<h3>Returns</h3>
+<div class="subelement response">
+<code>array</code><code>\SQL\Base\PDOStatement</code><code>string</code><code>false</code>, return PDOStatement if $fetch_style is null , or an array , or a SQL string if there is no PDO , or false if something goes wrong</div>
+</div></div>
+</div>
+<a name="quote" id="quote"></a><div class="element clickable method public quote" data-toggle="collapse" data-target=".quote .collapse">
+<h2>Safely escapes a value for use in a query.</h2>
+<pre>quote(string $value) : string | false</pre>
+<div class="labels"><span class="label">Inherited</span></div>
+<div class="row collapse"><div class="detail-description">
+<p class="long_description"></p>
+<table class="table table-bordered"><tr>
+<th>inherited_from</th>
+<td>\SQL\Base\QueryBuilder::quote()</td>
+</tr></table>
+<h3>Parameters</h3>
+<div class="subelement argument">
+<h4>$value</h4>
+<code>string</code><p>value to escape</p></div>
+<h3>Returns</h3>
+<div class="subelement response">
+<code>string</code><code>false</code>
+</div>
+</div></div>
+</div>
+<a name="quoteValue" id="quoteValue"></a><div class="element clickable method public quoteValue" data-toggle="collapse" data-target=".quoteValue .collapse">
+<h2>Safely escapes a value for use in a query.</h2>
+<pre>quoteValue(string $value, \PDO $connection) : string | false</pre>
+<div class="labels"><span class="label">Inherited</span></div>
+<div class="row collapse"><div class="detail-description">
+<p class="long_description"></p>
+<table class="table table-bordered"><tr>
+<th>inherited_from</th>
+<td>\SQL\Base\QueryBuilder::quoteValue()</td>
+</tr></table>
+<h3>Parameters</h3>
+<div class="subelement argument">
+<h4>$value</h4>
+<code>string</code><p>value to escape</p></div>
+<div class="subelement argument">
+<h4>$connection</h4>
+<code>\SQL\Base\PDOnull</code><p>PDO connection</p></div>
+<h3>Returns</h3>
+<div class="subelement response">
+<code>string</code><code>false</code>
+</div>
+</div></div>
+</div>
+<a name="setConnection" id="setConnection"></a><div class="element clickable method public setConnection" data-toggle="collapse" data-target=".setConnection .collapse">
+<h2>Sets the PDO database connection to use in executing this query.</h2>
+<pre>setConnection(\PDO $connection) : \SQL\Base\SQL\Base\QueryBuilder</pre>
+<div class="labels"><span class="label">Inherited</span></div>
+<div class="row collapse"><div class="detail-description">
+<p class="long_description"></p>
+<table class="table table-bordered"><tr>
+<th>inherited_from</th>
+<td>\SQL\Base\QueryBuilder::setConnection()</td>
+</tr></table>
+<h3>Parameters</h3>
+<div class="subelement argument">
+<h4>$connection</h4>
+<code></code>
+</div>
+<h3>Returns</h3>
+<div class="subelement response"><code>\SQL\Base\SQL\Base\QueryBuilder</code></div>
+</div></div>
+</div>
+<a name="where" id="where"></a><div class="element clickable method public where" data-toggle="collapse" data-target=".where .collapse">
+<h2>Adds a WHERE condition.</h2>
+<pre>where(string $column, mixed $value, string $operator, string $connector) : \SQL\Base\SQL\Base\WhereQueryBuilder</pre>
+<div class="labels"></div>
+<div class="row collapse"><div class="detail-description">
+<p class="long_description"></p>
+<h3>Parameters</h3>
+<div class="subelement argument">
+<h4>$column</h4>
+<code>string</code><p>column name</p></div>
+<div class="subelement argument">
+<h4>$value</h4>
+<code>mixed</code><p>value</p></div>
+<div class="subelement argument">
+<h4>$operator</h4>
+<code>string</code><p>optional comparison operator, default =</p>
+</div>
+<div class="subelement argument">
+<h4>$connector</h4>
+<code>string</code><p>optional logical connector, default AND</p></div>
+<h3>Returns</h3>
+<div class="subelement response"><code>\SQL\Base\SQL\Base\WhereQueryBuilder</code></div>
+</div></div>
+</div>
+<a name="closeCriteria" id="closeCriteria"></a><div class="element clickable method protected closeCriteria" data-toggle="collapse" data-target=".closeCriteria .collapse">
+<h2>Adds a closing bracket for nesting conditions to the specified WHERE or
+HAVING criteria.</h2>
+<pre>closeCriteria(array $criteria) : \SQL\Base\SQL\Base\WhereQueryBuilder</pre>
+<div class="labels"></div>
+<div class="row collapse"><div class="detail-description">
+<p class="long_description"></p>
+<h3>Parameters</h3>
+<div class="subelement argument">
+<h4>$criteria</h4>
+<code>array</code><p>WHERE or HAVING criteria</p></div>
+<h3>Returns</h3>
+<div class="subelement response"><code>\SQL\Base\SQL\Base\WhereQueryBuilder</code></div>
+</div></div>
+</div>
+<a name="criteria" id="criteria"></a><div class="element clickable method protected criteria" data-toggle="collapse" data-target=".criteria .collapse">
+<h2>Adds a condition to the specified WHERE or HAVING criteria.</h2>
+<pre>criteria(array $criteria, string $column, mixed $value, string $operator, string $connector) : \SQL\Base\SQL\Base\WhereQueryBuilder</pre>
+<div class="labels"></div>
+<div class="row collapse"><div class="detail-description">
+<p class="long_description"></p>
+<h3>Parameters</h3>
+<div class="subelement argument">
+<h4>$criteria</h4>
+<code>array</code><p>WHERE or HAVING criteria</p></div>
+<div class="subelement argument">
+<h4>$column</h4>
+<code>string</code><p>column name</p></div>
+<div class="subelement argument">
+<h4>$value</h4>
+<code>mixed</code><p>value</p></div>
+<div class="subelement argument">
+<h4>$operator</h4>
+<code>string</code><p>optional comparison operator, default =</p>
+</div>
+<div class="subelement argument">
+<h4>$connector</h4>
+<code>string</code><p>optional logical connector, default AND</p></div>
+<h3>Returns</h3>
+<div class="subelement response"><code>\SQL\Base\SQL\Base\WhereQueryBuilder</code></div>
+</div></div>
+</div>
+<a name="getCriteriaString" id="getCriteriaString"></a><div class="element clickable method protected getCriteriaString" data-toggle="collapse" data-target=".getCriteriaString .collapse">
+<h2>Returns the WHERE or HAVING portion of the query as a string.</h2>
+<pre>getCriteriaString(array $criteria, array $boundParams, bool $formatted) : string</pre>
+<div class="labels"></div>
+<div class="row collapse"><div class="detail-description">
+<p class="long_description"></p>
+<h3>Parameters</h3>
+<div class="subelement argument">
+<h4>$criteria</h4>
+<code>array</code><p>WHERE or HAVING criteria</p></div>
+<div class="subelement argument">
+<h4>$boundParams</h4>
+<code>array</code><p>bound parameters section</p></div>
+<div class="subelement argument">
+<h4>$formatted</h4>
+<code>bool</code><p>format SQL string on multiple lines, default false</p></div>
+<h3>Returns</h3>
+<div class="subelement response"><code>string</code></div>
+</div></div>
+</div>
+<a name="getSQLPart" id="getSQLPart"></a><div class="element clickable method protected getSQLPart" data-toggle="collapse" data-target=".getSQLPart .collapse">
+<h2>get SQL part</h2>
+<pre>getSQLPart(string $section) : mixed</pre>
+<div class="labels"><span class="label">Inherited</span></div>
+<div class="row collapse"><div class="detail-description">
+<p class="long_description"></p>
+<table class="table table-bordered"><tr>
+<th>inherited_from</th>
+<td>\SQL\Base\QueryBuilder::getSQLPart()</td>
+</tr></table>
+<h3>Parameters</h3>
+<div class="subelement argument">
+<h4>$section</h4>
+<code>string</code>
+</div>
+<h3>Returns</h3>
+<div class="subelement response"><code>mixed</code></div>
+</div></div>
+</div>
+<a name="indent" id="indent"></a><div class="element clickable method protected indent" data-toggle="collapse" data-target=".indent .collapse">
+<h2>return a indentation string repeat n times</h2>
+<pre>indent(int $multiplier) : String</pre>
+<div class="labels"><span class="label">Inherited</span></div>
+<div class="row collapse"><div class="detail-description">
+<p class="long_description"></p>
+<table class="table table-bordered"><tr>
+<th>inherited_from</th>
+<td>\SQL\Base\QueryBuilder::indent()</td>
+</tr></table>
+<h3>Parameters</h3>
+<div class="subelement argument">
+<h4>$multiplier</h4>
+<code>int</code><p>indent string multiplier</p></div>
+<h3>Returns</h3>
+<div class="subelement response"><code>String</code></div>
+</div></div>
+</div>
+<a name="mergeBoundParameters" id="mergeBoundParameters"></a><div class="element clickable method protected mergeBoundParameters" data-toggle="collapse" data-target=".mergeBoundParameters .collapse">
+<h2>Merge all BoundParameters section</h2>
+<pre>mergeBoundParameters() : array</pre>
+<div class="labels"><span class="label">Inherited</span></div>
+<div class="row collapse"><div class="detail-description">
+<p class="long_description"></p>
+<table class="table table-bordered"><tr>
+<th>inherited_from</th>
+<td>\SQL\Base\QueryBuilder::mergeBoundParameters()</td>
+</tr></table>
+<h3>Returns</h3>
+<div class="subelement response"><code>array</code></div>
+</div></div>
+</div>
+<a name="openCriteria" id="openCriteria"></a><div class="element clickable method protected openCriteria" data-toggle="collapse" data-target=".openCriteria .collapse">
+<h2>Adds an open bracket for nesting conditions to the specified WHERE or
+HAVING criteria.</h2>
+<pre>openCriteria(array $criteria, string $connector) : \SQL\Base\SQL\Base\WhereQueryBuilder</pre>
+<div class="labels"></div>
+<div class="row collapse"><div class="detail-description">
+<p class="long_description"></p>
+<h3>Parameters</h3>
+<div class="subelement argument">
+<h4>$criteria</h4>
+<code>array</code><p>WHERE or HAVING criteria</p></div>
+<div class="subelement argument">
+<h4>$connector</h4>
+<code>string</code><p>optional logical connector, default AND</p></div>
+<h3>Returns</h3>
+<div class="subelement response"><code>\SQL\Base\SQL\Base\WhereQueryBuilder</code></div>
+</div></div>
+</div>
+<a name="quoteBoundParameters" id="quoteBoundParameters"></a><div class="element clickable method protected quoteBoundParameters" data-toggle="collapse" data-target=".quoteBoundParameters .collapse">
+<h2>quote each item in a bound parameters array</h2>
+<pre>quoteBoundParameters(array $boundParameters) : array</pre>
+<div class="labels"><span class="label">Inherited</span></div>
+<div class="row collapse"><div class="detail-description">
+<p class="long_description"></p>
+<table class="table table-bordered"><tr>
+<th>inherited_from</th>
+<td>\SQL\Base\QueryBuilder::quoteBoundParameters()</td>
+</tr></table>
+<h3>Parameters</h3>
+<div class="subelement argument">
+<h4>$boundParameters</h4>
+<code>array</code>
+</div>
+<h3>Returns</h3>
+<div class="subelement response"><code>array</code></div>
+</div></div>
+</div>
+<h3>
+<i class="icon-custom icon-property"></i> Properties</h3>
+<a name="%24boundParams" id="$boundParams"> </a><div class="element clickable property protected $boundParams" data-toggle="collapse" data-target=".$boundParams .collapse">
+<h2>Where and Having bound parameters</h2>
+<pre>$boundParams : array</pre>
+<div class="labels"><span class="label">Inherited</span></div>
+<div class="row collapse"><div class="detail-description">
+<p class="long_description"></p>
+<table class="table table-bordered"><tr>
+<th>inherited_from</th>
+<td>\SQL\Base\QueryBuilder::$$boundParams</td>
+</tr></table>
+</div></div>
+</div>
+<a name="%24conditionalProxy" id="$conditionalProxy"> </a><div class="element clickable property protected $conditionalProxy" data-toggle="collapse" data-target=".$conditionalProxy .collapse">
+<h2>flags for boolean functions</h2>
+<pre>$conditionalProxy : <a href="../classes/SQL.Proxy.QueryConditionalProxy.html">\SQL\Proxy\QueryConditionalProxy</a></pre>
+<div class="labels"><span class="label">Inherited</span></div>
+<div class="row collapse"><div class="detail-description">
+<p class="long_description"></p>
+<table class="table table-bordered"><tr>
+<th>inherited_from</th>
+<td>\SQL\Base\QueryBuilder::$$conditionalProxy</td>
+</tr></table>
+</div></div>
+</div>
+<a name="%24connection" id="$connection"> </a><div class="element clickable property protected $connection" data-toggle="collapse" data-target=".$connection .collapse">
+<h2>PDO database connection to use in executing the query.</h2>
+<pre>$connection : \SQL\Base\PDO</pre>
+<div class="labels"><span class="label">Inherited</span></div>
+<div class="row collapse"><div class="detail-description">
+<p class="long_description"></p>
+<table class="table table-bordered"><tr>
+<th>inherited_from</th>
+<td>\SQL\Base\QueryBuilder::$$connection</td>
+</tr></table>
+</div></div>
+</div>
+<a name="%24indentChar" id="$indentChar"> </a><div class="element clickable property protected $indentChar" data-toggle="collapse" data-target=".$indentChar .collapse">
+<h2>$indentChar</h2>
+<pre>$indentChar : string</pre>
+<div class="labels"><span class="label">Inherited</span></div>
+<div class="row collapse"><div class="detail-description">
+<p class="long_description"></p>
+<table class="table table-bordered"><tr>
+<th>inherited_from</th>
+<td>\SQL\Base\QueryBuilder::$$indentChar</td>
+</tr></table>
+</div></div>
+</div>
+<a name="%24indentCharMultiplier" id="$indentCharMultiplier"> </a><div class="element clickable property protected $indentCharMultiplier" data-toggle="collapse" data-target=".$indentCharMultiplier .collapse">
+<h2>$indentCharMultiplier</h2>
+<pre>$indentCharMultiplier : int</pre>
+<div class="labels"><span class="label">Inherited</span></div>
+<div class="row collapse"><div class="detail-description">
+<p class="long_description"></p>
+<table class="table table-bordered"><tr>
+<th>inherited_from</th>
+<td>\SQL\Base\QueryBuilder::$$indentCharMultiplier</td>
+</tr></table>
+</div></div>
+</div>
+<a name="%24options" id="$options"> </a><div class="element clickable property protected $options" data-toggle="collapse" data-target=".$options .collapse">
+<h2>Execution options like DISTINCT and SQL_CALC_FOUND_ROWS.</h2>
+<pre>$options : array</pre>
+<div class="labels"><span class="label">Inherited</span></div>
+<div class="row collapse"><div class="detail-description">
+<p class="long_description"></p>
+<table class="table table-bordered"><tr>
+<th>inherited_from</th>
+<td>\SQL\Base\QueryBuilder::$$options</td>
+</tr></table>
+</div></div>
+</div>
+<a name="%24queryType" id="$queryType"> </a><div class="element clickable property protected $queryType" data-toggle="collapse" data-target=".$queryType .collapse">
+<h2>type of SQL Query (select,insert,update,delete)</h2>
+<pre>$queryType : string</pre>
+<div class="labels"><span class="label">Inherited</span></div>
+<div class="row collapse"><div class="detail-description">
+<p class="long_description"></p>
+<table class="table table-bordered"><tr>
+<th>inherited_from</th>
+<td>\SQL\Base\QueryBuilder::$$queryType</td>
+</tr></table>
+</div></div>
+</div>
+<a name="%24sqlParts" id="$sqlParts"> </a><div class="element clickable property protected $sqlParts" data-toggle="collapse" data-target=".$sqlParts .collapse">
+<h2>SQL query clauses</h2>
+<pre>$sqlParts : array</pre>
+<div class="labels"><span class="label">Inherited</span></div>
+<div class="row collapse"><div class="detail-description">
+<p class="long_description"></p>
+<table class="table table-bordered"><tr>
+<th>inherited_from</th>
+<td>\SQL\Base\QueryBuilder::$$sqlParts</td>
+</tr></table>
+</div></div>
+</div>
+<h3>
+<i class="icon-custom icon-constant"></i> Constants</h3>
+<a name="BETWEEN" id="BETWEEN"> </a><div class="element clickable constant  BETWEEN" data-toggle="collapse" data-target=".BETWEEN .collapse">
+<h2>BETWEEN</h2>
+<pre>BETWEEN </pre>
+<div class="labels"></div>
+<div class="row collapse"><div class="detail-description"><p class="long_description"></p></div></div>
+</div>
+<a name="BRACKET_CLOSE" id="BRACKET_CLOSE"> </a><div class="element clickable constant  BRACKET_CLOSE" data-toggle="collapse" data-target=".BRACKET_CLOSE .collapse">
+<h2>BRACKET_CLOSE</h2>
+<pre>BRACKET_CLOSE </pre>
+<div class="labels"><span class="label">Inherited</span></div>
+<div class="row collapse"><div class="detail-description">
+<p class="long_description"></p>
+<table class="table table-bordered"><tr>
+<th>inherited_from</th>
+<td>\SQL\Base\QueryBuilder::BRACKET_CLOSE</td>
+</tr></table>
+</div></div>
+</div>
+<a name="BRACKET_OPEN" id="BRACKET_OPEN"> </a><div class="element clickable constant  BRACKET_OPEN" data-toggle="collapse" data-target=".BRACKET_OPEN .collapse">
+<h2>Brackets for grouping criteria.</h2>
+<pre>BRACKET_OPEN </pre>
+<div class="labels"><span class="label">Inherited</span></div>
+<div class="row collapse"><div class="detail-description">
+<p class="long_description"></p>
+<table class="table table-bordered"><tr>
+<th>inherited_from</th>
+<td>\SQL\Base\QueryBuilder::BRACKET_OPEN</td>
+</tr></table>
+</div></div>
+</div>
+<a name="EQUALS" id="EQUALS"> </a><div class="element clickable constant  EQUALS" data-toggle="collapse" data-target=".EQUALS .collapse">
+<h2>Comparison operators.</h2>
+<pre>EQUALS </pre>
+<div class="labels"></div>
+<div class="row collapse"><div class="detail-description"><p class="long_description"></p></div></div>
+</div>
+<a name="EXISTS" id="EXISTS"> </a><div class="element clickable constant  EXISTS" data-toggle="collapse" data-target=".EXISTS .collapse">
+<h2>EXISTS</h2>
+<pre>EXISTS </pre>
+<div class="labels"></div>
+<div class="row collapse"><div class="detail-description"><p class="long_description"></p></div></div>
+</div>
+<a name="FETCH_LAST_INSERT_ID" id="FETCH_LAST_INSERT_ID"> </a><div class="element clickable constant  FETCH_LAST_INSERT_ID" data-toggle="collapse" data-target=".FETCH_LAST_INSERT_ID .collapse">
+<h2>FETCH_LAST_INSERT_ID</h2>
+<pre>FETCH_LAST_INSERT_ID </pre>
+<div class="labels"><span class="label">Inherited</span></div>
+<div class="row collapse"><div class="detail-description">
+<p class="long_description"></p>
+<table class="table table-bordered"><tr>
+<th>inherited_from</th>
+<td>\SQL\Base\QueryBuilder::FETCH_LAST_INSERT_ID</td>
+</tr></table>
+</div></div>
+</div>
+<a name="GREATER_THAN" id="GREATER_THAN"> </a><div class="element clickable constant  GREATER_THAN" data-toggle="collapse" data-target=".GREATER_THAN .collapse">
+<h2>GREATER_THAN</h2>
+<pre>GREATER_THAN </pre>
+<div class="labels"></div>
+<div class="row collapse"><div class="detail-description"><p class="long_description"></p></div></div>
+</div>
+<a name="GREATER_THAN_OR_EQUAL" id="GREATER_THAN_OR_EQUAL"> </a><div class="element clickable constant  GREATER_THAN_OR_EQUAL" data-toggle="collapse" data-target=".GREATER_THAN_OR_EQUAL .collapse">
+<h2>GREATER_THAN_OR_EQUAL</h2>
+<pre>GREATER_THAN_OR_EQUAL </pre>
+<div class="labels"></div>
+<div class="row collapse"><div class="detail-description"><p class="long_description"></p></div></div>
+</div>
+<a name="IN" id="IN"> </a><div class="element clickable constant  IN" data-toggle="collapse" data-target=".IN .collapse">
+<h2>IN</h2>
+<pre>IN </pre>
+<div class="labels"></div>
+<div class="row collapse"><div class="detail-description"><p class="long_description"></p></div></div>
+</div>
+<a name="IS_NOT_NULL" id="IS_NOT_NULL"> </a><div class="element clickable constant  IS_NOT_NULL" data-toggle="collapse" data-target=".IS_NOT_NULL .collapse">
+<h2>IS_NOT_NULL</h2>
+<pre>IS_NOT_NULL </pre>
+<div class="labels"></div>
+<div class="row collapse"><div class="detail-description"><p class="long_description"></p></div></div>
+</div>
+<a name="IS_NULL" id="IS_NULL"> </a><div class="element clickable constant  IS_NULL" data-toggle="collapse" data-target=".IS_NULL .collapse">
+<h2>IS_NULL</h2>
+<pre>IS_NULL </pre>
+<div class="labels"></div>
+<div class="row collapse"><div class="detail-description"><p class="long_description"></p></div></div>
+</div>
+<a name="LESS_THAN" id="LESS_THAN"> </a><div class="element clickable constant  LESS_THAN" data-toggle="collapse" data-target=".LESS_THAN .collapse">
+<h2>LESS_THAN</h2>
+<pre>LESS_THAN </pre>
+<div class="labels"></div>
+<div class="row collapse"><div class="detail-description"><p class="long_description"></p></div></div>
+</div>
+<a name="LESS_THAN_OR_EQUAL" id="LESS_THAN_OR_EQUAL"> </a><div class="element clickable constant  LESS_THAN_OR_EQUAL" data-toggle="collapse" data-target=".LESS_THAN_OR_EQUAL .collapse">
+<h2>LESS_THAN_OR_EQUAL</h2>
+<pre>LESS_THAN_OR_EQUAL </pre>
+<div class="labels"></div>
+<div class="row collapse"><div class="detail-description"><p class="long_description"></p></div></div>
+</div>
+<a name="LIKE" id="LIKE"> </a><div class="element clickable constant  LIKE" data-toggle="collapse" data-target=".LIKE .collapse">
+<h2>LIKE</h2>
+<pre>LIKE </pre>
+<div class="labels"></div>
+<div class="row collapse"><div class="detail-description"><p class="long_description"></p></div></div>
+</div>
+<a name="LOGICAL_AND" id="LOGICAL_AND"> </a><div class="element clickable constant  LOGICAL_AND" data-toggle="collapse" data-target=".LOGICAL_AND .collapse">
+<h2>Logical operators.</h2>
+<pre>LOGICAL_AND </pre>
+<div class="labels"></div>
+<div class="row collapse"><div class="detail-description"><p class="long_description"></p></div></div>
+</div>
+<a name="LOGICAL_OR" id="LOGICAL_OR"> </a><div class="element clickable constant  LOGICAL_OR" data-toggle="collapse" data-target=".LOGICAL_OR .collapse">
+<h2>LOGICAL_OR</h2>
+<pre>LOGICAL_OR </pre>
+<div class="labels"></div>
+<div class="row collapse"><div class="detail-description"><p class="long_description"></p></div></div>
+</div>
+<a name="NOT_BETWEEN" id="NOT_BETWEEN"> </a><div class="element clickable constant  NOT_BETWEEN" data-toggle="collapse" data-target=".NOT_BETWEEN .collapse">
+<h2>NOT_BETWEEN</h2>
+<pre>NOT_BETWEEN </pre>
+<div class="labels"></div>
+<div class="row collapse"><div class="detail-description"><p class="long_description"></p></div></div>
+</div>
+<a name="NOT_EQUALS" id="NOT_EQUALS"> </a><div class="element clickable constant  NOT_EQUALS" data-toggle="collapse" data-target=".NOT_EQUALS .collapse">
+<h2>NOT_EQUALS</h2>
+<pre>NOT_EQUALS </pre>
+<div class="labels"></div>
+<div class="row collapse"><div class="detail-description"><p class="long_description"></p></div></div>
+</div>
+<a name="NOT_EXISTS" id="NOT_EXISTS"> </a><div class="element clickable constant  NOT_EXISTS" data-toggle="collapse" data-target=".NOT_EXISTS .collapse">
+<h2>NOT_EXISTS</h2>
+<pre>NOT_EXISTS </pre>
+<div class="labels"></div>
+<div class="row collapse"><div class="detail-description"><p class="long_description"></p></div></div>
+</div>
+<a name="NOT_IN" id="NOT_IN"> </a><div class="element clickable constant  NOT_IN" data-toggle="collapse" data-target=".NOT_IN .collapse">
+<h2>NOT_IN</h2>
+<pre>NOT_IN </pre>
+<div class="labels"></div>
+<div class="row collapse"><div class="detail-description"><p class="long_description"></p></div></div>
+</div>
+<a name="NOT_LIKE" id="NOT_LIKE"> </a><div class="element clickable constant  NOT_LIKE" data-toggle="collapse" data-target=".NOT_LIKE .collapse">
+<h2>NOT_LIKE</h2>
+<pre>NOT_LIKE </pre>
+<div class="labels"></div>
+<div class="row collapse"><div class="detail-description"><p class="long_description"></p></div></div>
+</div>
+<a name="NOT_REGEXP" id="NOT_REGEXP"> </a><div class="element clickable constant  NOT_REGEXP" data-toggle="collapse" data-target=".NOT_REGEXP .collapse">
+<h2>NOT_REGEXP</h2>
+<pre>NOT_REGEXP </pre>
+<div class="labels"></div>
+<div class="row collapse"><div class="detail-description"><p class="long_description"></p></div></div>
+</div>
+<a name="RAW_CRITERIA" id="RAW_CRITERIA"> </a><div class="element clickable constant  RAW_CRITERIA" data-toggle="collapse" data-target=".RAW_CRITERIA .collapse">
+<h2>Specifies that the where() column name is the full where field, eg where('users.password = password(?)', 'test', QueryBuilder::RAW_WHERE)</h2>
+<pre>RAW_CRITERIA </pre>
+<div class="labels"></div>
+<div class="row collapse"><div class="detail-description"><p class="long_description"></p></div></div>
+</div>
+<a name="REGEXP" id="REGEXP"> </a><div class="element clickable constant  REGEXP" data-toggle="collapse" data-target=".REGEXP .collapse">
+<h2>REGEXP</h2>
+<pre>REGEXP </pre>
+<div class="labels"></div>
+<div class="row collapse"><div class="detail-description"><p class="long_description"></p></div></div>
+</div>
+<a name="SUB_QUERY_EXISTS" id="SUB_QUERY_EXISTS"> </a><div class="element clickable constant  SUB_QUERY_EXISTS" data-toggle="collapse" data-target=".SUB_QUERY_EXISTS .collapse">
+<h2>SUB_QUERY_EXISTS</h2>
+<pre>SUB_QUERY_EXISTS </pre>
+<div class="labels"></div>
+<div class="row collapse"><div class="detail-description"><p class="long_description"></p></div></div>
+</div>
+<a name="SUB_QUERY_IN" id="SUB_QUERY_IN"> </a><div class="element clickable constant  SUB_QUERY_IN" data-toggle="collapse" data-target=".SUB_QUERY_IN .collapse">
+<h2>Specifies that the where() column contains a subquery</h2>
+<pre>SUB_QUERY_IN </pre>
+<div class="labels"></div>
+<div class="row collapse"><div class="detail-description"><p class="long_description"></p></div></div>
+</div>
+<a name="SUB_QUERY_NOT_EXISTS" id="SUB_QUERY_NOT_EXISTS"> </a><div class="element clickable constant  SUB_QUERY_NOT_EXISTS" data-toggle="collapse" data-target=".SUB_QUERY_NOT_EXISTS .collapse">
+<h2>SUB_QUERY_NOT_EXISTS</h2>
+<pre>SUB_QUERY_NOT_EXISTS </pre>
+<div class="labels"></div>
+<div class="row collapse"><div class="detail-description"><p class="long_description"></p></div></div>
+</div>
+<a name="SUB_QUERY_NOT_IN" id="SUB_QUERY_NOT_IN"> </a><div class="element clickable constant  SUB_QUERY_NOT_IN" data-toggle="collapse" data-target=".SUB_QUERY_NOT_IN .collapse">
+<h2>SUB_QUERY_NOT_IN</h2>
+<pre>SUB_QUERY_NOT_IN </pre>
+<div class="labels"></div>
+<div class="row collapse"><div class="detail-description"><p class="long_description"></p></div></div>
+</div>
+<a name="TYPE_DELETE" id="TYPE_DELETE"> </a><div class="element clickable constant  TYPE_DELETE" data-toggle="collapse" data-target=".TYPE_DELETE .collapse">
+<h2>TYPE_DELETE</h2>
+<pre>TYPE_DELETE </pre>
+<div class="labels"><span class="label">Inherited</span></div>
+<div class="row collapse"><div class="detail-description">
+<p class="long_description"></p>
+<table class="table table-bordered"><tr>
+<th>inherited_from</th>
+<td>\SQL\Base\QueryBuilder::TYPE_DELETE</td>
+</tr></table>
+</div></div>
+</div>
+<a name="TYPE_INSERT" id="TYPE_INSERT"> </a><div class="element clickable constant  TYPE_INSERT" data-toggle="collapse" data-target=".TYPE_INSERT .collapse">
+<h2>TYPE_INSERT</h2>
+<pre>TYPE_INSERT </pre>
+<div class="labels"><span class="label">Inherited</span></div>
+<div class="row collapse"><div class="detail-description">
+<p class="long_description"></p>
+<table class="table table-bordered"><tr>
+<th>inherited_from</th>
+<td>\SQL\Base\QueryBuilder::TYPE_INSERT</td>
+</tr></table>
+</div></div>
+</div>
+<a name="TYPE_SELECT" id="TYPE_SELECT"> </a><div class="element clickable constant  TYPE_SELECT" data-toggle="collapse" data-target=".TYPE_SELECT .collapse">
+<h2>TYPE_SELECT</h2>
+<pre>TYPE_SELECT </pre>
+<div class="labels"><span class="label">Inherited</span></div>
+<div class="row collapse"><div class="detail-description">
+<p class="long_description"></p>
+<table class="table table-bordered"><tr>
+<th>inherited_from</th>
+<td>\SQL\Base\QueryBuilder::TYPE_SELECT</td>
+</tr></table>
+</div></div>
+</div>
+<a name="TYPE_UPDATE" id="TYPE_UPDATE"> </a><div class="element clickable constant  TYPE_UPDATE" data-toggle="collapse" data-target=".TYPE_UPDATE .collapse">
+<h2>TYPE_UPDATE</h2>
+<pre>TYPE_UPDATE </pre>
+<div class="labels"><span class="label">Inherited</span></div>
+<div class="row collapse"><div class="detail-description">
+<p class="long_description"></p>
+<table class="table table-bordered"><tr>
+<th>inherited_from</th>
+<td>\SQL\Base\QueryBuilder::TYPE_UPDATE</td>
+</tr></table>
+</div></div>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="row"><footer class="span12">
+            Template is built using <a href="http://twitter.github.com/bootstrap/">Twitter Bootstrap 2</a> and icons provided by <a href="http://glyphicons.com/">Glyphicons</a>.<br>
+            Documentation is powered by <a href="http://www.phpdoc.org/">phpDocumentor 2.0.0a8</a> and<br>
+            generated on 2012-07-23T10:13:47+02:00.<br></footer></div>
+</div>
+</body>
+</html>
