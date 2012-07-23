@@ -8,7 +8,7 @@ specific functions). These classes must be used with PDO and parameters are alwa
 bound .
 
 Based on original work by Justin Stayton [https://github.com/jstayton/QueryBuilder](https://github.com/jstayton/QueryBuilder)
-And some classes from Propel ORM project [https://github.com/jstayton/QueryBuilder](https://github.com/propelorm/Propel) .
+And some classes from Propel ORM project [https://github.com/propelorm/Propel](https://github.com/propelorm/Propel) .
 
 Installation
 ------------
