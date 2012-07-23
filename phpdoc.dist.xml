@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <phpdoc>
+  <title><![CDATA[<b>SQL QueryBuilder</b>]]></title>
   <parser>
     <target>doc/api</target>
   </parser>
