@@ -1,96 +1,84 @@
 <!DOCTYPE html>
 <html>
-  <head>
-    <meta charset='utf-8'>
-    <meta http-equiv="X-UA-Compatible" content="chrome=1">
-    <link href='https://fonts.googleapis.com/css?family=Chivo:900' rel='stylesheet' type='text/css'>
-    <link rel="stylesheet" type="text/css" href="stylesheets/stylesheet.css" media="screen" />
-    <link rel="stylesheet" type="text/css" href="stylesheets/pygment_trac.css" media="screen" />
-    <link rel="stylesheet" type="text/css" href="stylesheets/print.css" media="print" />
-    <!--[if lt IE 9]>
-    <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
-    <![endif]-->
-    <title>SQL QueryBuilder by csanquer</title>
-  </head>
+    <head>
+        <meta charset='utf-8'>
+        <meta http-equiv="X-UA-Compatible" content="chrome=1">
+        <link href='https://fonts.googleapis.com/css?family=Chivo:900' rel='stylesheet' type='text/css'>
+        <link rel="stylesheet" type="text/css" href="stylesheets/stylesheet.css" media="screen" />
+        <link rel="stylesheet" type="text/css" href="stylesheets/pygment_trac.css" media="screen" />
+        <link rel="stylesheet" type="text/css" href="stylesheets/print.css" media="print" />
+        <!--[if lt IE 9]>
+        <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+        <![endif]-->
+        <title>SQL QueryBuilder by csanquer</title>
+    </head>
 
-  <body>
-    <div id="container">
-      <div class="inner">
+    <body>
+        <div id="container">
+            <div class="inner">
 
-        <header>
-          <h1>SQL QueryBuilder</h1>
-          <h2>Classes used to build programmatically standard SQL Queries (with some MySQL  specific functions). These classes must be used with PDO and parameters are always set with placeholders.</h2>
-        </header>
+                <header>
+                    <h1>SQL QueryBuilder</h1>
+                </header>
 
-        <section id="downloads" class="clearfix">
-          <a href="https://github.com/csanquer/QueryBuilder/zipball/master" id="download-zip" class="button"><span>Download .zip</span></a>
-          <a href="https://github.com/csanquer/QueryBuilder/tarball/master" id="download-tar-gz" class="button"><span>Download .tar.gz</span></a>
-          <a href="https://github.com/csanquer/QueryBuilder" id="view-on-github" class="button"><span>View on GitHub</span></a>
-        </section>
+                <section id="downloads" class="clearfix">
+                    <a href="https://github.com/csanquer/QueryBuilder/zipball/master" id="download-zip" class="button"><span>Download .zip</span></a>
+                    <a href="https://github.com/csanquer/QueryBuilder/tarball/master" id="download-tar-gz" class="button"><span>Download .tar.gz</span></a>
+                    <a href="https://github.com/csanquer/QueryBuilder" id="view-on-github" class="button"><span>View on GitHub</span></a>
+                </section>
 
-        <hr>
+                <hr>
 
-        <section id="main_content">
-          <h1>SQLQueryBuilder</h1>
+                <section id="main_content">
+                    <h1>SQLQueryBuilder</h1>
 
-<p><a href="http://travis-ci.org/csanquer/QueryBuilder"><img src="https://secure.travis-ci.org/csanquer/QueryBuilder.png?branch=master" alt="Build Status"></a></p>
+                    <p><a href="http://travis-ci.org/csanquer/QueryBuilder"><img src="https://secure.travis-ci.org/csanquer/QueryBuilder.png?branch=master" alt="Build Status"></a></p>
 
-<p>Classes used to build programmatically standard SQL Queries (with some MySQL
-specific functions). These classes must be used with PDO and parameters are always
-bound .</p>
+                    <p><a href="https://github.com/csanquer/QueryBuilder">Github repository</a></p>
 
-<p>Based on original work by Justin Stayton <a href="https://github.com/jstayton/QueryBuilder">https://github.com/jstayton/QueryBuilder</a>
-And some classes from Propel ORM project <a href="https://github.com/propelorm/Propel">https://github.com/jstayton/QueryBuilder</a> .</p>
+                    <p>Classes used to build programmatically standard SQL Queries (with some MySQL
+                        specific functions). These classes must be used with PDO and parameters are always
+                        bound .</p>
 
-<h2>Installation</h2>
+                    <p>Based on original work by Justin Stayton <a href="https://github.com/jstayton/QueryBuilder">https://github.com/jstayton/QueryBuilder</a>
+                        And some classes from Propel ORM project <a href="https://github.com/propelorm/Propel">https://github.com/jstayton/QueryBuilder</a> .</p>
 
-<p>The easiest way is to use <a href="http://getcomposer.org/">composer</a> and <a href="http://packagist.org/">packagist.org</a> package <a href="http://packagist.org/packages/csanquer/querybuilder">csanquer/querybuilder</a>.</p>
+                    <h2>Installation</h2>
 
-<p>Or copy manually the src/SQL directory and use a <a href="https://github.com/php-fig/fig-standards/blob/master/accepted/PSR-0.md">PSR-0 autoloader</a>.</p>
+                    <p>The easiest way is to use <a href="http://getcomposer.org/">composer</a> and <a href="http://packagist.org/">packagist.org</a> package <a href="http://packagist.org/packages/csanquer/querybuilder">csanquer/querybuilder</a>.</p>
 
-<h2>Requirements</h2>
+                    <p>Or copy manually the src/SQL directory and use a <a href="https://github.com/php-fig/fig-standards/blob/master/accepted/PSR-0.md">PSR-0 autoloader</a>.</p>
 
-<ul>
-<li>PHP &gt;= 5.3.0</li>
-</ul><h2>Getting Started</h2>
+                    <h2>Requirements</h2>
 
-<p><a href="">Read the documentation</a></p>
+                    <ul>
+                        <li>PHP &gt;= 5.3.0</li>
+                    </ul><h2>Getting Started</h2>
 
-<p><a href="/QueryBuilder/api/">Read the API documentation</a> generated by <a href="http://www.phpdoc.org/">PHP Documentor 2</a></p>
+                    <p><a href="">Read the documentation</a></p>
 
-<h2>Licensing</h2>
+                    <p><a href="/QueryBuilder/api/">Read the API documentation</a> generated by <a href="http://www.phpdoc.org/">PHP Documentor 2</a></p>
 
-<p>License LGPL 3</p>
+                    <h2>Licensing</h2>
 
-<ul>
-<li>Copyright (C) 2009-2010 Justin Stayton <a href="mailto:justin.stayton@gmail.com">justin.stayton@gmail.com</a>
-</li>
-<li>Copyright (C) 2011 Matt Labrum</li>
-<li>Copyright (C) 2011-2012 Charles SANQUER <a href="mailto:charles.sanquer@gmail.com">charles.sanquer@gmail.com</a>
-</li>
-</ul><p>This file is part of SQLQueryBuilder.</p>
+                    <p>License LGPL 3</p>
 
-<p>SQLQueryBuilder is free software: you can redistribute it and/or modify
-it under the terms of the GNU Lesser General Public License as published by
-the Free Software Foundation, either version 3 of the License, or
-(at your option) any later version.</p>
+                    <ul>
+                        <li>Copyright (C) 2009-2010 Justin Stayton <a href="mailto:justin.stayton@gmail.com">justin.stayton@gmail.com</a>
+                        </li>
+                        <li>Copyright (C) 2011 Matt Labrum</li>
+                        <li>Copyright (C) 2011-2012 Charles SANQUER <a href="mailto:charles.sanquer@gmail.com">charles.sanquer@gmail.com</a>
+                        </li>
+                    </ul>
+                </section>
 
-<p>SQLQueryBuilder is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-GNU Lesser General Public License for more details.</p>
+                <footer>
+                    SQL QueryBuilder is maintained by <a href="https://github.com/csanquer">csanquer</a><br>
+                    This page was generated by <a href="http://pages.github.com">GitHub Pages</a>. Tactile theme by <a href="http://twitter.com/jasonlong">Jason Long</a>.
+                </footer>
 
-<p>You should have received a copy of the GNU Lesser General Public License
-along with SQLQueryBuilder.  If not, see <a href="http://www.gnu.org/licenses/">http://www.gnu.org/licenses/</a>.</p>
-        </section>
 
-        <footer>
-          SQL QueryBuilder is maintained by <a href="https://github.com/csanquer">csanquer</a><br>
-          This page was generated by <a href="http://pages.github.com">GitHub Pages</a>. Tactile theme by <a href="http://twitter.com/jasonlong">Jason Long</a>.
-        </footer>
-
-        
-      </div>
-    </div>
-  </body>
+            </div>
+        </div>
+    </body>
 </html>
